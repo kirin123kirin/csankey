@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+
+  <!-- <link href="https://fonts.googleapis.com/css?family=Roboto:100i" rel="stylesheet"> -->
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="d3-sankey-circular.js"></script>
+
+  <title>Sankey with circular links</title>
+  <style>
+    h1 {
+      position: relative;
+      /* padding: 0.1em 0.5em; */
+      background: -webkit-linear-gradient(to right, gray, transparent);
+      background: linear-gradient(to right, gray, transparent);
+      color: white;
+    }
+
+    body {
+      font-family: "MS UI Gothic";
+    }
+
+    rect {
+      shape-rendering: crispEdges;
+    }
+
+    text {
+      font-size: 12px;
+      font-family: "MS UI Gothic";
+    }
+
+    .link {
+      fill: none;
+    }
+
+    footer {
+      width: 100%;
+      font-size: 9px;
+      background-color: gray;
+      color: #fff;
+      text-align: left;
+      padding: 5px 0;
+
+      position: absolute;
+      bottom: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Sankey Diagram Output Page</h1>
+
+  <table>
+    <td>
+      <tr>
+        <form name="f_animation" action="#">アニメーション
+          <input type="radio" name="R1" value="ON" onclick="func()" checked="checked">ON
+          <input type="radio" name="R1" value="OFF" onclick="func()">OFF
+        </form>
+      </tr>
+      <tr>
+        <form name="f_arrow" action="#">&nbsp;&nbsp;矢印
+          <input type="radio" name="R2" value="ON" onclick="func()" checked="checked">ON
+          <input type="radio" name="R2" value="OFF" onclick="func()">OFF
+        </form>
+      </tr>
+      <form name="f_value" action="#">&nbsp;&nbsp;値の表示
+        <input type="radio" name="R3" value="ON" onclick="func()" checked="checked">ON
+        <input type="radio" name="R3" value="OFF" onclick="func()">OFF
+      </form>
+      <tr>
+      </tr>
+      <tr>
+        <form name="F1" action="#">
+          &nbsp;<input type="button" value="PNGダウンロード" onclick="download_PNG()">
+
+          幅&nbsp;<input type="text" name="T1" size="3" maxlength="4" placeholder="pixel"
+            oninput="value = value.replace(/[^0-9]+/i,'');">
+          高さ&nbsp;<input type="text" name="T1" size="3" maxlength="4" placeholder="pixel"
+            oninput="value = value.replace(/[^0-9]+/i,'');">
+          &nbsp;(空白の場合は等倍解像度)
+        </form>
+      </tr>
+    </td>
+  </table>
+
+  <div id="chart"></div>
+
+
+
+  <!-- My Sankey Data Section -->
+  <script>
+    var data = {
+      "nodes": [
+        { "name": "abc" },
+        { "name": "bbb" },
+        { "name": "ccc" },
+        { "name": "aaa" },
+      ],
+      "links": [
+        { "source": "bbb", "target": "abc", "value": 1 },
+        { "source": "ccc", "target": "aaa", "value": 1 },
+        { "source": "abc", "target": "bbb", "value": 1 },
+        { "source": "bbb", "target": "ccc", "value": 1 },
+        { "source": "aaa", "target": "bbb", "value": 1 },
+      ]
+    };
+  </script>
+
+
+
+  <script>
+    // Function that appends a path to selection that has sankey path data attached
+    // The path is formatted as dash array, and triangle paths to create arrows along the path
+    function appendArrows(selection, arrowLength, gapLength, arrowHeadSize) {
+      let totalDashArrayLength = arrowLength + gapLength
+
+      arrows = selection
+        .append('path')
+        .attr('d', function (d) {
+          return d.path;
+        })
+        .style('stroke-width', 1)
+        .style('stroke', 'black')
+        .style('stroke-dasharray', arrowLength + ',' + gapLength)
+
+      arrows.each(function (arrow) {
+        let thisPath = d3.select(this).node()
+        let parentG = d3.select(this.parentNode)
+        let pathLength = thisPath.getTotalLength()
+        let numberOfArrows = Math.ceil(pathLength / totalDashArrayLength)
+
+        // remove the last arrow head if it will overlap the target node
+        if (
+          (numberOfArrows - 1) * totalDashArrayLength +
+          (arrowLength + (arrowHeadSize + 1)) >
+          pathLength
+        ) {
+          numberOfArrows = numberOfArrows - 1
+        }
+
+        let arrowHeadData = d3.range(numberOfArrows).map(function (d, i) {
+          let length = i * totalDashArrayLength + arrowLength
+
+          let point = thisPath.getPointAtLength(length)
+          let previousPoint = thisPath.getPointAtLength(length - 2)
+
+          let rotation = 0
+
+          if (point.y == previousPoint.y) {
+            rotation = point.x < previousPoint.x ? 180 : 0
+          } else if (point.x == previousPoint.x) {
+            rotation = point.y < previousPoint.y ? -90 : 90
+          } else {
+            let adj = Math.abs(point.x - previousPoint.x)
+            let opp = Math.abs(point.y - previousPoint.y)
+            let angle = Math.atan(opp / adj) * (180 / Math.PI)
+            if (point.x < previousPoint.x) {
+              angle = angle + (90 - angle) * 2
+            }
+            if (point.y < previousPoint.y) {
+              rotation = -angle
+            } else {
+              rotation = angle
+            }
+          }
+
+          return { x: point.x, y: point.y, rotation: rotation }
+        })
+
+        let arrowHeads = parentG
+          .selectAll('.arrow-heads')
+          .data(arrowHeadData)
+          .enter()
+          .append('path')
+          .attr('d', function (d) {
+            return (
+              'M' +
+              d.x +
+              ',' +
+              (d.y - arrowHeadSize / 2) +
+              ' ' +
+              'L' +
+              (d.x + arrowHeadSize) +
+              ',' +
+              d.y +
+              ' ' +
+              'L' +
+              d.x +
+              ',' +
+              (d.y + arrowHeadSize / 2)
+            )
+          })
+          .attr('class', 'arrow-head')
+          .attr('transform', function (d) {
+            return 'rotate(' + d.rotation + ',' + d.x + ',' + d.y + ')'
+          })
+          .style('fill', 'black')
+      })
+    }
+
+    function addMinardLabels(link) {
+      const gap = 100;
+
+      let label = link.value
+
+      var linkLength = this.getTotalLength();
+
+      let n = Math.floor(linkLength / gap)
+
+      for (var i = 0; i < 1; i++) {
+
+        let thisLength = (i * gap) - 10
+
+        let position = this.getPointAtLength(thisLength)
+        let positionPlueOne = this.getPointAtLength(thisLength + 5)
+
+        let adj = positionPlueOne.x - position.x;
+        let opp = position.y - positionPlueOne.y;
+        let angle = Math.atan(opp / adj) * (180 / Math.PI);
+        let rotation = 0;
+
+        linkLabels.append("text")
+          .attr("class", "link-label")
+          .text(link.value)
+          .attr("x", position.x)
+          .attr("y", position.y)
+          .attr("dx", "0.55em")
+          .style("fill", "black")
+          .style("text-anchor", "start")
+          .attr("transform", "rotate(" + rotation + "," + position.x + "," + position.y + ")")
+
+      }
+    }
+
+    function download_PNG() {
+      var svg = document.querySelector("svg");
+      var svgData = new XMLSerializer().serializeToString(svg);
+      var canvas = document.createElement("canvas");
+
+      let height = document.F1.T1[1].value;
+      let width = document.F1.T1[0].value;
+      canvas.width = svg.width.baseVal.value;
+      canvas.height = svg.height.baseVal.value;
+
+      var ctx = canvas.getContext("2d");
+      var image = new Image;
+      image.onload = function () {
+
+        if (width && height)
+          ctx.drawImage(image, 0, 0, width, height);
+        else if (width)
+          ctx.drawImage(image, 0, 0, width, canvas.height);
+        else if (height)
+          ctx.drawImage(image, 0, 0, canvas.width, height);
+        else
+          ctx.drawImage(image, 0, 0);
+
+        var a = document.createElement("a");
+        a.href = canvas.toDataURL("image/png");
+        a.setAttribute("download", "sankeydiagram.png");
+        a.dispatchEvent(new MouseEvent("click"));
+      }
+      image.src = "data:image/svg+xml;charset=utf-8;base64," + btoa(unescape(encodeURIComponent(svgData)));
+    }
+
+    var margin = { top: 30, right: 30, bottom: 30, left: 30 };
+    var width = 1100;
+    var height = 600;
+
+    var nodePadding = 40;
+
+    var circularLinkGap = 2;
+
+    var sankey = null;
+    var svg = null;
+    var g = null;
+    var linkLabels = null;
+    var linkG = null;
+    var nodeG = null;
+    var nodeColour = null;
+    var node = null;
+    var link = null;
+    var arrowsG = null;
+    var duration = 5
+    var maxOffset = 10
+    var percentageOffset = 1.0
+    var animateDash = null;
+    var sankeyData = null;
+    var sankeyNodes = null;
+    var sankeyLinks = null;
+    var depthExtent = null;
+    var duration = null;
+    var maxOffset = null;
+    var percentageOffset = null;
+    var linkpathes = null;
+
+    sankey = d3.sankeyCircular()
+      .nodeWidth(10)
+      .nodePadding(nodePadding) //note that this will be overridden by nodePaddingRatio
+      .nodePaddingRatio(0.5)
+      .size([width, height])
+      .nodeId(function (d) {
+        return d.name;
+      })
+      .nodeAlign(d3.sankeyJustify)
+      .iterations(32)
+      .circularLinkGap(2);
+
+    svg = d3.select("#chart").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom);
+
+    g = svg.append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+    linkLabels = g.append("g")
+
+    linkG = g.append("g")
+      .attr("class", "links")
+      .attr("fill", "none")
+      .attr("stroke-opacity", 0.2)
+      .selectAll("path");
+
+    nodeG = g.append("g")
+      .attr("class", "nodes")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", 10)
+      .selectAll("g");
+
+    //run the Sankey + circular over the data
+    sankeyData = sankey(data);
+    sankeyNodes = sankeyData.nodes;
+    sankeyLinks = sankeyData.links;
+
+    console.log(sankeyLinks);
+
+    depthExtent = d3.extent(sankeyNodes, function (d) { return d.depth; });
+
+    nodeColour = d3.scaleSequential(d3.interpolateCool)
+      .domain([0, width]);
+
+    node = nodeG.data(sankeyNodes)
+      .enter()
+      .append("g");
+
+    node.append("rect")
+      .attr("x", function (d) { return d.x0; })
+      .attr("y", function (d) { return d.y0; })
+      .attr("height", function (d) { return d.y1 - d.y0; })
+      .attr("width", function (d) { return d.x1 - d.x0; })
+      .style("fill", function (d) { return nodeColour(d.x0); })
+      .style("opacity", 0.5)
+      .on("mouseover", function (d) {
+
+        let thisName = d.name;
+
+        node.selectAll("rect")
+          .style("opacity", function (d) {
+            return highlightNodes(d, thisName)
+          })
+
+        d3.selectAll(".sankey-link")
+          .style("opacity", function (l) {
+            return l.source.name == thisName || l.target.name == thisName ? 1 : 0.3;
+          })
+
+        node.selectAll("text")
+          .style("opacity", function (d) {
+            return highlightNodes(d, thisName)
+          })
+      })
+      .on("mouseout", function (d) {
+        d3.selectAll("rect").style("opacity", 0.5);
+        d3.selectAll(".sankey-link").style("opacity", 0.7);
+        d3.selectAll("text").style("opacity", 1);
+      })
+
+    node.append("text")
+      .attr("x", function (d) { return (d.x0 + d.x1) / 2; })
+      .attr("y", function (d) { return d.y0 - 12; })
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "middle")
+      .text(function (d) { return d.name; });
+
+    node.append("title")
+      .text(function (d) { return d.name + "\n" + (d.value); });
+
+    link = linkG.data(sankeyLinks)
+      .enter()
+      .append("g")
+
+    linkpathes = link.append("path")
+      .attr("class", "sankey-link")
+      .attr("d", function (link) {
+        return link.path;
+      })
+      .style("stroke-width", function (d) { return Math.max(1, d.width); })
+      .style("opacity", 0.7)
+      .style("stroke", function (link, i) {
+        return link.circular ? "red" : "black"
+      })
+
+    link.append("title")
+      .text(function (d) {
+        return d.source.name + " → " + d.target.name + "\n Index: " + (d.index);
+      });
+
+
+    arrowsG = linkG.data(sankeyLinks)
+      .enter()
+      .append("g")
+      .attr("class", "g-arrow")
+      .call(appendArrows, 20, 300, 4)
+
+    function highlightNodes(node, name) {
+
+      let opacity = 0.3
+
+      if (node.name == name) {
+        opacity = 1;
+      }
+      node.sourceLinks.forEach(function (link) {
+        if (link.target.name == name) {
+          opacity = 1;
+        };
+      })
+      node.targetLinks.forEach(function (link) {
+        if (link.source.name == name) {
+          opacity = 1;
+        };
+      })
+
+      return opacity;
+
+    }
+
+    //VALUES
+    function value_on() {
+      linkpathes.each(addMinardLabels);
+    }
+
+    //ARROWS
+    function arrows_initialize() {
+      arrowsG = linkG.data(sankeyLinks)
+        .enter()
+        .append("g")
+        .attr("class", "g-arrow")
+        .call(appendArrows, 50, 100, 10) //arrow length, gap, arrow head size
+    }
+
+    function arrow_on() {
+      arrowsG.selectAll(".arrow-head")
+        .attr("markerWidth", "0")
+        .style('fill', 'gray')
+    }
+
+    function arrow_off() {
+      arrowsG.selectAll(".arrow-head").remove()
+    }
+
+    function updateDash() {
+      arrowsG.selectAll("path")
+        .style("stroke-dashoffset", percentageOffset * maxOffset)
+
+      percentageOffset = percentageOffset <= 0.0 ? 10 : percentageOffset - 0.01
+    }
+
+    function animation_on() {
+      arrowsG.selectAll("path")
+        .style("stroke-width", "5")
+        .style("stroke-dasharray", "10,40")
+
+      if (animateDash == null)
+        animateDash = setInterval(updateDash, duration);
+    }
+
+    function animation_off() {
+      arrowsG.selectAll("path")
+        .style("stroke-width", "0")
+    }
+
+  </script>
+
+  <footer id="copyright"><a href="https://bl.ocks.org/tomshanley/874923fe54b173735b456479423ac7d6">[Referenced by Sankey
+      with circular link and animated dashes]</a></footer>
+</body>
+
+</html>
