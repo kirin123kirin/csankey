@@ -8,7 +8,7 @@ import sys
 from psutil import virtual_memory, Process
 process = Process(os.getpid())
 
-IMPORTS = ' import sankey'
+IMPORTS = ' import to_sankeyhtml'
 try:
     from csankey.csankey import *
     smip = 'from csankey.csankey'
@@ -33,7 +33,6 @@ def memusage():
 
 def runtimeit(funcstr, setup=smip, number=10000, normalize=10000):
     st = setup.strip()
-    st += r';bf = open(r"Y:\usr\local\bin\csankey\src\bf.txt", encoding="utf-8").read()'
     i = 0
     for fc in funcstr.strip().splitlines():
         fc = fc.strip()
@@ -49,9 +48,8 @@ def runtimeit(funcstr, setup=smip, number=10000, normalize=10000):
         i += 1
 
 def test_sankey():
-    assert(sankey([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]]))
-    runtimeit('sankey([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]])')
-    # runtimeit('sankey([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]]) + bf')
+    assert(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]]))
+    runtimeit('to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]])')
 
 
 if __name__ == '__main__':
