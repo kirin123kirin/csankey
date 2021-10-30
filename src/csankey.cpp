@@ -39,7 +39,7 @@ wchar_t* parse_py2string(PyObject* o, Py_ssize_t* len) {
     return ws;
 }
 
-PyObject* render_flatten(PyObject* py2darraydata) {
+std::wstring dirtytable_tojson(PyObject* py2darraydata) {
     std::unordered_set<std::wstring> nodes = {};
     std::unordered_map<std::wstring, int> links = {};
     std::size_t datasize = 31;  // header + footer
@@ -48,8 +48,10 @@ PyObject* render_flatten(PyObject* py2darraydata) {
         PyObject* row = PySequence_GetItem(py2darraydata, n);
         Py_ssize_t nlen = PyObject_Length(row);
 
-        if(nlen == -1)
-            return PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object only.");
+        if(nlen == -1) {
+            PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object only.");
+            return L"";
+        }
         Py_ssize_t count = (nlen >> 1) + 1;
 
         for(Py_ssize_t i = 0; i < count; ++i) {
@@ -59,20 +61,24 @@ PyObject* render_flatten(PyObject* py2darraydata) {
 
             if((pysrc = PySequence_GetItem(row, i)) == NULL) {
                 Py_CLEAR(row);
-                return PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object only.");
+                PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object only.");
+                return L"";
             }
 
             if((pytar = PySequence_GetItem(row, i + 1)) == NULL) {
                 Py_CLEAR(row);
-                return PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object only.");
+                PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object only.");
+                return L"";
             }
 
             Py_ssize_t src_len = 0, tar_len = 0;
             src = parse_py2string(pysrc, &src_len);
             tar = parse_py2string(pytar, &tar_len);
 
-            if(!(src && tar))
-                return PyErr_Format(PyExc_ValueError, "Parse string Error.");
+            if(!(src && tar)) {
+                PyErr_Format(PyExc_ValueError, "Parse string Error.");
+                return L"";
+            }
 
             key = LR"(  { "source": ")" + std::wstring(src) + LR"(", "target": ")" + std::wstring(tar) +
                   LR"(", "value": )";
@@ -98,87 +104,72 @@ PyObject* render_flatten(PyObject* py2darraydata) {
 
     Py_DECREF(py2darraydata);
 
-    for(auto&& link : links) {
-        datasize += (std::size_t)std::log10(link.second) + 1;
-    }
+    std::wstring res = L"{\n\"nodes\":[\n";
 
-    std::size_t bf_len = (sizeof(BEFORE_TEXT) / sizeof(wchar_t)) - 1;
-    std::size_t af_len = (sizeof(AFTER_TEXT) / sizeof(wchar_t)) - 1;
+    for(auto&& node : nodes)
+        res += LR"({"name":")" + node + L"\"},\n";
+    res += L"],\n\"links\":[\n";
 
-    datasize += bf_len + af_len;
-    std::size_t wsize = sizeof(wchar_t);
+    for(auto&& link : links)
+        res += link.first + std::to_wstring(link.second) + L"},\n";
 
-    PyObject* res = PyUnicode_New(datasize, wsize == 2 ? 65535 : 1114111);
-    if(res == NULL)
-        return PyErr_Format(PyExc_MemoryError, "Unknow Error.");
+    return res + L"]}\n";
+}
 
-    wchar_t* p = (wchar_t*)PyUnicode_DATA(res);
-    if(p == NULL)
-        return PyErr_Format(PyExc_MemoryError, "Unknow Error.");
-
-    // p = std::copy(BEFORE_TEXT, BEFORE_TEXT + bf_len, p);
+PyObject* render_flatten(PyObject* py2darraydata) {
+    PyObject* res = NULL;
+    wchar_t *ret, *p;
     errno_t err;
-    err = memcpy_s(p, wsize * datasize, BEFORE_TEXT, wsize * bf_len);
-    if(err)
-        return PyErr_Format(PyExc_MemoryError, "Error. before_text data memory writing");
-    p += bf_len;
+    std::size_t json_len, bf_len, af_len, wsize, datasize;
 
-    {                                            // NODES
-        for(auto&& x : L"{\n\"nodes\" : [\n") {  // size +14
-            if(x)
-                *p++ = x;
-        }
+    std::wstring jsontbl = dirtytable_tojson(py2darraydata);
 
-        for(auto&& node : nodes) {
-            for(auto&& x : LR"(  { "name": ")") {  // size +13
-                if(x)
-                    *p++ = x;
-            }
-            for(auto&& x : node) {
-                if(x)
-                    *p++ = x;
-            }
-            for(auto&& x : L"\" },\n") {  // size +5
-                if(x)
-                    *p++ = x;
-            }
+    if((json_len = jsontbl.size()) == 0)
+        return NULL;
+
+    wsize = sizeof(wchar_t);
+    bf_len = (sizeof(BEFORE_TEXT) / wsize) - 1;
+    af_len = (sizeof(AFTER_TEXT) / wsize) - 1;
+    datasize = json_len + bf_len + af_len;
+
+    {
+        /* Make Faster PyUnicode Object Make. */
+        if((res = PyUnicode_New(datasize, wsize == 2 ? 65535 : 1114111)) == NULL)
+            return PyErr_Format(PyExc_MemoryError, "Unknow Error.");
+
+        if((ret = (wchar_t*)PyUnicode_DATA(res)) == NULL) {
+            Py_CLEAR(res);
+            return PyErr_Format(PyExc_MemoryError, "Unknow Error.");
         }
+        p = ret;
     }
 
-    {                                            // LINKS
-        for(auto&& x : L"],\n\"links\": [\n") {  // size +14
-            if(x)
-                *p++ = x;
+    {
+        /* Befor + json + After Writing */
+        err = memcpy_s(p, wsize * datasize, BEFORE_TEXT, wsize * bf_len);
+        if(err) {
+            Py_CLEAR(res);
+            return PyErr_Format(PyExc_MemoryError, "Error. before_text data memory writing");
         }
+        p += bf_len;
 
-        for(auto&& link : links) {
-            for(auto&& x : link.first) {
-                if(x)
-                    *p++ = x;
-            }
-            for(auto&& x : std::to_wstring(link.second)) {
-                if(x)
-                    *p++ = x;
-            }
-            for(auto&& x : L" },\n") {  // size +4
-                if(x)
-                    *p++ = x;
-            }
+        err = memcpy_s(p, wsize * (datasize - bf_len), jsontbl.data(), wsize * json_len);
+        if(err) {
+            Py_CLEAR(res);
+            return PyErr_Format(PyExc_MemoryError, "Error. after_text data memory writing");
         }
+        p += json_len;
 
-        for(auto&& x : L"]}\n") {  // size +3
-            if(x)
-                *p++ = x;
+        err = memcpy_s(p, wsize * af_len, AFTER_TEXT, wsize * af_len);
+        if(err) {
+            Py_CLEAR(res);
+            return PyErr_Format(PyExc_MemoryError, "Error. after_text data memory writing");
         }
     }
-
-    // std::copy(AFTER_TEXT, AFTER_TEXT + af_len, p);
-    err = memcpy_s(p, wsize * af_len, AFTER_TEXT, wsize * af_len);
-    if(err)
-        return PyErr_Format(PyExc_MemoryError, "Error. after_text data memory writing");
 
     return res;
 }
+
 
 extern "C" PyObject* sankey_py(PyObject* self, PyObject* args, PyObject* kwargs) {
     PyObject* o;

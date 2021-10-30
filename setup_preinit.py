@@ -4,9 +4,9 @@ from os.path import dirname, normpath, join as pathjoin
 SRCDIR = pathjoin(dirname(__file__), "src")
 TARGET = normpath(pathjoin(SRCDIR, "index.html"))
 
-def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=True):
+def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
     if minify:
-        re_minify = re.compile("\n\s*").sub
+        re_minify = re.compile("^\s+", re.MULTILINE).sub
     else:
         re_minify = lambda a, b: b
     dat = None

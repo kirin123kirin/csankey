@@ -123,7 +123,7 @@ if sys.version_info[:2] >= (3, 3):
 # make input data for csankey.cpp
 if (exists(TARGET)):
     from setup_preinit import make_compiler_input
-    make_compiler_input(minify=is_debug)
+    make_compiler_input(minify=is_debug == False)
 
 setup(name=MOD_NAME,
       version=__version__,
