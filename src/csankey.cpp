@@ -11,23 +11,6 @@ static constexpr wchar_t AFTER_TEXT[] =
 #include "af.txt"
     ;
 
-PyObject* iterhead(PyObject* o) {
-    PyObject* row;
-
-    if((PySequence_Check(o) || PyObject_CheckBuffer(o)) && (row = PySequence_GetItem(o, 0)) == NULL) {
-        Py_DECREF(row);
-        return PyErr_Format(PyExc_IndexError, "Failed get header.");
-    } else if(PyGen_Check(o) || PyIter_Check(o)) {
-        //@todo
-        return NULL;
-    } else if(PyRange_Check(o) || PyMapping_Check(o)) {
-        //@todo
-        return NULL;
-    }
-
-    return row;
-}
-
 std::wstring pyto_wstring(PyObject* o) {
     wchar_t* ws;
     Py_ssize_t _len = -1;
@@ -164,8 +147,6 @@ struct SankeyData {
             }
 
             Py_ssize_t _nlen = PyObject_Length(row);
-            if(n == 0)
-                nlen = _nlen;
 
             if(_nlen != needcolnum || (mapper(PySequence_GetItem(row, 0), PySequence_GetItem(row, 1))) == false) {
                 Py_DECREF(row);
@@ -206,12 +187,16 @@ std::wstring table_tojson(PyObject* py2darraydata, bool header = false) {
     SankeyData arr(py2darraydata);
     if(nlen == 2) {
         // return arr.parse_normalized(py2darraydata, nlen);
+        return L"";
     } else if(nlen == 3) {
         // return arr.parse_normalized(py2darraydata, nlen);
+        return L"";
     } else if(nlen == 4) {
         // return arr.parse_normalized(py2darraydata, nlen);
+        return L"";
     } else if(nlen == 5) {
         // return arr.parse_normalized(py2darraydata, nlen);
+        return L"";
     } else {
         PyErr_Format(PyExc_ValueError, "Unknow List Values.");
         return L"";
@@ -237,7 +222,7 @@ PyObject* render_flatten(PyObject* py2darraydata) {
 
     {
         /* Make Faster PyUnicode Object Make. */
-        if((res = PyUnicode_New(datasize, wsize == 2 ? 65535 : 1114111)) == NULL)
+        if((res = PyUnicode_New((Py_ssize_t)datasize, (Py_UCS4)(wsize == 2 ? 65535 : 1114111))) == NULL)
             return PyErr_Format(PyExc_MemoryError, "Unknow Error.");
 
         if((ret = (wchar_t*)PyUnicode_DATA(res)) == NULL) {
@@ -299,7 +284,7 @@ PyObject* to_sankeyjson_py(PyObject* self, PyObject* args, PyObject* kwargs) {
         SankeyData arr(o);
         std::wstring jsondata;
         if(arr.parse_dirty() && (jsondata = arr.to_json()) != L"")
-            return PyUnicode_FromWideChar(jsondata.data(), jsondata.size());
+            return PyUnicode_FromWideChar(jsondata.data(), (Py_ssize_t)jsondata.size());
         else
             return NULL;
     }
