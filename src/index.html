@@ -253,11 +253,11 @@
           .style("text-anchor", "start")
           .attr("transform", "rotate(" + rotation + "," + position.x + "," + position.y + ")")
 
-        // @todo future
-        existslink = false
-        if (existslink) {
+        var result = re_markdownlink.exec(link.value)
+        if (result) {
+          link.value = link.value.replace(re_markdownlink, result[1])
           label = label
-            .append("a").attr("xlink:href", "http://www.example.com")
+            .append("a").attr("xlink:href", result[2])
             .style("text-decoration", "underline")
         }
 
@@ -346,6 +346,8 @@
     let maxOffset = 10
     let percentageOffset = 1.0
 
+    let re_markdownlink = /\[\s*([^\]]*)\s*\]\(\s*["']*([^\) "]*)["']*\s*\)/gu;
+
     function initialize() {
       if (sankey)
         d3.selectAll("svg").remove()
@@ -388,7 +390,7 @@
       sankeyNodes = sankeyData.nodes;
       sankeyLinks = sankeyData.links;
 
-      console.log(sankeyLinks);
+      // console.log(sankeyLinks);
 
       depthExtent = d3.extent(sankeyNodes, function (d) { return d.depth; });
 
@@ -433,6 +435,7 @@
           d3.selectAll("text").style("opacity", 1);
         })
 
+
       let nodelabel = node.append("text")
         .attr("class", "node-label")
         .attr("x", function (d) { return (d.x0 + d.x1) / 2; })
@@ -440,15 +443,15 @@
         .attr("dy", "0.35em")
         .attr("text-anchor", "middle")
 
-      // @todo future
-      let existslink = false
-      if (existslink) {
-        nodelabel = nodelabel
-          .append("a").attr("href", "http://www.example.com")
-          .style("text-decoration", "underline")
-      }
-
-      nodelabel.text(function (d) { return d.name; })
+      nodelabel.append("a").attr("xlink:href", function (d) {
+        var result = re_markdownlink.exec(d.name)
+        if (result) {
+          d.name = d.name.replace(re_markdownlink, result[1])
+          return result[2];
+        }
+        return null
+      }).style("text-decoration", "underline")
+        .text(function (d) { return d.name })
 
       node.append("title")
         .text(function (d) { return d.name + "\n" + (d.value); });
