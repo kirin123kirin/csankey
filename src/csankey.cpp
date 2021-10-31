@@ -103,27 +103,20 @@ struct SankeyData {
         for(Py_ssize_t n = 0; n < len; ++n) {
             std::wstring src, tar;
             PyObject* row = PySequence_GetItem(data, n);
-            if(row == NULL) {
-                PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object?");
-                return false;
-            }
-
             Py_ssize_t _nlen = PyObject_Length(row);
-            if(_nlen == -1 || (mapper(PySequence_GetItem(row, 0), PySequence_GetItem(row, 1))) == false) {
-                Py_DECREF(row);
+
+            if(row == NULL || _nlen == -1) {
                 PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object?");
                 return false;
             }
 
-            {
-                Py_ssize_t count = (_nlen >> 1) + 1;
 
-                for(Py_ssize_t i = 0; i < count; ++i) {
-                    if((mapper(PySequence_GetItem(row, i), PySequence_GetItem(row, i + 1))) == false) {
-                        Py_DECREF(row);
-                        PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object?");
-                        return false;
-                    }
+            Py_ssize_t count = (_nlen >> 1) + 1;
+            for(Py_ssize_t i = 0; i < count; ++i) {
+                if((mapper(PySequence_GetItem(row, i), PySequence_GetItem(row, i + 1))) == false) {
+                    Py_DECREF(row);
+                    PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object?");
+                    return false;
                 }
             }
 
