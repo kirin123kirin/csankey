@@ -1,5 +1,6 @@
 import re
 from os.path import dirname, normpath, join as pathjoin
+from urllib import request
 
 SRCDIR = pathjoin(dirname(__file__), "src")
 TARGET = normpath(pathjoin(SRCDIR, "index.html"))
@@ -8,7 +9,7 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
     if minify:
         re_minify = re.compile("^\s+", re.MULTILINE).sub
     else:
-        re_minify = lambda a, b: b
+        def re_minify(a, b): return b
     dat = None
     with open(target, "r", encoding="utf-8") as f:
         dat = f.read()
@@ -23,10 +24,16 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
             if i == 0:
                 start = re_scp.start()
             end = re_scp.end()
-
-            scpfile = normpath(pathjoin(SRCDIR, re_scp.group(1)))
-            with open(scpfile, "r", encoding="utf-8") as f:
-                scripts += f.read()
+            scpname = re_scp.group(1)
+            if (scpname.startswith("http")):
+                req = request.Request(scpname)
+                with request.urlopen(req) as res:
+                    scripts += res.read()
+            else:
+                scpfile = normpath(pathjoin(SRCDIR, scpname))
+                with open(scpfile, "r", encoding="utf-8") as f:
+                    scripts += f.read()
+        
         scripts += "</script>"
 
         bf = dat[:start] + scripts
@@ -62,4 +69,3 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
 
     else:
         raise ValueError("Is Empty" + target + "?")
-

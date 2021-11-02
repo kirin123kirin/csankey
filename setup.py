@@ -13,9 +13,9 @@ from setup_preinit import TARGET
 __version__ = '0.1.2'
 
 DESCRIPTION = "Sakey Diagram HTML builder"
-KEYWORDS = ["flatten", "to_datetime"]
+KEYWORDS = ["sankey", "d3", "visualization"]
 LISCENSE = "MIT"
-LANGUAGE = 'c++'
+LANGUAGE = 'c++, javascript, html, python'
 MOD_NAME = 'csankey'
 MOD_SRC = ['src/csankey.cpp']
 AUTHOR = 'kirin123kirin'
@@ -26,7 +26,6 @@ PLATFORMS = ["Windows", "Linux", "Mac OS-X"]
 CLASSIFIERS = """
 Development Status :: 2 - Pre-Alpha
 License :: OSI Approved :: MIT License
-Programming Language :: C
 Programming Language :: C++
 Programming Language :: Python :: 3.6
 Programming Language :: Python :: 3.7
@@ -52,7 +51,7 @@ def sep(*x):
 
 COMPILE_ARGS = [
     sep('-std', 'c++14'),
-    globalinc + 'boost',
+    # globalinc + 'boost',
     # Reason unicode string crash #
     sep("-source-charset", "utf-8"),
 ]
