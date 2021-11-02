@@ -313,7 +313,8 @@ extern "C" PyObject* to_sankeyjson_py(PyObject* self, PyObject* args, PyObject* 
 // this module description
 #define MODULE_DOCS                       \
     "Make html data of Sankey Diagram.\n" \
-    "Sankey diagram made using d3.js and the sankey plugin."
+    "Sankey diagram made using d3.js and the sankey plugin.\n" \
+    ""
 
 #define to_sankeyhtml_py_DESC "\n"
 #define to_sankeyjson_py_DESC "\n"
