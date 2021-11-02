@@ -18,9 +18,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      //
-      // from C++ Run Debugger
-      //
       "name": "Win : C++ Debug",
       "type": "cppvsdbg",
       "request": "launch",
@@ -32,9 +29,6 @@
       "preLaunchTask": "Win : Debug C++",
       "console": "internalConsole"
     },
-    //
-    // from C++ Run Release
-    //
     {
       "name": "Win : C++ Release",
       "type": "cppvsdbg",
@@ -47,9 +41,6 @@
       "preLaunchTask": "Win : Release C++",
       "console": "internalConsole"
     },
-    //
-    // from Debug Setup Running
-    //
     {
       "name": "Win : Debug Setup.py",
       "type": "cppvsdbg",
@@ -66,7 +57,6 @@
       "preLaunchTask": "Win : DebugSetup.py",
       "console": "internalConsole"
     },
-    // for Release Setup Running
     {
       "name": "Win : Release Setup.py",
       "type": "python",
@@ -81,9 +71,6 @@
       "preLaunchTask": "Win : ReleaseSetup.py",
       "console": "internalConsole"
     },
-    //
-    // from Python to C++ Debug Run
-    //
     {
       "name": "Win : Instant Debug from py",
       "type": "cppvsdbg",
@@ -113,9 +100,6 @@
       "preLaunchTask": "Win : ReleaseSetup.py"
     },
     {
-      //
-      // from C++ Run Debugger for linux
-      //
       "name": "linux : C++ Debug",
       "type": "cppdbg",
       "request": "launch",
@@ -128,9 +112,6 @@
       "console": "internalConsole"
     },
     {
-      //
-      // from C++ Release Run for linux
-      //
       "name": "linux : C++ Release",
       "type": "cppdbg",
       "request": "launch",
@@ -142,9 +123,6 @@
       "preLaunchTask": "linux : Release C++",
       "console": "internalConsole"
     },
-    // //
-    // // from pytest Run Debugger
-    // //
     {
       "name": "linux : Debug Setup.py",
       "type": "cppdbg",
@@ -161,7 +139,6 @@
       "preLaunchTask": "linux : DebugSetup.py",
       "console": "internalConsole"
     },
-    // for Release Setup Running
     {
       "name": "linux : Release Setup.py",
       "type": "cppdbg",
@@ -177,9 +154,6 @@
       "preLaunchTask": "linux : ReleaseSetup.py",
       "console": "internalConsole"
     },
-    //
-    // from Python to C++ Debug Run for Linux
-    //
     {
       "name": "linux : Instant Debug from py",
       "type": "cppdbg",
@@ -190,7 +164,6 @@
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
-      // "cwd": "${workspaceFolder}/build",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
@@ -206,9 +179,6 @@
       "preLaunchTask": "linux : DebugSetup.py",
       "console": "internalConsole"
     },
-    //
-    // from Python to C++ Release Run for Linux
-    //
     {
       "name": "linux : Instant Release from py",
       "type": "cppdbg",
@@ -234,13 +204,30 @@
       "preLaunchTask": "linux : ReleaseSetup.py",
       "console": "internalConsole"
     },
-    // for Python
     {
       "name": "Python: Normal Run",
       "type": "python",
       "request": "launch",
       "program": "${file}",
       "console": "internalConsole"
+    },
+    {
+      "name": "html-js Debug",
+      "request": "launch",
+      "type": "chrome",
+      "internalConsoleOptions": "openOnSessionStart",
+      "file": "${workspaceFolder}/src/index.html",
+      // "url": "http://localhost:3000/src/index.html",
+      "webRoot": "${workspaceFolder}/src/",
+      // "sourceMaps": true,
+      "trace": true,
+      "runtimeExecutable": "stable",
+      "runtimeArgs": [
+        // "--headless",
+        // "--disable-gpu",
+        // "--remote-debugging-port=9222",
+        "--incognito" //private mode
+        ],
     },
   ]
 }
