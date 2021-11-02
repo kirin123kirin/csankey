@@ -173,14 +173,10 @@ struct SankeyData {
             ++n;
         }
 
-        if(nlen == 2) {
-            return _table_parse(nlen, 0, 1);
-        } else if(nlen == 3) {
+        if(nlen == 2 || nlen == 3) {
             return _table_parse(nlen, 0, 1);
         } else if(nlen == 4) {
-            return _table_parse(nlen, 0, 1);
-        } else if(nlen == 5) {
-            return _table_parse(nlen, 0, 1);
+            return _table_parse(nlen, 1, 2);
         } else {
             PyErr_Format(PyExc_ValueError, "Unknow List Values.");
             return false;
