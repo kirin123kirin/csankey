@@ -15,6 +15,19 @@
       color: white;
     }
 
+    footer {
+      width: 100%;
+      font-size: 9px;
+      background: -webkit-linear-gradient(to right, gray, transparent);
+      background: linear-gradient(to right, gray, transparent);
+      color: #fff;
+      text-align: left;
+      padding: 5px 0;
+
+      /* position: absolute; */
+      bottom: 0;
+    }
+
     body {
       font-family: "MS UI Gothic";
     }
@@ -39,11 +52,11 @@
       font-size: 16px;
       font-family: "MS UI Gothic";
       fill: white;
-      font-size: 14px;
       font-style: italic;
     }
 
     .link-label-rect {
+      shape-rendering: crispEdges;
       fill: blue;
       opacity: 100%;
     }
@@ -119,18 +132,6 @@
       background: linear-gradient(175deg, #ccc, #999, #ccc);
       color: #fff;
       text-shadow: 1px 1px 1px #333;
-    }
-
-    footer {
-      width: 100%;
-      font-size: 9px;
-      background-color: gray;
-      color: #fff;
-      text-align: left;
-      padding: 5px 0;
-
-      /* position: absolute; */
-      bottom: 0;
     }
   </style>
 
@@ -302,6 +303,9 @@
     }
 
     function download_PNG() {
+      node.selectAll(".link-label-rect").remove()
+      node.selectAll(".link-label").style("fill", "black")
+
       var svg = document.querySelector("svg");
       var svgData = new XMLSerializer().serializeToString(svg);
       var canvas = document.createElement("canvas");
@@ -330,6 +334,51 @@
         a.dispatchEvent(new MouseEvent("click"));
       }
       image.src = "data:image/svg+xml;charset=utf-8;base64," + btoa(unescape(encodeURIComponent(svgData)));
+
+      func() /* reload */
+    }
+
+    /* thank you for https://kuroeveryday.blogspot.com/2016/05/file-download-from-browser.html */
+    function download_SVG() {
+      node.selectAll(".link-label-rect").remove()
+      node.selectAll(".link-label").style("fill", "black")
+
+      var svg = document.querySelector("svg");
+      var content = new XMLSerializer().serializeToString(svg);
+
+      var mimeType = 'image/svg+xml';
+      var name = 'sankeydiagram.svg';
+
+      // BOM mojibake
+      var bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+      var blob = new Blob([bom, content], { type: mimeType });
+
+      var a = document.createElement('a');
+      a.download = name;
+      a.target = '_blank';
+
+      if (window.navigator.msSaveBlob) {
+        // for IE
+        window.navigator.msSaveBlob(blob, name)
+      }
+      else if (window.URL && window.URL.createObjectURL) {
+        // for Firefox
+        a.href = window.URL.createObjectURL(blob);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      else if (window.webkitURL && window.webkitURL.createObject) {
+        // for Chrome
+        a.href = window.webkitURL.createObjectURL(blob);
+        a.click();
+      }
+      else {
+        // for Safari
+        window.open('data:' + mimeType + ';base64,' + window.Base64.encode(content), '_blank');
+      }
+      func() /* reload */
+
     }
 
     function highlightNodes(node, name) {
@@ -473,12 +522,6 @@
               return l.source.name == thisName || l.target.name == thisName ? 1 : 0.3;
             })
 
-          link.selectAll(".link-label-rect")
-            .style("opacity", function (l) {
-              console.log(l)
-              return l.source.name == thisName || l.target.name == thisName ? 1 : 0.3;
-            })
-
           node.selectAll("text")
             .style("opacity", function (d) {
               return highlightNodes(d, thisName)
@@ -617,14 +660,14 @@
         { "name": "abc" },
         { "name": "b\nbb" },
         { "name": "ccc" },
-        { "name": "aaa" },
+        { "name": "aaあa" },
       ],
       "links": [
         { "source": "b\nbb", "target": "abc", "value": 1 },
-        { "source": "ccc", "target": "aaa", "value": 1 },
+        { "source": "ccc", "target": "aaあa", "value": 1 },
         { "source": "abc", "target": "b\nbb", "value": 1 },
         { "source": "b\nbb", "target": "ccc", "value": 1 },
-        { "source": "aaa", "target": "b\nbb", "value": 1 },
+        { "source": "aaあa", "target": "b\nbb", "value": 1 },
       ]
     };
   </script>
@@ -683,9 +726,12 @@
             </div>
             <div>
               <!-- thanks for download button data http://design-ec.com/?p=342 -->
-              &nbsp;<input type="button" src="pngdownload.png" value="PNGダウンロード" onclick="download_PNG()">
+              &nbsp;<input type="button" value="PNGダウンロード" onclick="download_PNG()">
             </div>
           </form>
+        </td>
+        <td>
+          <br /><input type="button" value="SVGダウンロード" onclick="download_SVG()">
         </td>
       </tr>
     </table>
@@ -694,11 +740,17 @@
 
   <div id="chart"></div>
   <script>func()</script>
-  
+
   <div><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></div>
   <div>
-    <footer><a href="https://bl.ocks.org/tomshanley/874923fe54b173735b456479423ac7d6">[Referenced by Sankey
-        with circular link and animated dashes]</a></footer>
+    <footer>
+      Powered by &nbsp;<a href="https://d3js.org/d3.v4.min.js">d3.js</a>
+      &nbsp;|&nbsp;Referenced by&nbsp;<a
+        href="https://bl.ocks.org/tomshanley/raw/6eb025290888935f10b142e4bc576d8d/d3-sankey-circular.js">Tom Shanley’s
+        Block Sankey with circular links1</a>
+      <a href="https://bl.ocks.org/tomshanley/874923fe54b173735b456479423ac7d6">Tom Shanley’s Block Sankey with circular
+        links2</a>
+    </footer>
   </div>
 </body>
 
