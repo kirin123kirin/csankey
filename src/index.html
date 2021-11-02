@@ -1,13 +1,10 @@
+<!DOCTYPE html>
 <html lang="ja">
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
   <title>Sankey Diagram</title>
-
-  <!-- <link href="https://fonts.googleapis.com/css?family=Roboto:100i" rel="stylesheet"> -->
-  <script src="d3.v4.min.js"></script>
-  <script src="d3-sankey-circular.js"></script>
 
   <style>
     h1 {
@@ -41,9 +38,14 @@
     .link-label {
       font-size: 16px;
       font-family: "MS UI Gothic";
-      fill: blue;
+      fill: white;
       font-size: 14px;
       font-style: italic;
+    }
+
+    .link-label-rect {
+      fill: blue;
+      opacity: 100%;
     }
 
     .link {
@@ -57,6 +59,68 @@
       pointer-events: all;
     }
 
+    .toggle_area {
+      position: relative;
+      /* margin: auto; */
+      width: 50px;
+      height: 25px;
+      float: left;
+    }
+
+    .toggle_area input[type="radio"] {
+      display: none;
+    }
+
+    .toggle_area label {
+      display: block;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      line-height: 20px;
+      font-size: 10pt;
+      font-weight: bold;
+      border: 2px solid #ccc;
+    }
+
+    .toggle_area #R1_ON+label,
+    #R2_ON+label,
+    #R3_ON+label {
+      right: 50%;
+      border-radius: 6px 0 0 6px;
+      background: #eee;
+      color: #666;
+      border-right: none;
+    }
+
+    .toggle_area #R1_ON:checked+label,
+    #R2_ON:checked+label,
+    #R3_ON:checked+label {
+      background: linear-gradient(180deg, #00b359, #006633, #00b359);
+      color: #fff;
+      text-shadow: 1px 1px 1px #333;
+    }
+
+    .toggle_area #R1_OFF+label,
+    #R2_OFF+label,
+    #R3_OFF+label {
+      left: 50%;
+      border-radius: 0 6px 6px 0;
+      background: #eee;
+      color: #666;
+      border-left: none;
+    }
+
+    .toggle_area #R1_OFF:checked+label,
+    #R2_OFF:checked+label,
+    #R3_OFF:checked+label {
+      background: linear-gradient(175deg, #ccc, #999, #ccc);
+      color: #fff;
+      text-shadow: 1px 1px 1px #333;
+    }
+
     footer {
       width: 100%;
       font-size: 9px;
@@ -65,76 +129,50 @@
       text-align: left;
       padding: 5px 0;
 
-      position: absolute;
+      /* position: absolute; */
       bottom: 0;
     }
   </style>
-</head>
-
-<body>
-
-  <h1>Sankey Diagram Output Page</h1>
-
-  <table>
-    <td>
-      <tr>
-        <form name="f_animation" action="#">アニメーション
-          <input type="radio" name="R1" value="ON" onclick="func()" checked="checked">ON
-          <input type="radio" name="R1" value="OFF" onclick="func()">OFF
-        </form>
-      </tr>
-      <tr>
-        <form name="f_arrow" action="#">&nbsp;&nbsp;矢印
-          <input type="radio" name="R2" value="ON" onclick="func()" checked="checked">ON
-          <input type="radio" name="R2" value="OFF" onclick="func()">OFF
-        </form>
-      </tr>
-      <form name="f_value" action="#">&nbsp;&nbsp;値の表示
-        <input type="radio" name="R3" value="ON" onclick="func()" checked="checked">ON
-        <input type="radio" name="R3" value="OFF" onclick="func()">OFF
-      </form>
-      <tr>
-      </tr>
-      <tr>
-        <form name="F1" action="#">
-          &nbsp;<input type="button" value="PNGダウンロード" onclick="download_PNG()">
-
-          幅&nbsp;<input type="text" name="T1" size="3" maxlength="4" placeholder="pixel"
-            oninput="value = value.replace(/[^0-9]+/i,'');">
-          高さ&nbsp;<input type="text" name="T1" size="3" maxlength="4" placeholder="pixel"
-            oninput="value = value.replace(/[^0-9]+/i,'');">
-          &nbsp;(空白の場合は等倍解像度)
-        </form>
-      </tr>
-    </td>
-  </table>
-
-  <div id="chart"></div>
 
 
 
-  <!-- My Sankey Data Section -->
+  <!-- include Section -->
+  <script src="d3.v4.min.js"></script>
+  <script src="d3-sankey-circular.js"></script>
+
+
+
+  <!-- My Script Section -->
   <script>
-    var data = {
-      "nodes": [
-        { "name": "abc" },
-        { "name": "bbb" },
-        { "name": "ccc" },
-        { "name": "aaa" },
-      ],
-      "links": [
-        { "source": "bbb", "target": "abc", "value": 1 },
-        { "source": "ccc", "target": "aaa", "value": 1 },
-        { "source": "abc", "target": "bbb", "value": 1 },
-        { "source": "bbb", "target": "ccc", "value": 1 },
-        { "source": "aaa", "target": "bbb", "value": 1 },
-      ]
-    };
-  </script>
+    let margin = { top: 30, right: 30, bottom: 30, left: 30 };
+    let width = 1100;
+    let height = 600;
 
+    let nodePadding = 40;
+    var circularLinkGap = 2;
 
+    let sankey = null;
+    let svg = null;
+    let g = null;
+    let linkLabels = null;
+    let linkG = null;
+    let nodeG = null;
+    let nodeColour = null;
+    let node = null;
+    let link = null;
+    let arrowsG = null;
+    let animateDash = null;
+    let sankeyData = null;
+    let sankeyNodes = null;
+    let sankeyLinks = null;
+    let depthExtent = null;
+    let linkpathes = null;
+    let duration = 5
+    let maxOffset = 10
+    let percentageOffset = 1.0
 
-  <script>
+    let re_markdownlink = /(!?)\[\s*([^\]]*)\s*\]\(\s*["']*([^\) "]*)["']*\s*\)/gu;
+
     // Function that appends a path to selection that has sankey path data attached
     // The path is formatted as dash array, and triangle paths to create arrows along the path
     function appendArrows(selection, arrowLength, gapLength, arrowHeadSize) {
@@ -201,18 +239,13 @@
           .attr('d', function (d) {
             return (
               'M' +
-              d.x +
-              ',' +
+              d.x + ',' +
               (d.y - arrowHeadSize / 2) +
-              ' ' +
-              'L' +
-              (d.x + arrowHeadSize) +
-              ',' +
+              ' L' +
+              (d.x + arrowHeadSize) + ',' +
               d.y +
-              ' ' +
-              'L' +
-              d.x +
-              ',' +
+              ' L' +
+              d.x + ',' +
               (d.y + arrowHeadSize / 2)
             )
           })
@@ -225,44 +258,47 @@
     }
 
     function addMinardLabels(link) {
-      const gap = 100;
+      let thisLength = 1
+      let position = this.getPointAtLength(thisLength)
+      let positionPlueOne = this.getPointAtLength(thisLength + 5)
 
-      var linkLength = this.getTotalLength();
+      // let adj = positionPlueOne.x - position.x;
+      // let opp = position.y - positionPlueOne.y;
+      // let angle = Math.atan(opp / adj) * (180 / Math.PI);
+      let rotation = 0;
 
-      let n = Math.floor(linkLength / gap)
+      let label = node
+      let result = re_markdownlink.exec(link.value)
 
-      for (var i = 0; i < 1; i++) {
-
-        let thisLength = (i * gap) - 10
-
-        let position = this.getPointAtLength(thisLength)
-
-        let positionPlueOne = this.getPointAtLength(thisLength + 5)
-
-        // let adj = positionPlueOne.x - position.x;
-        // let opp = position.y - positionPlueOne.y;
-        // let angle = Math.atan(opp / adj) * (180 / Math.PI);
-        let rotation = 0;
-
-        let label = linkLabels
-          .append("text")
-          .attr("class", "link-label")
-          .attr("x", position.x)
-          .attr("y", position.y - 5)
-          .attr("dx", "0.4em")
-          .style("text-anchor", "start")
-          .attr("transform", "rotate(" + rotation + "," + position.x + "," + position.y + ")")
-
-        var result = re_markdownlink.exec(link.value)
-        if (result) {
-          link.value = link.value.replace(re_markdownlink, result[1])
-          label = label
-            .append("a").attr("xlink:href", result[2])
-            .style("text-decoration", "underline")
-        }
-
-        label.text(link.value)
+      if (result) {
+        link.value = link.value.replace(re_markdownlink, result[2])
+        if (result[1] == "!")
+          label = node.append("img").attr("src", result[3]).attr("alt", link.value)
+        else
+          label = node.append("a").attr("xlink:href", result[3])
       }
+
+      let clen = String(link.value).length;
+
+      /* thanks for https://stackoverflow.com/questions/6725288/svg-text-inside-rect */
+      label.append("rect")
+        .attr("class", "link-label-rect")
+        .attr("x", position.x)
+        .attr("y", position.y - 23)
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("height", 25)
+        .attr("width", 25 + (clen * (2.6 - (clen / 100))) * Math.log(clen))
+
+      label.append("text")
+        .attr("class", "link-label")
+        .attr("x", position.x)
+        .attr("y", position.y - 5)
+        .attr("dx", "0.2em")
+        .style("text-anchor", "start")
+        .attr("transform", "rotate(" + rotation + "," + position.x + "," + position.y + ")")
+        .text(link.value)
+
     }
 
     function download_PNG() {
@@ -318,35 +354,49 @@
 
     }
 
-    let margin = { top: 30, right: 30, bottom: 30, left: 30 };
-    let width = 1100;
-    let height = 600;
+    function leftLinebreak(data) {
+      let text = data.name
+      if (text.indexOf('\n') == -1)
+        return text
 
-    let nodePadding = 40;
+      let array = text.replace("\r", "").split("\n")
+      if (array.length < 2)
+        return text
 
-    var circularLinkGap = 2;
+      let ret = "";
 
-    let sankey = null;
-    let svg = null;
-    let g = null;
-    let linkLabels = null;
-    let linkG = null;
-    let nodeG = null;
-    let nodeColour = null;
-    let node = null;
-    let link = null;
-    let arrowsG = null;
-    let animateDash = null;
-    let sankeyData = null;
-    let sankeyNodes = null;
-    let sankeyLinks = null;
-    let depthExtent = null;
-    let linkpathes = null;
-    let duration = 5
-    let maxOffset = 10
-    let percentageOffset = 1.0
+      array.forEach((t, i) => {
+        let adjast_x = data.x0 + t.length * 5
+        let adjast_y = (data.y0 - (array.length - 1) * 35) + (i * 25)
+        ret += `<tspan y="${adjast_y}" x="${adjast_x}">${t}</tspan>`;
+      });
+      return ret;
+    }
 
-    let re_markdownlink = /\[\s*([^\]]*)\s*\]\(\s*["']*([^\) "]*)["']*\s*\)/gu;
+    function rightLinebreak(textdata) { //@todo
+      let array = textdata.split("\n")
+      let string = "";
+      const maxTextLength = d3.max(array, d => d.length)
+      array.forEach((t, i) => {
+        let l = maxTextLength - t.length;
+        string += `<tspan y="${i}em" x="${l}em">${t}</tspan>`;
+      });
+      return string;
+    }
+
+    function centerLinebreak(textdata) { //@todo
+      let array = textdata.split("\n")
+      let string = "";
+      const maxTextLength = d3.max(array, d => d.length)
+      array.forEach((t, i) => {
+        let l = (maxTextLength - t.length) / 2;
+        string += `<tspan y="${i}em" x="${l}em">${t}</tspan>`;
+      });
+      return string
+    }
+
+
+    /* My Handling Section */
 
     function initialize() {
       if (sankey)
@@ -370,8 +420,6 @@
 
       g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-
-      linkLabels = g.append("g")
 
       linkG = g.append("g")
         .attr("class", "links")
@@ -404,6 +452,7 @@
         .append("g");
 
       node.append("rect")
+        .attr("class", "node-rect")
         .attr("x", function (d) { return d.x0; })
         .attr("y", function (d) { return d.y0; })
         .attr("height", function (d) { return d.y1 - d.y0; })
@@ -414,7 +463,7 @@
 
           let thisName = d.name;
 
-          node.selectAll("rect")
+          node.selectAll(".node-rect")
             .style("opacity", function (d) {
               return highlightNodes(d, thisName)
             })
@@ -424,17 +473,23 @@
               return l.source.name == thisName || l.target.name == thisName ? 1 : 0.3;
             })
 
+          link.selectAll(".link-label-rect")
+            .style("opacity", function (l) {
+              console.log(l)
+              return l.source.name == thisName || l.target.name == thisName ? 1 : 0.3;
+            })
+
           node.selectAll("text")
             .style("opacity", function (d) {
               return highlightNodes(d, thisName)
             })
         })
         .on("mouseout", function (d) {
-          d3.selectAll("rect").style("opacity", 0.5);
+          d3.selectAll(".node-rect").style("opacity", 0.5);
+          d3.selectAll(".link-label-rect").style("opacity", 1);
           d3.selectAll(".sankey-link").style("opacity", 0.7);
           d3.selectAll("text").style("opacity", 1);
         })
-
 
       let nodelabel = node.append("text")
         .attr("class", "node-label")
@@ -446,12 +501,12 @@
       nodelabel.append("a").attr("xlink:href", function (d) {
         var result = re_markdownlink.exec(d.name)
         if (result) {
-          d.name = d.name.replace(re_markdownlink, result[1])
-          return result[2];
+          d.name = d.name.replace(re_markdownlink, result[2])
+          return result[3];
         }
         return null
       }).style("text-decoration", "underline")
-        .text(function (d) { return d.name })
+        .html(function (d) { return leftLinebreak(d) }) //LF thanks for https://gunmagisgeek.com/blog/d3v4/4686
 
       node.append("title")
         .text(function (d) { return d.name + "\n" + (d.value); });
@@ -525,9 +580,8 @@
         .style("stroke-width", "0")
     }
 
-  </script>
+    /* Startup Handling Section */
 
-  <script>
     function func() {
       initialize()
       nodes_setup()
@@ -551,12 +605,101 @@
       }
 
     }
-    func()
 
   </script>
 
-  <footer id="copyright"><a href="https://bl.ocks.org/tomshanley/874923fe54b173735b456479423ac7d6">[Referenced by Sankey
-      with circular link and animated dashes]</a></footer>
+
+
+  <!-- My Sankey Data Section -->
+  <script>
+    var data = {
+      "nodes": [
+        { "name": "abc" },
+        { "name": "b\nbb" },
+        { "name": "ccc" },
+        { "name": "aaa" },
+      ],
+      "links": [
+        { "source": "b\nbb", "target": "abc", "value": 1 },
+        { "source": "ccc", "target": "aaa", "value": 1 },
+        { "source": "abc", "target": "b\nbb", "value": 1 },
+        { "source": "b\nbb", "target": "ccc", "value": 1 },
+        { "source": "aaa", "target": "b\nbb", "value": 1 },
+      ]
+    };
+  </script>
+
+
+</head>
+
+<body>
+
+  <h1>Sankey Diagram Output Page</h1>
+
+  <div>
+
+    <table>
+      <tr>
+        <td>アニメーション</td>
+        <td>
+          <form class="toggle_area" name="f_animation" action="#">
+            <input type="radio" name="R1" id="R1_ON" onclick="func()" checked="checked">
+            <label for="R1_ON">入</label>
+            <input type="radio" name="R1" id="R1_OFF" onclick="func()">
+            <label for="R1_OFF">切</label>
+          </form>
+        </td>
+        <td>&nbsp</td>
+
+        <td>矢印</td>
+        <td>
+          <form class="toggle_area" name="f_arrow" action="#">
+            <input type="radio" name="R2" id="R2_ON" onclick="func()" checked="checked">
+            <label for="R2_ON">入</label>
+            <input type="radio" name="R2" id="R2_OFF" onclick="func()">
+            <label for="R2_OFF">切</label>
+          </form>
+        </td>
+        <td>&nbsp</td>
+
+        <td>値表示</td>
+        <td>
+          <form class="toggle_area" name="f_value" action="#">
+            <input type="radio" name="R3" id="R3_ON" onclick="func()" checked="checked">
+            <label for="R3_ON">入</label>
+            <input type="radio" name="R3" id="R3_OFF" onclick="func()">
+            <label for="R3_OFF">切</label>
+          </form>
+        </td>
+        <td>&nbsp</td>
+
+        <td>
+          <form name="F1" action="#">
+            <div>
+              &nbsp;<input type="text" name="T1" size="3" maxlength="4" placeholder="幅pixel"
+                oninput="value = value.replace(/[^0-9]+/i,'');" title="空白の場合は等倍解像度でダウンロード">
+              &nbsp;<input type="text" name="T1" size="3" maxlength="4" placeholder="高pixel"
+                oninput="value = value.replace(/[^0-9]+/i,'');" title="空白の場合は等倍解像度でダウンロード">&nbsp;
+            </div>
+            <div>
+              <!-- thanks for download button data http://design-ec.com/?p=342 -->
+              &nbsp;<input type="button" src="pngdownload.png" value="PNGダウンロード" onclick="download_PNG()">
+            </div>
+          </form>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+
+  <div id="chart"></div>
+  <script>func()</script>
+  
+  <div><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></div>
+  <div>
+    <footer><a href="https://bl.ocks.org/tomshanley/874923fe54b173735b456479423ac7d6">[Referenced by Sankey
+        with circular link and animated dashes]</a></footer>
+  </div>
 </body>
 
 </html>
