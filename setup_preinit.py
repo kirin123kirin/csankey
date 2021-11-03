@@ -20,14 +20,16 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
         start = 0
         end = 0
 
-        for i, re_scp in enumerate(re.finditer('<script\s+src="([^\"]+)">\s*</script>', dat)):
+        for i, re_scp in enumerate(re.finditer('<script\s+src="([^\"]+)"\s*>.*</script>', dat)):
             if i == 0:
                 start = re_scp.start()
             end = re_scp.end()
             scpname = re_scp.group(1)
             if (scpname.startswith("http")):
-                req = request.Request(scpname)
-                with request.urlopen(req) as res:
+                opener = request.build_opener()
+                opener.addheaders = [('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
+                request.install_opener(opener)
+                with request.urlopen(scpname) as res:
                     scripts += res.read()
             else:
                 scpfile = normpath(pathjoin(SRCDIR, scpname))
