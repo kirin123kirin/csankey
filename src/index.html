@@ -32,6 +32,26 @@
       font-family: "MS UI Gothic";
     }
 
+    .viewsetting {
+      width: 900px;
+      border-collapse: collapse;
+      background: -webkit-linear-gradient(to right, gray, transparent);
+      background: linear-gradient(to right, gray, transparent);
+      color: white;
+    }
+
+    /* .viewsetting th,
+    .viewsetting td {
+      border: 1px solid #CCCCCC;
+      padding: 5px 10px;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    .viewsetting th {
+      background-color: #FFCCCC;
+    } */
+
     rect {
       shape-rendering: crispEdges;
     }
@@ -72,66 +92,61 @@
       pointer-events: all;
     }
 
-    .toggle_area {
-      position: relative;
-      /* margin: auto; */
-      width: 50px;
-      height: 25px;
-      float: left;
+    /* thanks for https://ginpen.com/2012/12/11/segmented-control */
+    .segmented {
+      display: inline-block;
     }
 
-    .toggle_area input[type="radio"] {
+    .segmented .label {
+      background-color: #eee;
+      background-image: linear-gradient(to bottom, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
+      border: 1px #ccc;
+      border-style: solid none solid solid;
+      color: #777;
+      cursor: pointer;
+      float: left;
+      padding: 3px;
+      text-align: center;
+      text-shadow: 1px 1px #fff;
+      /* width: 40px; */
+    }
+
+    .segmented :first-child .label {
+      border-radius: 5px 0 0 5px;
+      /* border-radius: 5px 5px 5px 5px; */
+    }
+
+    .segmented :last-child .label {
+      border-radius: 0 5px 5px 0;
+      /* border-radius: 5px 5px 5px 5px; */
+      border-right-style: solid;
+    }
+
+    .segmented input {
       display: none;
     }
 
-    .toggle_area label {
-      display: block;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      text-align: center;
-      line-height: 20px;
-      font-size: 10pt;
-      font-weight: bold;
-      border: 2px solid #ccc;
-    }
-
-    .toggle_area #R1_ON+label,
-    #R2_ON+label,
-    #R3_ON+label {
-      right: 50%;
-      border-radius: 6px 0 0 6px;
-      background: #eee;
-      color: #666;
-      border-right: none;
-    }
-
-    .toggle_area #R1_ON:checked+label,
-    #R2_ON:checked+label,
-    #R3_ON:checked+label {
-      background: linear-gradient(180deg, #00b359, #006633, #00b359);
+    .segmented input:checked+.label {
+      background-color: #00f;
+      background-image: linear-gradient(to bottom, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
+      border-color: hsl(214, 90%, 60%);
+      box-shadow: 3px 2px 10px rgba(0, 0, 0, .2) inset, -3px 2px 10px rgba(0, 0, 0, .2) inset;
       color: #fff;
-      text-shadow: 1px 1px 1px #333;
+      text-shadow: -1px -1px rgba(0, 0, 0, .3);
     }
 
-    .toggle_area #R1_OFF+label,
-    #R2_OFF+label,
-    #R3_OFF+label {
-      left: 50%;
-      border-radius: 0 6px 6px 0;
-      background: #eee;
-      color: #666;
-      border-left: none;
+    .segmented .label {
+      background-image: -moz-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
+      background-image: -ms-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
+      background-image: -webkit-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
+      background-image: linear-gradient(to bottom, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
     }
 
-    .toggle_area #R1_OFF:checked+label,
-    #R2_OFF:checked+label,
-    #R3_OFF:checked+label {
-      background: linear-gradient(175deg, #ccc, #999, #ccc);
-      color: #fff;
-      text-shadow: 1px 1px 1px #333;
+    .segmented input:checked+span {
+      background-image: -moz-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
+      background-image: -ms-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
+      background-image: -webkit-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
+      background-image: -webkit-linear-gradient(to bottom, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
     }
   </style>
 
@@ -434,39 +449,66 @@
         return text
 
       let array = text.replace("\r", "").split("\n")
-      if (array.length < 2)
+      let alen = array.length
+      if (alen < 2)
         return text
 
       let ret = "";
 
+      const maxTextLength = d3.max(array, d => d.length)
+      const ax = data.x0
+      const ay = data.y0
       array.forEach((t, i) => {
-        let adjast_x = data.x0 + t.length * 5
-        let adjast_y = (data.y0 - (array.length - 1) * 35) + (i * 25)
+        let adjast_x = ax + t.length * 5
+        let adjast_y = (ay - (alen - 1) * 35) + (i * 25)
         ret += `<tspan y="${adjast_y}" x="${adjast_x}">${t}</tspan>`;
       });
       return ret;
     }
 
-    function rightLinebreak(textdata) { //@todo
-      let array = textdata.split("\n")
-      let string = "";
+    function rightLinebreak(data) {
+      let text = data.name
+      if (text.indexOf('\n') == -1)
+        return text
+
+      let array = text.replace("\r", "").split("\n")
+      let alen = array.length
+      if (alen < 2)
+        return text
+
+      let ret = "";
+
       const maxTextLength = d3.max(array, d => d.length)
+      const ax = data.x0
+      const ay = data.y0
       array.forEach((t, i) => {
-        let l = maxTextLength - t.length;
-        string += `<tspan y="${i}em" x="${l}em">${t}</tspan>`;
+        let adjast_x = ax + (2 * maxTextLength - t.length) * 5
+        let adjast_y = (ay - (alen - 1) * 35) + (i * 25)
+        ret += `<tspan y="${adjast_y}" x="${adjast_x}">${t}</tspan>`;
       });
-      return string;
+      return ret;
     }
 
-    function centerLinebreak(textdata) { //@todo
-      let array = textdata.split("\n")
-      let string = "";
+    function centerLinebreak(data) {
+      let text = data.name
+      if (text.indexOf('\n') == -1)
+        return text
+
+      let array = text.replace("\r", "").split("\n")
+      let alen = array.length
+      if (alen < 2)
+        return text
+
+      let ret = "";
       const maxTextLength = d3.max(array, d => d.length)
+      const ax = data.x0
+      const ay = data.y0
       array.forEach((t, i) => {
-        let l = (maxTextLength - t.length) / 2;
-        string += `<tspan y="${i}em" x="${l}em">${t}</tspan>`;
+        let adjast_x = ax + (maxTextLength + t.length) * 2.5
+        let adjast_y = (ay - (alen - 1) * 35) + (i * 25)
+        ret += `<tspan y="${adjast_y}" x="${adjast_x}">${t}</tspan>`;
       });
-      return string
+      return ret
     }
 
 
@@ -571,6 +613,8 @@
         .attr("dy", "0.35em")
         .attr("text-anchor", "middle")
 
+      let nodeposition = document.f_nodepos.R4.value
+
       nodelabel.append("a").attr("xlink:href", function (d) {
         var result = re_markdownlink.exec(d.name)
         if (result) {
@@ -579,8 +623,15 @@
         }
         return null
       }).style("text-decoration", "underline")
-        .html(function (d) { return leftLinebreak(d) }) //LF thanks for https://gunmagisgeek.com/blog/d3v4/4686
-
+        .html(function (d) {
+          //LF thanks for https://gunmagisgeek.com/blog/d3v4/4686
+          if (nodeposition == "left")
+            return leftLinebreak(d)
+          else if (nodeposition == "right")
+            return rightLinebreak(d)
+          else
+            return centerLinebreak(d)
+        })
       node.append("title")
         .text(function (d) { return d.name + "\n" + (d.value); });
 
@@ -711,37 +762,41 @@
 
   <div>
 
-    <table>
+    <table class="viewsetting">
       <tr>
         <td>アニメーション</td>
         <td>
-          <form class="toggle_area" name="f_animation" action="#">
-            <input type="radio" name="R1" id="R1_ON" onclick="func()" checked="checked">
-            <label for="R1_ON">入</label>
-            <input type="radio" name="R1" id="R1_OFF" onclick="func()">
-            <label for="R1_OFF">切</label>
+          <form class="segmented" name="f_animation" action="#">
+            <label><input type="radio" name="R1" value="on" onclick="func()" checked><span class="label">入</span></label>
+            <label><input type="radio" name="R1" value="off" onclick="func()"><span class="label">切</span></label>
           </form>
         </td>
         <td>&nbsp</td>
 
         <td>矢印</td>
         <td>
-          <form class="toggle_area" name="f_arrow" action="#">
-            <input type="radio" name="R2" id="R2_ON" onclick="func()" checked="checked">
-            <label for="R2_ON">入</label>
-            <input type="radio" name="R2" id="R2_OFF" onclick="func()">
-            <label for="R2_OFF">切</label>
+          <form class="segmented" name="f_arrow" action="#">
+            <label><input type="radio" name="R2" value="on" onclick="func()" checked><span class="label">入</span></label>
+            <label><input type="radio" name="R2" value="off" onclick="func()"><span class="label">切</span></label>
           </form>
         </td>
         <td>&nbsp</td>
 
         <td>値表示</td>
         <td>
-          <form class="toggle_area" name="f_value" action="#">
-            <input type="radio" name="R3" id="R3_ON" onclick="func()" checked="checked">
-            <label for="R3_ON">入</label>
-            <input type="radio" name="R3" id="R3_OFF" onclick="func()">
-            <label for="R3_OFF">切</label>
+          <form class="segmented" name="f_value" action="#">
+            <label><input type="radio" name="R3" value="on" onclick="func()" checked><span class="label">入</span></label>
+            <label><input type="radio" name="R3" value="off" onclick="func()"><span class="label">切</span></label>
+          </form>
+        </td>
+        <td>&nbsp</td>
+
+        <td> ノード文字揃 </td>
+        <td>
+          <form class="segmented" name="f_nodepos" action="#">
+            <label><input type="radio" name="R4" value="left" onclick="func()" checked><span class="label">左</span></label>
+            <label><input type="radio" name="R4" value="center" onclick="func()"><span class="label">中</span></label>
+            <label><input type="radio" name="R4" value="right" onclick="func()"><span class="label">右</span></label>
           </form>
         </td>
         <td>&nbsp</td>
@@ -760,11 +815,14 @@
             </div>
           </form>
         </td>
+        <td>&nbsp</td>
+
         <td>
           <br /><input type="button" value="SVGダウンロード" onclick="download_SVG()">
         </td>
       </tr>
     </table>
+
 
   </div>
 
