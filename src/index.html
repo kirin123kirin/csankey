@@ -138,9 +138,8 @@
 
 
   <!-- include Section -->
-  <script src="d3.v4.min.js"></script>
-  <script src="d3-sankey-circular.js"></script>
-
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://bl.ocks.org/tomshanley/raw/6eb025290888935f10b142e4bc576d8d/d3-sankey-circular.js"></script>
 
 
   <!-- My Script Section -->
@@ -258,10 +257,14 @@
       })
     }
 
+    /* thanks https://bl.ocks.org/tomshanley/d01b00c17a5ebe76779c26f82ab9d7ec#index.html */
     function addMinardLabels(link) {
       let thisLength = 1
       let position = this.getPointAtLength(thisLength)
       let positionPlueOne = this.getPointAtLength(thisLength + 5)
+      let linkval = link.value
+      let sourcename = link.source.name
+      let targetname = link.target.name
 
       // let adj = positionPlueOne.x - position.x;
       // let opp = position.y - positionPlueOne.y;
@@ -269,21 +272,23 @@
       let rotation = 0;
 
       let label = node
-      let result = re_markdownlink.exec(link.value)
+      let result = re_markdownlink.exec(linkval)
 
       if (result) {
-        link.value = link.value.replace(re_markdownlink, result[2])
+        link.value = linkval.replace(re_markdownlink, result[2])
         if (result[1] == "!")
-          label = node.append("img").attr("src", result[3]).attr("alt", link.value)
+          label = node.append("img").attr("src", result[3]).attr("alt", linkval)
         else
           label = node.append("a").attr("xlink:href", result[3])
       }
 
-      let clen = String(link.value).length;
+      let clen = String(linkval).length;
 
       /* thanks for https://stackoverflow.com/questions/6725288/svg-text-inside-rect */
       label.append("rect")
         .attr("class", "link-label-rect")
+        .attr("_source", sourcename)
+        .attr("_target", targetname)
         .attr("x", position.x)
         .attr("y", position.y - 23)
         .attr("rx", 4)
@@ -293,30 +298,87 @@
 
       label.append("text")
         .attr("class", "link-label")
+        .attr("_source", sourcename)
+        .attr("_target", targetname)
         .attr("x", position.x)
         .attr("y", position.y - 5)
         .attr("dx", "0.2em")
         .style("text-anchor", "start")
-        .attr("transform", "rotate(" + rotation + "," + position.x + "," + position.y + ")")
-        .text(link.value)
+        // .attr("transform", "rotate(" + rotation + "," + position.x + "," + position.y + ")")
+        .text(linkval)
 
     }
 
-    function download_PNG() {
-      node.selectAll(".link-label-rect").remove()
-      node.selectAll(".link-label").style("fill", "black")
+    /* thanks for https://qiita.com/Nikkely/items/aa485ebdbec51e49ecbc */
+    function getSVGdata(SVGElement = document.querySelector("svg")) {
+      SVGElement.version = 1.1
+      SVGElement.xmlns = 'http://www.w3.org/2000/svg'
 
-      var svg = document.querySelector("svg");
-      var svgData = new XMLSerializer().serializeToString(svg);
-      var canvas = document.createElement("canvas");
+      const queue = []
+      queue.push(SVGElement)
+      while (queue.length != 0) {
+        const element = queue.pop()
+
+        const computedStyle = window.getComputedStyle(element, '')
+        for (let property of computedStyle) {
+          element.style[property] = computedStyle.getPropertyValue(property)
+        }
+
+        const children = element.children
+
+        for (let child of children) {
+          queue.push(child)
+        }
+      }
+
+      return new XMLSerializer().serializeToString(SVGElement);
+    }
+
+    /* thanks for https://kuroeveryday.blogspot.com/2016/05/file-download-from-browser.html?m=1 */
+    function browser_download(content, mimeType, savefilename) {
+      // BOM mojibake
+      let bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+      let blob = new Blob([bom, content], { type: mimeType });
+
+      let a = document.createElement('a');
+      a.download = savefilename;
+      a.target = '_blank';
+
+      if (window.navigator.msSaveBlob) {
+        // for IE
+        window.navigator.msSaveBlob(blob, savefilename)
+      }
+      else if (window.URL && window.URL.createObjectURL) {
+        // for Firefox
+        a.href = window.URL.createObjectURL(blob);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      else if (window.webkitURL && window.webkitURL.createObject) {
+        // for Chrome
+        a.href = window.webkitURL.createObjectURL(blob);
+        a.click();
+      }
+      else {
+        // for Safari
+        window.open('data:' + mimeType + ';charset=utf-8;base64,' + window.Base64.encode(content), '_blank');
+      }
+    }
+
+    /* thanks for https://zenn.dev/skryo/articles/7d7f1ce601510b */
+    function download_PNG() {
+      let elem = document.querySelector("svg");
+      let svgData = getSVGdata(elem)
+      let canvas = document.createElement("canvas");
 
       let height = document.F1.T1[1].value;
       let width = document.F1.T1[0].value;
-      canvas.width = svg.width.baseVal.value;
-      canvas.height = svg.height.baseVal.value;
+      canvas.width = elem.width.baseVal.value;
+      canvas.height = elem.height.baseVal.value;
 
-      var ctx = canvas.getContext("2d");
-      var image = new Image;
+      let ctx = canvas.getContext("2d");
+      let image = new Image;
       image.onload = function () {
 
         if (width && height)
@@ -335,50 +397,12 @@
       }
       image.src = "data:image/svg+xml;charset=utf-8;base64," + btoa(unescape(encodeURIComponent(svgData)));
 
-      func() /* reload */
     }
 
     /* thank you for https://kuroeveryday.blogspot.com/2016/05/file-download-from-browser.html */
     function download_SVG() {
-      node.selectAll(".link-label-rect").remove()
-      node.selectAll(".link-label").style("fill", "black")
-
-      var svg = document.querySelector("svg");
-      var content = new XMLSerializer().serializeToString(svg);
-
-      var mimeType = 'image/svg+xml';
-      var name = 'sankeydiagram.svg';
-
-      // BOM mojibake
-      var bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-      var blob = new Blob([bom, content], { type: mimeType });
-
-      var a = document.createElement('a');
-      a.download = name;
-      a.target = '_blank';
-
-      if (window.navigator.msSaveBlob) {
-        // for IE
-        window.navigator.msSaveBlob(blob, name)
-      }
-      else if (window.URL && window.URL.createObjectURL) {
-        // for Firefox
-        a.href = window.URL.createObjectURL(blob);
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
-      else if (window.webkitURL && window.webkitURL.createObject) {
-        // for Chrome
-        a.href = window.webkitURL.createObjectURL(blob);
-        a.click();
-      }
-      else {
-        // for Safari
-        window.open('data:' + mimeType + ';base64,' + window.Base64.encode(content), '_blank');
-      }
-      func() /* reload */
-
+      let elem = document.querySelector("svg");
+      browser_download(getSVGdata(elem), 'image/svg+xml', 'sankeydiagram.svg')
     }
 
     function highlightNodes(node, name) {
@@ -403,6 +427,7 @@
 
     }
 
+    /* thanks for https://bl.ocks.org/shimizu/44ac0be6f0ce6e75bd62 */
     function leftLinebreak(data) {
       let text = data.name
       if (text.indexOf('\n') == -1)
@@ -465,7 +490,8 @@
 
       svg = d3.select("#chart").append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom);
+        .attr("height", height + margin.top + margin.bottom)
+        .attr("xmlns:xlink", "http://www.w3.org/1999/xlink");
 
       g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
@@ -512,26 +538,30 @@
 
           let thisName = d.name;
 
-          node.selectAll(".node-rect")
-            .style("opacity", function (d) {
-              return highlightNodes(d, thisName)
-            })
-
-          d3.selectAll(".sankey-link")
+          link.selectAll(".sankey-link")
             .style("opacity", function (l) {
               return l.source.name == thisName || l.target.name == thisName ? 1 : 0.3;
             })
 
-          node.selectAll("text")
+          node.selectAll("text, .node-rect")
             .style("opacity", function (d) {
               return highlightNodes(d, thisName)
             })
+
+          node.selectAll(".link-label-rect, .link-label")
+            .style("opacity", function (d) {
+              let src = this.attributes[1].nodeValue;
+              let tar = this.attributes[2].nodeValue;
+              return thisName == src || thisName == tar ? 1 : 0.1;
+            })
+
         })
         .on("mouseout", function (d) {
+          d3.selectAll("text").style("opacity", 1);
           d3.selectAll(".node-rect").style("opacity", 0.5);
           d3.selectAll(".link-label-rect").style("opacity", 1);
+          d3.selectAll(".link-label").style("opacity", 1);
           d3.selectAll(".sankey-link").style("opacity", 0.7);
-          d3.selectAll("text").style("opacity", 1);
         })
 
       let nodelabel = node.append("text")
