@@ -1,4 +1,5 @@
-﻿#include <Python.h>
+﻿/* csankey.cpp | MIT License | https://github.com/kirin123kirin/csankey/raw/main/LICENSE */
+#include <Python.h>
 #include <string>
 #include <tuple>
 #include <unordered_map>
