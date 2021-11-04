@@ -5,10 +5,10 @@
 #include <unordered_set>
 
 static constexpr wchar_t BEFORE_TEXT[] =
-#include "bf.txt"
+#include "bf.cc"
     ;
 static constexpr wchar_t AFTER_TEXT[] =
-#include "af.txt"
+#include "af.cc"
     ;
 
 std::wstring pyto_wstring(PyObject* o) {
