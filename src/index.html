@@ -34,13 +34,13 @@
     }
 
     .viewsetting {
-      width: 950px;
+      width: 900px;
       display: table;
       border-collapse: collapse;
       /* background: -webkit-linear-gradient(to right, gray, transparent);
       background: linear-gradient(to right, gray, transparent); */
       /* color: white; */
-      text-align: left;
+      text-align: center;
       text-shadow: 1px 1px #050505;
       font-size: 14px;
       font-family: "メイリオ", "Meiryo";
@@ -49,7 +49,6 @@
     .viewsetting .horizon {
       display: table-cell;
       vertical-align: middle;
-      text-align: left;
     }
 
     rect {
@@ -81,6 +80,12 @@
       opacity: 100%;
     }
 
+    /* .link-label-rect {
+      shape-rendering: crispEdges;
+      fill: blue;
+      opacity: 100%;
+    }
+ */
     .link {
       fill: none;
     }
@@ -90,6 +95,13 @@
       /* top: 0; */
       /* left: 0; */
       pointer-events: all;
+    }
+
+
+    .segmented_header {
+      margin-top: 5px;
+      text-align: center;
+      height: 10px;
     }
 
     /* thanks for https://ginpen.com/2012/12/11/segmented-control */
@@ -143,7 +155,8 @@
       background-image: linear-gradient(to bottom, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
     }
 
-    .segmented input:checked+span, [download] span {
+    .segmented input:checked+span,
+    [download] span {
       background-image: -moz-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
       background-image: -ms-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
       background-image: -webkit-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
@@ -162,7 +175,7 @@
       position: relative;
       text-align: center;
       vertical-align: middle;
-      width: 70px;
+      width: 80px;
     }
 
     [download] span {
@@ -232,13 +245,91 @@
     [download]:hover span:last-child {
       display: none;
     }
+
+    /* thanks for https://codepen.io/estelle/pen/RJpreX */
+    table {
+      border-collapse: collapse;
+      font-family: "メイリオ", "Meiryo";
+    }
+
+    td,
+    th {
+      border: 1px solid;
+      padding: 8px;
+      min-width: 10px;
+      background: white;
+      box-sizing: border-box;
+      text-align: left;
+      padding-right: 5em;
+    }
+
+    .table-container {
+      position: relative;
+      max-height: 500px;
+      width: 1000px;
+      overflow: scroll;
+    }
+
+    thead th {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      color: azure;
+      border-color: black;
+      background: hsl(214, 90%, 40%);
+    }
+
+    thead th:first-child {
+      color: black;
+      left: 0;
+      z-index: 3;
+    }
+
+    tfoot {
+      position: -webkit-sticky;
+      bottom: 0;
+      z-index: 2;
+      color: azure;
+      border-color: black;
+    }
+
+    tfoot td {
+      position: sticky;
+      bottom: 0;
+      z-index: 2;
+      background: hsl(214, 90%, 40%);
+    }
+
+    tfoot td:first-child {
+      z-index: 3;
+      color: black;
+    }
+
+    tbody {
+      overflow: scroll;
+      height: 500px;
+    }
+
+    /* MAKE LEFT COLUMN FIXEZ */
+    tr> :first-child {
+      position: -webkit-sticky;
+      position: sticky;
+      background: hsl(214, 90%, 70%);
+      left: 0;
+    }
+
+    /* don't do this */
+    tr> :first-child {
+      box-shadow: inset 0px 1px black;
+    }
   </style>
 
 
 
   <!-- include Section -->
   <script src="https://d3js.org/d3.v4.min.js"></script>
-  <script src="https://bl.ocks.org/tomshanley/raw/6eb025290888935f10b142e4bc576d8d/d3-sankey-circular.js"></script>
+  <script src="d3-sankey-circular.js"></script>
 
 
   <!-- My Script Section -->
@@ -361,7 +452,6 @@
       let thisLength = 1
       let position = this.getPointAtLength(thisLength)
       let positionPlueOne = this.getPointAtLength(thisLength + 5)
-      let linkval = link.value
       let sourcename = link.source.name
       let targetname = link.target.name
 
@@ -371,17 +461,17 @@
       let rotation = 0;
 
       let label = node
-      let result = re_markdownlink.exec(linkval)
+      let result = re_markdownlink.exec(link.value)
 
       if (result) {
-        link.value = linkval.replace(re_markdownlink, result[2])
+        link.value = link.value.replace(re_markdownlink, result[2])
         if (result[1] == "!")
-          label = node.append("img").attr("src", result[3]).attr("alt", linkval)
+          label = node.append("img").attr("src", result[3]).attr("alt", link.value)
         else
           label = node.append("a").attr("xlink:href", result[3])
       }
 
-      let clen = String(linkval).length;
+      let clen = String(link.value).length;
 
       /* thanks for https://stackoverflow.com/questions/6725288/svg-text-inside-rect */
       label.append("rect")
@@ -404,7 +494,7 @@
         .attr("dx", "0.2em")
         .style("text-anchor", "start")
         // .attr("transform", "rotate(" + rotation + "," + position.x + "," + position.y + ")")
-        .text(linkval)
+        .text(link.value)
 
     }
 
@@ -845,32 +935,35 @@
   <h1>Sankey Diagram Output Page
 
     <div class="viewsetting">
-      <div class="horizon" style="padding-left: 10px;">アニメーション</div>
+      <!-- <div class="horizon" style="padding-left: 10px;">アニメーション</div> -->
+
       <div class="horizon">
+        <div class="segmented_header">アニメーション</div>
         <form class="segmented" name="f_animation" action="#">
           <label><input type="radio" name="R1" value="on" onclick="func()" checked><span class="label">入</span></label>
           <label><input type="radio" name="R1" value="off" onclick="func()"><span class="label">切</span></label>
         </form>
       </div>
 
-      <div class="horizon" style="padding-left: 10px;">矢印</div>
+      <!-- <div class="horizon" style="padding-left: 10px;"></div> -->
       <div class="horizon">
+        <div class="segmented_header">矢印</div>
         <form class="segmented" name="f_arrow" action="#">
           <label><input type="radio" name="R2" value="on" onclick="func()" checked><span class="label">入</span></label>
           <label><input type="radio" name="R2" value="off" onclick="func()"><span class="label">切</span></label>
         </form>
       </div>
 
-      <div class="horizon" style="padding-left: 10px;">値表示</div>
       <div class="horizon">
+        <div class="segmented_header">値表示</div>
         <form class="segmented" name="f_value" action="#">
           <label><input type="radio" name="R3" value="on" onclick="func()" checked><span class="label">入</span></label>
           <label><input type="radio" name="R3" value="off" onclick="func()"><span class="label">切</span></label>
         </form>
       </div>
 
-      <div class="horizon" style="padding-left: 10px;"> ノード文字揃 </div>
       <div class="horizon">
+        <div class="segmented_header">ノード文字揃え</div>
         <form class="segmented" name="f_nodepos" action="#">
           <label><input type="radio" name="R4" value="left" onclick="func()" checked><span
               class="label">左</span></label>
@@ -879,29 +972,31 @@
         </form>
       </div>
 
-      <div class="horizon" style="padding-left: 10px;">
+      <div class="horizon" style="padding-left: 15px">
         <form name="F1" action="#">
           <div class="horizon">
+
             <div>
               <input type="text" name="T1" size="3" maxlength="4" placeholder="幅pixel"
                 oninput="value = value.replace(/[^0-9]+/i,'');"
                 title="解像度 幅ピクセルを4桁数値で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
             </div>
+
             <div>
               <input type="text" name="T1" size="3" maxlength="4" placeholder="高pixel"
                 oninput="value = value.replace(/[^0-9]+/i,'');"
                 title="解像度 高さピクセルを4桁数値で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
             </div>
           </div>
+
           <div class="horizon">
             <a href="javascript:download_PNG();" id="DLPNG" download><span>Download</span><span>PNG</span></a>
+            <a href="javascript:download_SVG();" id="DLSVG" download><span>Download</span><span>SVG</span></a>
           </div>
+
         </form>
       </div>
 
-      <div class="horizon">
-        <a href="javascript:download_SVG();" id="DLSVG" download><span>Download</span><span>SVG</span></a>
-      </div>
     </div>
   </h1>
 
@@ -909,15 +1004,55 @@
 
   <script>func()</script>
 
+
+  <!-- @todo -->
+  <!-- thanks for https://codepen.io/estelle/pen/RJpreX -->
+  <div class="table-container">
+    <strong>リンク一覧</strong>
+    <div style="padding: 15px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Header</th>
+            <th>Header</th>
+            <th>Header</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Column one</th>
+            <td>Column two</td>
+            <td>Column three</td>
+          </tr>
+          <tr>
+            <th>Column one</th>
+            <td>Column two</td>
+            <td>Column three</td>
+          </tr>
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td>Footer</td>
+            <td>Footer</td>
+            <td>Footer</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
   <div><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></div>
+
   <div>
     <footer>
+      csankey Copyright © 2021 kirin123kirin see <a href="https://opensource.org/licenses/MIT">MIT
+        Liscense</a>&nbsp;&nbsp;|
       Powered by &nbsp;<a href="https://d3js.org/d3.v4.min.js">d3.js</a>
-      &nbsp;|&nbsp;Referenced by&nbsp;<a
-        href="https://bl.ocks.org/tomshanley/raw/6eb025290888935f10b142e4bc576d8d/d3-sankey-circular.js">Tom Shanley’s
-        Block Sankey with circular links1</a>
-      <a href="https://bl.ocks.org/tomshanley/874923fe54b173735b456479423ac7d6">Tom Shanley’s Block Sankey with circular
-        links2</a>
+      &nbsp;|&nbsp;Referenced by Tom Shanley’s&nbsp;<a
+        href="https://bl.ocks.org/tomshanley/raw/6eb025290888935f10b142e4bc576d8d/d3-sankey-circular.js">Sankey circular
+        links1</a>
+      <a href="https://bl.ocks.org/tomshanley/874923fe54b173735b456479423ac7d6">Sankey circular links2</a>
     </footer>
   </div>
 </body>
