@@ -74,18 +74,6 @@
       font-style: italic;
     }
 
-    .link-label-rect {
-      shape-rendering: crispEdges;
-      fill: blue;
-      opacity: 100%;
-    }
-
-    /* .link-label-rect {
-      shape-rendering: crispEdges;
-      fill: blue;
-      opacity: 100%;
-    }
- */
     .link {
       fill: none;
     }
@@ -104,7 +92,9 @@
       height: 10px;
     }
 
-    /* thanks for https://ginpen.com/2012/12/11/segmented-control */
+    /*
+     * thanks for https://ginpen.com/2012/12/11/segmented-control
+     */
     .segmented {
       display: inline-block;
       padding: 10px;
@@ -163,7 +153,9 @@
       background-image: -webkit-linear-gradient(to bottom, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
     }
 
-    /* thanks for https://devsnap.me/css-download-buttons */
+    /* 
+     * thanks for https://devsnap.me/css-download-buttons
+     */
     [download] {
       background: none;
       /* 		border: solid 1px #e6e6e6; */
@@ -218,7 +210,7 @@
       background: #e2e8f0;
     }
 
-    /*a:before{transform:translate(-30%,-60%);}*/
+    /* [download]:before{transform:translate(-30%,-60%);} */
 
     [download]:before {
       margin: -23px 0 0 -5px;
@@ -246,7 +238,37 @@
       display: none;
     }
 
-    /* thanks for https://codepen.io/estelle/pen/RJpreX */
+    /* 
+     * thanks for https://codepen.io/rperry1886/pen/OJPQxza
+     */
+    button {
+      filter: drop-shadow(3px 3px 3px rgba(60, 60, 60, 0.432));
+      min-height: 25px;
+      min-width: 25px;
+      background: blue;
+      font-weight: bold;
+      color: white;
+      font-size: 12pt;
+      border: none;
+      padding: 10;
+      stroke: black;
+      outline: none;
+      border-radius: 10px 10px 10px 10px;
+    }
+
+    button:hover {
+      filter: drop-shadow(3px 5px 5px rgba(0, 0, 0, 0.45));
+    }
+
+    button:active {
+      filter: none;
+      transform: scale(.95);
+    }
+
+
+    /* 
+     * thanks for https://codepen.io/estelle/pen/RJpreX
+     */
     table {
       border-collapse: collapse;
       font-family: "メイリオ", "Meiryo";
@@ -447,54 +469,36 @@
       })
     }
 
-    /* thanks https://bl.ocks.org/tomshanley/d01b00c17a5ebe76779c26f82ab9d7ec#index.html */
+    /* refs https://bl.ocks.org/tomshanley/d01b00c17a5ebe76779c26f82ab9d7ec#index.html */
     function addMinardLabels(link) {
-      let thisLength = 1
-      let position = this.getPointAtLength(thisLength)
-      let positionPlueOne = this.getPointAtLength(thisLength + 5)
-      let sourcename = link.source.name
-      let targetname = link.target.name
+      let position = this.getPointAtLength(3)
+      if (!(typeof (link.value) == "string" || link.value instanceof String))
+        link.value = String(link.value)
 
-      // let adj = positionPlueOne.x - position.x;
-      // let opp = position.y - positionPlueOne.y;
-      // let angle = Math.atan(opp / adj) * (180 / Math.PI);
-      let rotation = 0;
+      /* thanks for https://stackoverflow.com/questions/39974264/how-to-pack-text-inside-svg-rect */
+      let length = String(link.value).length;
+      let count = (link.value.match(/\n/g) || [1]).length;
 
-      let label = node
+      let label = node.append("foreignObject")
+        .attr("class", "link-label")
+        .attr("_source", link.source.name)
+        .attr("_target", link.target.name)
+        .attr("x", position.x)
+        .attr("y", position.y - 15)
+        .attr("width", 32 + (length - 1) * 9)
+        .attr("height", count * 32)
+        .append("xhtml:div").append("button").attr("type", "button")
+
       let result = re_markdownlink.exec(link.value)
-
       if (result) {
         link.value = link.value.replace(re_markdownlink, result[2])
-        if (result[1] == "!")
-          label = node.append("img").attr("src", result[3]).attr("alt", link.value)
-        else
-          label = node.append("a").attr("xlink:href", result[3])
+        label
+          .attr("onclick", 'location.href="' + result[3] + '"')
+          .style("cursor", "pointer")
+      } else {
+        label.attr("disabled", false)
       }
-
-      let clen = String(link.value).length;
-
-      /* thanks for https://stackoverflow.com/questions/6725288/svg-text-inside-rect */
-      label.append("rect")
-        .attr("class", "link-label-rect")
-        .attr("_source", sourcename)
-        .attr("_target", targetname)
-        .attr("x", position.x)
-        .attr("y", position.y - 23)
-        .attr("rx", 4)
-        .attr("ry", 4)
-        .attr("height", 25)
-        .attr("width", 25 + (clen * (2.6 - (clen / 100))) * Math.log(clen))
-
-      label.append("text")
-        .attr("class", "link-label")
-        .attr("_source", sourcename)
-        .attr("_target", targetname)
-        .attr("x", position.x)
-        .attr("y", position.y - 5)
-        .attr("dx", "0.2em")
-        .style("text-anchor", "start")
-        // .attr("transform", "rotate(" + rotation + "," + position.x + "," + position.y + ")")
-        .text(link.value)
+      label.text(link.value)
 
     }
 
@@ -764,7 +768,7 @@
               return highlightNodes(d, thisName)
             })
 
-          node.selectAll(".link-label-rect, .link-label")
+          node.selectAll(".link-label")
             .style("opacity", function (d) {
               let src = this.attributes[1].nodeValue;
               let tar = this.attributes[2].nodeValue;
@@ -775,7 +779,6 @@
         .on("mouseout", function (d) {
           d3.selectAll("text").style("opacity", 1);
           d3.selectAll(".node-rect").style("opacity", 0.5);
-          d3.selectAll(".link-label-rect").style("opacity", 1);
           d3.selectAll(".link-label").style("opacity", 1);
           d3.selectAll(".sankey-link").style("opacity", 0.7);
         })
@@ -1008,7 +1011,40 @@
   <!-- @todo -->
   <!-- thanks for https://codepen.io/estelle/pen/RJpreX -->
   <div class="table-container">
-    <strong>リンク一覧</strong>
+    <h2>リンク一覧</h2>
+    <div style="padding: 15px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Header</th>
+            <th>Header</th>
+            <th>Header</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Column one</th>
+            <td>Column two</td>
+            <td>Column three</td>
+          </tr>
+          <tr>
+            <th>Column one</th>
+            <td>Column two</td>
+            <td>Column three</td>
+          </tr>
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td>Footer</td>
+            <td>Footer</td>
+            <td>Footer</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <h2>ノード一覧</h2>
     <div style="padding: 15px;">
       <table>
         <thead>
