@@ -8,9 +8,10 @@ import os
 import io
 import sys
 from os.path import dirname, join as pjoin
-from setup_preinit import TARGET
+from setup_preinit import TARGET, SRCDIR
+from glob import glob
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 DESCRIPTION = "Sakey Diagram HTML builder"
 KEYWORDS = ["sankey", "d3", "visualization"]
@@ -146,3 +147,7 @@ setup(name=MOD_NAME,
       classifiers=CLASSIFIERS.strip().splitlines(),
       **tests
       )
+
+for cc in glob(pjoin(SRCDIR, "*.cc")):
+    os.remove(cc)
+

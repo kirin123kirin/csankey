@@ -30,7 +30,7 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
                 opener.addheaders = [('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
                 request.install_opener(opener)
                 with request.urlopen(scpname) as res:
-                    scripts += res.read()
+                    scripts += res.read().decode()
             else:
                 scpfile = normpath(pathjoin(SRCDIR, scpname))
                 with open(scpfile, "r", encoding="utf-8") as f:
@@ -53,7 +53,7 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
         if not maf:
             raise ValueError("unexpected `after` template data.")
 
-        with open(normpath(pathjoin(srcdir, "bf.txt")), "w", encoding="utf-8") as w:
+        with open(normpath(pathjoin(srcdir, "bf.cc")), "w", encoding="utf-8") as w:
             w.write("{")
             for d in map(repr, re_minify("", bf)):
                 if d == '"\'"':
@@ -61,7 +61,7 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
                 w.write("L" + d + ",")
             w.write("NULL}")
 
-        with open(normpath(pathjoin(srcdir, "af.txt")), "w", encoding="utf-8") as w:
+        with open(normpath(pathjoin(srcdir, "af.cc")), "w", encoding="utf-8") as w:
             w.write("{")
             for d in map(repr, re_minify("", af[maf.start():])):
                 if d == '"\'"':
