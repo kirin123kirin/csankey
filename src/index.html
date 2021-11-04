@@ -4,15 +4,20 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-  <title>Sankey Diagram</title>
+  <title>Sankey</title>
 
   <style>
+    body {
+      font-family: "MS UI Gothic";
+    }
+
     h1 {
       position: relative;
-      /* padding: 0.1em 0.5em; */
+      padding: 0.1em 0.5em;
       background: -webkit-linear-gradient(to right, gray, transparent);
       background: linear-gradient(to right, gray, transparent);
       color: white;
+      text-shadow: 1px 1px black;
     }
 
     footer {
@@ -28,29 +33,24 @@
       bottom: 0;
     }
 
-    body {
-      font-family: "MS UI Gothic";
-    }
-
     .viewsetting {
-      width: 900px;
+      width: 950px;
+      display: table;
       border-collapse: collapse;
-      background: -webkit-linear-gradient(to right, gray, transparent);
-      background: linear-gradient(to right, gray, transparent);
-      color: white;
-    }
-
-    /* .viewsetting th,
-    .viewsetting td {
-      border: 1px solid #CCCCCC;
-      padding: 5px 10px;
+      /* background: -webkit-linear-gradient(to right, gray, transparent);
+      background: linear-gradient(to right, gray, transparent); */
+      /* color: white; */
       text-align: left;
-      font-size: 12px;
+      text-shadow: 1px 1px #050505;
+      font-size: 14px;
+      font-family: "メイリオ", "Meiryo";
     }
 
-    .viewsetting th {
-      background-color: #FFCCCC;
-    } */
+    .viewsetting .horizon {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: left;
+    }
 
     rect {
       shape-rendering: crispEdges;
@@ -87,14 +87,15 @@
 
     svg {
       /* position: absolute; */
-      top: 0;
-      left: 0;
+      /* top: 0; */
+      /* left: 0; */
       pointer-events: all;
     }
 
     /* thanks for https://ginpen.com/2012/12/11/segmented-control */
     .segmented {
       display: inline-block;
+      padding: 10px;
     }
 
     .segmented .label {
@@ -105,7 +106,7 @@
       color: #777;
       cursor: pointer;
       float: left;
-      padding: 3px;
+      padding: 4px;
       text-align: center;
       text-shadow: 1px 1px #fff;
       /* width: 40px; */
@@ -142,11 +143,94 @@
       background-image: linear-gradient(to bottom, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
     }
 
-    .segmented input:checked+span {
+    .segmented input:checked+span, [download] span {
       background-image: -moz-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
       background-image: -ms-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
       background-image: -webkit-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
       background-image: -webkit-linear-gradient(to bottom, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
+    }
+
+    /* thanks for https://devsnap.me/css-download-buttons */
+    [download] {
+      background: none;
+      /* 		border: solid 1px #e6e6e6; */
+      border-radius: 3px;
+      display: inline-block;
+      height: 65px;
+      line-height: 65px;
+      /* margin: 5px; */
+      position: relative;
+      text-align: center;
+      vertical-align: middle;
+      width: 70px;
+    }
+
+    [download] span {
+      /* background: orange; */
+      border-radius: 4px;
+      color: #ffffff;
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: normal;
+      padding: 5px 10px;
+      position: relative;
+      text-transform: uppercase;
+      z-index: 1;
+    }
+
+    [download] span:last-child {
+      margin-left: -20px;
+    }
+
+    [download]:before,
+    [download]:after {
+      background: #ffffff;
+      border: solid 3px #9fb4cc;
+      border-radius: 4px;
+      content: '';
+      display: block;
+      height: 35px;
+      left: 50%;
+      margin: -17px 0 0 -12px;
+      position: absolute;
+      top: 50%;
+      /*transform:translate(-50%,-50%);*/
+
+      width: 25px;
+    }
+
+    [download]:hover:before,
+    [download]:hover:after {
+      background: #e2e8f0;
+    }
+
+    /*a:before{transform:translate(-30%,-60%);}*/
+
+    [download]:before {
+      margin: -23px 0 0 -5px;
+    }
+
+    [download]:hover {
+      background: #e2e8f0;
+      border-color: #9fb4cc;
+    }
+
+    [download]:active {
+      background: #dae0e8;
+      box-shadow: inset 0 2px 2px rgba(0, 0, 0, .25);
+    }
+
+    [download] span:first-child {
+      display: none;
+    }
+
+    [download]:hover span:first-child {
+      display: inline-block;
+    }
+
+    [download]:hover span:last-child {
+      display: none;
     }
   </style>
 
@@ -758,75 +842,71 @@
 
 <body>
 
-  <h1>Sankey Diagram Output Page</h1>
+  <h1>Sankey Diagram Output Page
 
-  <div>
+    <div class="viewsetting">
+      <div class="horizon" style="padding-left: 10px;">アニメーション</div>
+      <div class="horizon">
+        <form class="segmented" name="f_animation" action="#">
+          <label><input type="radio" name="R1" value="on" onclick="func()" checked><span class="label">入</span></label>
+          <label><input type="radio" name="R1" value="off" onclick="func()"><span class="label">切</span></label>
+        </form>
+      </div>
 
-    <table class="viewsetting">
-      <tr>
-        <td>アニメーション</td>
-        <td>
-          <form class="segmented" name="f_animation" action="#">
-            <label><input type="radio" name="R1" value="on" onclick="func()" checked><span class="label">入</span></label>
-            <label><input type="radio" name="R1" value="off" onclick="func()"><span class="label">切</span></label>
-          </form>
-        </td>
-        <td>&nbsp</td>
+      <div class="horizon" style="padding-left: 10px;">矢印</div>
+      <div class="horizon">
+        <form class="segmented" name="f_arrow" action="#">
+          <label><input type="radio" name="R2" value="on" onclick="func()" checked><span class="label">入</span></label>
+          <label><input type="radio" name="R2" value="off" onclick="func()"><span class="label">切</span></label>
+        </form>
+      </div>
 
-        <td>矢印</td>
-        <td>
-          <form class="segmented" name="f_arrow" action="#">
-            <label><input type="radio" name="R2" value="on" onclick="func()" checked><span class="label">入</span></label>
-            <label><input type="radio" name="R2" value="off" onclick="func()"><span class="label">切</span></label>
-          </form>
-        </td>
-        <td>&nbsp</td>
+      <div class="horizon" style="padding-left: 10px;">値表示</div>
+      <div class="horizon">
+        <form class="segmented" name="f_value" action="#">
+          <label><input type="radio" name="R3" value="on" onclick="func()" checked><span class="label">入</span></label>
+          <label><input type="radio" name="R3" value="off" onclick="func()"><span class="label">切</span></label>
+        </form>
+      </div>
 
-        <td>値表示</td>
-        <td>
-          <form class="segmented" name="f_value" action="#">
-            <label><input type="radio" name="R3" value="on" onclick="func()" checked><span class="label">入</span></label>
-            <label><input type="radio" name="R3" value="off" onclick="func()"><span class="label">切</span></label>
-          </form>
-        </td>
-        <td>&nbsp</td>
+      <div class="horizon" style="padding-left: 10px;"> ノード文字揃 </div>
+      <div class="horizon">
+        <form class="segmented" name="f_nodepos" action="#">
+          <label><input type="radio" name="R4" value="left" onclick="func()" checked><span
+              class="label">左</span></label>
+          <label><input type="radio" name="R4" value="center" onclick="func()"><span class="label">中</span></label>
+          <label><input type="radio" name="R4" value="right" onclick="func()"><span class="label">右</span></label>
+        </form>
+      </div>
 
-        <td> ノード文字揃 </td>
-        <td>
-          <form class="segmented" name="f_nodepos" action="#">
-            <label><input type="radio" name="R4" value="left" onclick="func()" checked><span class="label">左</span></label>
-            <label><input type="radio" name="R4" value="center" onclick="func()"><span class="label">中</span></label>
-            <label><input type="radio" name="R4" value="right" onclick="func()"><span class="label">右</span></label>
-          </form>
-        </td>
-        <td>&nbsp</td>
-
-        <td>
-          <form name="F1" action="#">
+      <div class="horizon" style="padding-left: 10px;">
+        <form name="F1" action="#">
+          <div class="horizon">
             <div>
-              &nbsp;<input type="text" name="T1" size="3" maxlength="4" placeholder="幅pixel"
-                oninput="value = value.replace(/[^0-9]+/i,'');" title="空白の場合は等倍解像度でダウンロード">
-              &nbsp;<input type="text" name="T1" size="3" maxlength="4" placeholder="高pixel"
-                oninput="value = value.replace(/[^0-9]+/i,'');" title="空白の場合は等倍解像度でダウンロード">&nbsp;
+              <input type="text" name="T1" size="3" maxlength="4" placeholder="幅pixel"
+                oninput="value = value.replace(/[^0-9]+/i,'');"
+                title="解像度 幅ピクセルを4桁数値で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
             </div>
             <div>
-              <!-- thanks for download button data http://design-ec.com/?p=342 -->
-              &nbsp;<input type="button" value="PNGダウンロード" onclick="download_PNG()">
+              <input type="text" name="T1" size="3" maxlength="4" placeholder="高pixel"
+                oninput="value = value.replace(/[^0-9]+/i,'');"
+                title="解像度 高さピクセルを4桁数値で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
             </div>
-          </form>
-        </td>
-        <td>&nbsp</td>
+          </div>
+          <div class="horizon">
+            <a href="javascript:download_PNG();" id="DLPNG" download><span>Download</span><span>PNG</span></a>
+          </div>
+        </form>
+      </div>
 
-        <td>
-          <br /><input type="button" value="SVGダウンロード" onclick="download_SVG()">
-        </td>
-      </tr>
-    </table>
-
-
-  </div>
+      <div class="horizon">
+        <a href="javascript:download_SVG();" id="DLSVG" download><span>Download</span><span>SVG</span></a>
+      </div>
+    </div>
+  </h1>
 
   <div id="chart"></div>
+
   <script>func()</script>
 
   <div><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></div>
