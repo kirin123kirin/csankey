@@ -3,9 +3,7 @@
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
   <title>Sankey</title>
-
   <style>
     body {
       font-family: "MS UI Gothic";
@@ -346,14 +344,9 @@
       box-shadow: inset 0px 1px black;
     }
   </style>
-
-
-
   <!-- include Section -->
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="d3-sankey-circular.js"></script>
-
-
   <!-- My Script Section -->
   <script>
     let margin = { top: 30, right: 30, bottom: 30, left: 30 };
@@ -393,14 +386,14 @@
 
       arrows = selection
         .append('path')
-        .attr('d', function (d) {
+        .attr('d', function(d) {
           return d.path;
         })
         .style('stroke-width', 1)
         .style('stroke', 'black')
         .style('stroke-dasharray', arrowLength + ',' + gapLength)
 
-      arrows.each(function (arrow) {
+      arrows.each(function(arrow) {
         let thisPath = d3.select(this).node()
         let parentG = d3.select(this.parentNode)
         let pathLength = thisPath.getTotalLength()
@@ -415,7 +408,7 @@
           numberOfArrows = numberOfArrows - 1
         }
 
-        let arrowHeadData = d3.range(numberOfArrows).map(function (d, i) {
+        let arrowHeadData = d3.range(numberOfArrows).map(function(d, i) {
           let length = i * totalDashArrayLength + arrowLength
 
           let point = thisPath.getPointAtLength(length)
@@ -449,7 +442,7 @@
           .data(arrowHeadData)
           .enter()
           .append('path')
-          .attr('d', function (d) {
+          .attr('d', function(d) {
             return (
               'M' +
               d.x + ',' +
@@ -463,7 +456,7 @@
             )
           })
           .attr('class', 'arrow-head')
-          .attr('transform', function (d) {
+          .attr('transform', function(d) {
             return 'rotate(' + d.rotation + ',' + d.x + ',' + d.y + ')'
           })
           .style('fill', 'black')
@@ -473,7 +466,7 @@
     /* refs https://bl.ocks.org/tomshanley/d01b00c17a5ebe76779c26f82ab9d7ec#index.html */
     function addMinardLabels(link) {
       let position = this.getPointAtLength(3)
-      if (!(typeof (link.value) == "string" || link.value instanceof String))
+      if (!(typeof(link.value) == "string" || link.value instanceof String))
         link.value = String(link.value)
 
       /* thanks for https://stackoverflow.com/questions/39974264/how-to-pack-text-inside-svg-rect */
@@ -492,7 +485,6 @@
         .append("xhtml:div")
         .append("button")
         .attr("type", "button")
-      // .attr("title", )
 
       let result = re_markdownlink.exec(link.value)
       if (result) {
@@ -503,7 +495,8 @@
       } else {
         label.attr("disabled", false)
       }
-      label = label.text(link.value)
+      label.text(link.value)
+      
     }
 
     /* thanks for https://qiita.com/Nikkely/items/aa485ebdbec51e49ecbc */
@@ -511,23 +504,25 @@
       SVGElement.version = 1.1
       SVGElement.xmlns = 'http://www.w3.org/2000/svg'
 
-      const queue = []
-      queue.push(SVGElement)
-      while (queue.length != 0) {
-        const element = queue.pop()
+      SVGElement.querySelectorAll("text,button")
+      .forEach(function(f) {
+        let queue = []
+        queue.push(f)
+        while (queue.length != 0) {
+          let element = queue.pop()
 
-        const computedStyle = window.getComputedStyle(element, '')
-        for (let property of computedStyle) {
-          element.style[property] = computedStyle.getPropertyValue(property)
+          let computedStyle = window.getComputedStyle(element, '')
+          for (let property of computedStyle) {
+            element.style[property] = computedStyle.getPropertyValue(property)
+          }
+
+          let children = element.children
+
+          for (let child of children) {
+            queue.push(child)
+          }
         }
-
-        const children = element.children
-
-        for (let child of children) {
-          queue.push(child)
-        }
-      }
-
+      })
       return new XMLSerializer().serializeToString(SVGElement);
     }
 
@@ -576,7 +571,7 @@
 
       let ctx = canvas.getContext("2d");
       let image = new Image;
-      image.onload = function () {
+      image.onload = function() {
 
         if (width && height)
           ctx.drawImage(image, 0, 0, width, height);
@@ -609,12 +604,12 @@
       if (node.name == name) {
         opacity = 1;
       }
-      node.sourceLinks.forEach(function (link) {
+      node.sourceLinks.forEach(function(link) {
         if (link.target.name == name) {
           opacity = 1;
         };
       })
-      node.targetLinks.forEach(function (link) {
+      node.targetLinks.forEach(function(link) {
         if (link.source.name == name) {
           opacity = 1;
         };
@@ -705,7 +700,7 @@
         .nodePadding(nodePadding) //note that this will be overridden by nodePaddingRatio
         .nodePaddingRatio(nodePaddingRatio)
         .size([width, height])
-        .nodeId(function (d) {
+        .nodeId(function(d) {
           return d.name;
         })
         .nodeAlign(d3.sankeyJustify)
@@ -739,7 +734,7 @@
 
       // console.log(sankeyLinks);
 
-      depthExtent = d3.extent(sankeyNodes, function (d) { return d.depth; });
+      depthExtent = d3.extent(sankeyNodes, function(d) { return d.depth; });
 
       nodeColour = d3.scaleSequential(d3.interpolateCool)
         .domain([0, width]);
@@ -752,35 +747,35 @@
 
       node.append("rect")
         .attr("class", "node-rect")
-        .attr("x", function (d) { return d.x0; })
-        .attr("y", function (d) { return d.y0; })
-        .attr("height", function (d) { return d.y1 - d.y0; })
-        .attr("width", function (d) { return d.x1 - d.x0; })
-        .style("fill", function (d) { return nodeColour(d.x0); })
+        .attr("x", function(d) { return d.x0; })
+        .attr("y", function(d) { return d.y0; })
+        .attr("height", function(d) { return d.y1 - d.y0; })
+        .attr("width", function(d) { return d.x1 - d.x0; })
+        .style("fill", function(d) { return nodeColour(d.x0); })
         .style("opacity", 0.5)
-        .on("mouseover", function (d) {
+        .on("mouseover", function(d) {
 
           let thisName = d.name;
 
           link.selectAll(".sankey-link")
-            .style("opacity", function (l) {
+            .style("opacity", function(l) {
               return l.source.name == thisName || l.target.name == thisName ? 1 : 0.3;
             })
 
           node.selectAll("text, .node-rect")
-            .style("opacity", function (d) {
+            .style("opacity", function(d) {
               return highlightNodes(d, thisName)
             })
 
           node.selectAll(".link-label")
-            .style("opacity", function (d) {
+            .style("opacity", function(d) {
               let src = this.attributes[1].nodeValue;
               let tar = this.attributes[2].nodeValue;
               return thisName == src || thisName == tar ? 1 : 0.1;
             })
 
         })
-        .on("mouseout", function (d) {
+        .on("mouseout", function(d) {
           d3.selectAll("text").style("opacity", 1);
           d3.selectAll(".node-rect").style("opacity", 0.5);
           d3.selectAll(".link-label").style("opacity", 1);
@@ -789,22 +784,22 @@
 
       let nodelabel = node.append("text")
         .attr("class", "node-label")
-        .attr("x", function (d) { return (d.x0 + d.x1) / 2; })
-        .attr("y", function (d) { return d.y0 - 20; })
+        .attr("x", function(d) { return (d.x0 + d.x1) / 2; })
+        .attr("y", function(d) { return d.y0 - 20; })
         .attr("dy", "0.35em")
         .attr("text-anchor", "middle")
 
       let nodeposition = document.f_nodepos.R4.value
 
-      nodelabel.append("a").attr("xlink:href", function (d) {
-        var result = re_markdownlink.exec(d.name)
-        if (result) {
-          d.name = d.name.replace(re_markdownlink, result[2])
-          return result[3];
-        }
-        return null
-      }).style("text-decoration", "underline")
-        .html(function (d) {
+      nodelabel.append("a").attr("xlink:href", function(d) {
+          var result = re_markdownlink.exec(d.name)
+          if (result) {
+            d.name = d.name.replace(re_markdownlink, result[2])
+            return result[3];
+          }
+          return null
+        }).style("text-decoration", "underline")
+        .html(function(d) {
           //LF thanks for https://gunmagisgeek.com/blog/d3v4/4686
           if (nodeposition == "left")
             return leftLinebreak(d)
@@ -814,7 +809,7 @@
             return centerLinebreak(d)
         })
       node.append("title")
-        .text(function (d) { return d.name + "\n" + (d.value); });
+        .text(function(d) { return d.name + "\n" + (d.value); });
 
     }
 
@@ -825,17 +820,17 @@
 
       linkpathes = link.append("path")
         .attr("class", "sankey-link")
-        .attr("d", function (link) {
+        .attr("d", function(link) {
           return link.path;
         })
-        .style("stroke-width", function (d) { return Math.max(1, d.width); })
+        .style("stroke-width", function(d) { return Math.max(1, d.width); })
         .style("opacity", 0.7)
-        .style("stroke", function (link, i) {
+        .style("stroke", function(link, i) {
           return link.circular ? "red" : "black"
         })
 
       link.append("title")
-        .text(function (l) {
+        .text(function(l) {
           return l.source.name + " → " + l.target.name + " = " + l.value;
         });
     }
@@ -910,11 +905,7 @@
       }
 
     }
-
   </script>
-
-
-
   <!-- My Sankey Data Section -->
   <script>
     var data = {
@@ -933,17 +924,12 @@
       ]
     };
   </script>
-
-
 </head>
 
 <body>
-
   <h1>Sankey Diagram Output Page
-
     <div class="viewsetting">
       <!-- <div class="horizon" style="padding-left: 10px;">アニメーション</div> -->
-
       <div class="horizon">
         <div class="segmented_header">アニメーション</div>
         <form class="segmented" name="f_animation" action="#">
@@ -951,7 +937,6 @@
           <label><input type="radio" name="R1" value="off" onclick="func()"><span class="label">切</span></label>
         </form>
       </div>
-
       <!-- <div class="horizon" style="padding-left: 10px;"></div> -->
       <div class="horizon">
         <div class="segmented_header">矢印</div>
@@ -960,7 +945,6 @@
           <label><input type="radio" name="R2" value="off" onclick="func()"><span class="label">切</span></label>
         </form>
       </div>
-
       <div class="horizon">
         <div class="segmented_header">値表示</div>
         <form class="segmented" name="f_value" action="#">
@@ -968,51 +952,37 @@
           <label><input type="radio" name="R3" value="off" onclick="func()"><span class="label">切</span></label>
         </form>
       </div>
-
       <div class="horizon">
         <div class="segmented_header">ノード文字揃え</div>
         <form class="segmented" name="f_nodepos" action="#">
-          <label><input type="radio" name="R4" value="left" onclick="func()" checked><span
-              class="label">左</span></label>
+          <label><input type="radio" name="R4" value="left" onclick="func()" checked><span class="label">左</span></label>
           <label><input type="radio" name="R4" value="center" onclick="func()"><span class="label">中</span></label>
           <label><input type="radio" name="R4" value="right" onclick="func()"><span class="label">右</span></label>
         </form>
       </div>
-
       <div class="horizon" style="padding-left: 15px">
         <form name="F1" action="#">
           <div class="horizon">
-
             <div>
-              <input type="text" name="T1" size="3" maxlength="4" placeholder="幅pixel"
-                oninput="value = value.replace(/[^0-9]+/i,'');"
-                title="解像度 幅ピクセルを4桁数値で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
+              <input type="text" name="T1" size="3" maxlength="4" placeholder="幅pixel" oninput="value = value.replace(/[^0-9]+/i,'');" title="解像度 幅ピクセルを4桁数値で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
             </div>
-
             <div>
-              <input type="text" name="T1" size="3" maxlength="4" placeholder="高pixel"
-                oninput="value = value.replace(/[^0-9]+/i,'');"
-                title="解像度 高さピクセルを4桁数値で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
+              <input type="text" name="T1" size="3" maxlength="4" placeholder="高pixel" oninput="value = value.replace(/[^0-9]+/i,'');" title="解像度 高さピクセルを4桁数値で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
             </div>
           </div>
-
           <div class="horizon">
             <!-- <a href="javascript:download_PNG();" id="DLPNG" download><span>Download</span><span>PNG</span></a> -->
             <a href="javascript:download_PNG();" id="DLPNG" download><span>Download</span><span>PNG</span></a>
             <a href="javascript:download_SVG();" id="DLSVG" download><span>Download</span><span>SVG</span></a>
           </div>
-
         </form>
       </div>
-
     </div>
   </h1>
-
   <div id="chart"></div>
-
-  <script>func()</script>
-
-
+  <script>
+    func()
+  </script>
   <!-- @todo -->
   <!-- thanks for https://codepen.io/estelle/pen/RJpreX -->
   <div class="table-container">
@@ -1038,7 +1008,6 @@
             <td>Column three</td>
           </tr>
         </tbody>
-
         <tfoot>
           <tr>
             <td>Footer</td>
@@ -1049,7 +1018,6 @@
       </table>
     </div>
   </div>
-
   <div class="table-container">
     <h2>ノード一覧</h2>
     <div style="padding: 15px;">
@@ -1073,7 +1041,6 @@
             <td>Column three</td>
           </tr>
         </tbody>
-
         <tfoot>
           <tr>
             <td>Footer</td>
@@ -1084,16 +1051,13 @@
       </table>
     </div>
   </div>
-
   <div><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></div>
-
   <div>
     <footer>
       csankey Copyright © 2021 kirin123kirin see <a href="https://opensource.org/licenses/MIT">MIT
         Liscense</a>&nbsp;&nbsp;|
       Powered by &nbsp;<a href="https://d3js.org/d3.v4.min.js">d3.js</a>
-      &nbsp;|&nbsp;Referenced by Tom Shanley’s&nbsp;<a
-        href="https://bl.ocks.org/tomshanley/raw/6eb025290888935f10b142e4bc576d8d/d3-sankey-circular.js">Sankey circular
+      &nbsp;|&nbsp;Referenced by Tom Shanley’s&nbsp;<a href="https://bl.ocks.org/tomshanley/raw/6eb025290888935f10b142e4bc576d8d/d3-sankey-circular.js">Sankey circular
         links1</a>
       <a href="https://bl.ocks.org/tomshanley/874923fe54b173735b456479423ac7d6">Sankey circular links2</a>
     </footer>
