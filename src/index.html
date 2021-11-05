@@ -479,7 +479,8 @@
       let length = String(link.value).length;
       let count = (link.value.match(/\n/g) || [1]).length;
 
-      let label = node.append("foreignObject")
+      g.append("title").text(link.source.name + "→" + link.target.name + " = " + link.value)
+      let label = g.append("foreignObject")
         .attr("class", "link-label")
         .attr("_source", link.source.name)
         .attr("_target", link.target.name)
@@ -487,7 +488,10 @@
         .attr("y", position.y - 15)
         .attr("width", 32 + (length - 1) * 9)
         .attr("height", count * 32)
-        .append("xhtml:div").append("button").attr("type", "button")
+        .append("xhtml:div")
+        .append("button")
+        .attr("type", "button")
+        // .attr("title", )
 
       let result = re_markdownlink.exec(link.value)
       if (result) {
@@ -498,8 +502,7 @@
       } else {
         label.attr("disabled", false)
       }
-      label.text(link.value)
-
+      label = label.text(link.value)
     }
 
     /* thanks for https://qiita.com/Nikkely/items/aa485ebdbec51e49ecbc */
@@ -831,8 +834,8 @@
         })
 
       link.append("title")
-        .text(function (d) {
-          return d.source.name + " → " + d.target.name;
+        .text(function (l) {
+          return l.source.name + " → " + l.target.name + " = " + l.value;
         });
     }
 
@@ -1043,7 +1046,9 @@
         </tfoot>
       </table>
     </div>
+  </div>
 
+  <div class="table-container">
     <h2>ノード一覧</h2>
     <div style="padding: 15px;">
       <table>
