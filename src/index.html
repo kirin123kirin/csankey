@@ -4,16 +4,28 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Sankey</title>
+
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@riversun/sortable-table/lib/sortable-table.js"></script>
+  <script src="d3-sankey-circular.js"></script>
+
   <style>
+    :root {
+      --main-font-family: "MS Gothic";
+      --sub-font-family: "メイリオ", "Meiryo";
+    }
+
     body {
-      font-family: "MS UI Gothic";
+      font-family: var(--main-font-family);
     }
 
     h1 {
       position: relative;
-      padding: 0.1em 0.5em;
-      background: -webkit-linear-gradient(to right, gray, transparent);
-      background: linear-gradient(to right, gray, transparent);
+      padding: 0.1em 0.3em;
+      font-family: var(--main-font-family);
+      /* background: -webkit-linear-gradient(to right, gray, transparent);
+      background: linear-gradient(to right, gray, transparent); */
+      background: #C0C0C0;
       color: white;
       text-shadow: 1px 1px black;
     }
@@ -41,39 +53,19 @@
       text-align: center;
       text-shadow: 1px 1px #050505;
       font-size: 14px;
-      font-family: "メイリオ", "Meiryo";
+      font-family: var(--sub-font-family);
     }
 
-    .viewsetting .horizon {
+    .viewsetting .horizon-center {
       display: table-cell;
-      vertical-align: middle;
+      vertical-align: top;
+      white-space: nowrap;
     }
 
-    rect {
-      shape-rendering: crispEdges;
-    }
-
-    text {
-      font-size: 18px;
-      font-family: "MS UI Gothic";
-    }
-
-    .node-label {
-      font-size: 18px;
-      font-family: "メイリオ", "Meiryo";
-      font-weight: bold;
-      fill: blue;
-    }
-
-    .link-label {
-      font-size: 16px;
-      font-family: "MS UI Gothic";
-      fill: white;
-      font-style: italic;
-    }
-
-    .link {
-      fill: none;
+    .viewsetting .horizon-left {
+      display: table-cell;
+      vertical-align: top;
+      text-align: left;
     }
 
     svg {
@@ -149,6 +141,47 @@
       background-image: -ms-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
       background-image: -webkit-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
       background-image: -webkit-linear-gradient(to bottom, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
+    }
+
+    /* thanks for https://pecopla.net/web-column/table-design */
+    table {
+      line-height: 1.25;
+      border-collapse: collapse;
+      margin: 0 30px;
+      padding: 0;
+      /* width: 650px; */
+      box-shadow: 0 0 15px -6px #00000073;
+      min-width: 200px;
+    }
+
+    table tr {
+      background-color: #fff;
+    }
+
+    table tbody tr:hover {
+      background-color: #fffae9;
+    }
+
+    table th,
+    table td {
+      padding: .35em 1em;
+      border: 1px solid #bbb;
+    }
+
+    table thead th {
+      font-size: .85em;
+      padding: 1em;
+      border-right: 1px solid #eee;
+    }
+
+    table thead tr {
+      background-color: #C0C0C0;
+      color: #fff;
+    }
+
+    table tbody th {
+      text-align: left;
+      font-size: .8em;
     }
 
     /* 
@@ -236,164 +269,191 @@
       display: none;
     }
 
-    /* 
-     * thanks for https://codepen.io/rperry1886/pen/OJPQxza
-     */
-    button {
-      filter: drop-shadow(3px 3px 3px rgba(60, 60, 60, 0.432));
-      min-height: 25px;
-      min-width: 25px;
-      background: blue;
-      font-weight: bold;
-      color: white;
-      font-size: 12pt;
+
+    input[type='range'] {
+      margin: 0;
+      padding: 0;
+      /* font-size: inherit; */
+      width: 5em;
+      height: 1em;
+      font-family: var(--sub-font-family);
+      color: black;
+    }
+
+    input[type='range']+label {
+      font-size: 12px;
+      padding: 5px;
+    }
+
+    .cp_ipselect {
+      overflow: hidden;
+      width: 100%;
+      margin: 5px;
+      text-align: center;
+    }
+
+    .cp_ipselect select {
+      width: 100%;
+      padding-right: 3px;
+      cursor: pointer;
+      text-indent: 0.01px;
+      text-overflow: ellipsis;
       border: none;
-      padding: 10;
-      stroke: black;
       outline: none;
-      border-radius: 10px 10px 10px 10px;
+      background: transparent;
+      background-image: none;
+      box-shadow: none;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
-    button:hover {
-      filter: drop-shadow(3px 5px 5px rgba(0, 0, 0, 0.45));
+    .cp_ipselect select::-ms-expand {
+      display: none;
     }
 
-    button:active {
-      filter: none;
-      transform: scale(.95);
-    }
-
-
-    /* 
-     * thanks for https://codepen.io/estelle/pen/RJpreX
-     */
-    table {
-      border-collapse: collapse;
-      font-family: "メイリオ", "Meiryo";
-    }
-
-    td,
-    th {
-      border: 1px solid;
-      padding: 8px;
-      min-width: 10px;
-      background: white;
-      box-sizing: border-box;
-      text-align: left;
-      padding-right: 5em;
-    }
-
-    .table-container {
+    .cp_ipselect.cp_sl01 {
       position: relative;
-      max-height: 500px;
-      width: 1000px;
-      overflow: scroll;
+      border: 1px solid #bbbbbb;
+      border-radius: 2px;
+      background: #ffffff;
     }
 
-    thead th {
-      position: -webkit-sticky;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      color: azure;
-      border-color: black;
-      background: hsl(214, 90%, 40%);
+    .cp_ipselect.cp_sl01::before {
+      position: absolute;
+      top: 0.8em;
+      right: 0.9em;
+      width: 0;
+      height: 0;
+      padding: 0;
+      content: '';
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid #666666;
+      pointer-events: none;
     }
 
-    thead th:first-child {
-      color: black;
-      left: 0;
-      z-index: 3;
-    }
-
-    tfoot {
-      position: -webkit-sticky;
-      bottom: 0;
-      z-index: 2;
-      color: azure;
-      border-color: black;
-    }
-
-    tfoot td {
-      position: sticky;
-      bottom: 0;
-      z-index: 2;
-      background: hsl(214, 90%, 40%);
-    }
-
-    tfoot td:first-child {
-      z-index: 3;
-      color: black;
-    }
-
-    tbody {
-      overflow: scroll;
-      height: 500px;
-    }
-
-    /* MAKE LEFT COLUMN FIXEZ */
-    tr> :first-child {
-      position: -webkit-sticky;
-      position: sticky;
-      background: hsl(214, 90%, 70%);
-      left: 0;
-    }
-
-    /* don't do this */
-    tr> :first-child {
-      box-shadow: inset 0px 1px black;
+    .cp_ipselect.cp_sl01 select {
+      /* padding: 8px 38px 8px 8px; */
+      color: #666666;
     }
   </style>
-  <!-- include Section -->
-  <script src="https://d3js.org/d3.v4.min.js"></script>
-  <script src="d3-sankey-circular.js"></script>
-  <!-- My Script Section -->
-  <script>
-    let margin = { top: 30, right: 30, bottom: 30, left: 30 };
-    let width = 1100;
-    let height = 600;
 
-    let nodePadding = 40;
-    let nodePaddingRatio = 0.5;
+  <script>
+    var width = 0;
+    var height = 0;
+    var margin = { top: height * 0.05, right: width * 0.1, bottom: height * 0.13, left: width * 0.1 };
+    var outerwidth = width + margin.left + margin.right;
+    var outerheight = height + margin.top + margin.bottom;
+
+    var nodewidth = null;
+    var nodepaddingratio = null;
+    var strokeopacity = null;
+    var linkopacity = null;
+    var linkforwardcolor = null;
+    var linkreversecolor = null;
+    var nodealign = null;
+    var nodeiterations = null;
+    var nodeopacity = null;
+    var hideopacity = null;
+    var textalign = null;
+    var nodetextfontsize = null;
+    var nodetextfontweight = null;
+    var fontfamily = null;
+    var arrowlen = null;
+    var arrowgaplen = null;
+    var arrowheadsize = null;
+    var arrowcolor = null;
+    var badgetextsize = null;
+    var badgebgcolor = null;
+    var badgetextcolor = null;
+    var highlighttype = null;
+
+    var nodePadding = 20;
+
     var circularLinkGap = 2;
 
-    let sankey = null;
-    let svg = null;
-    let g = null;
-    let linkLabels = null;
-    let linkG = null;
-    let nodeG = null;
-    let nodeColour = null;
-    let node = null;
-    let link = null;
-    let arrowsG = null;
+    var sankeyData = null;
+    var sankeyNodes = null;
+    var sankeyLinks = null;
+
+    var duration = 5;
+    var maxOffset = 10;
+    var percentageOffset = 1.0;
+
     let animateDash = null;
-    let sankeyData = null;
-    let sankeyNodes = null;
-    let sankeyLinks = null;
-    let depthExtent = null;
-    let linkpathes = null;
-    let duration = 5
-    let maxOffset = 10
-    let percentageOffset = 1.0
+    var sankey = null;
 
-    let re_markdownlink = /(!?)\[\s*([^\]]*)\s*\]\(\s*["']*([^\) "]*)["']*\s*\)/gu;
+    var svg = null;
+    var g = null;
+    var nodecolor = null;
+    var nodetextfontcolor = null;
+    var linkG = null;
+    var nodeG = null;
+    var node = null;
+    var link = null;
+    var badge = null;
+    var arrowsG = null;
 
-    // Function that appends a path to selection that has sankey path data attached
-    // The path is formatted as dash array, and triangle paths to create arrows along the path
-    function appendArrows(selection, arrowLength, gapLength, arrowHeadSize) {
+    function maketable(target_table_id, content) {
+      let idlabel = "ID";
+      let sortableTable = new SortableTable();
+      let tbl = d3.select(target_table_id)
+      let head = tbl
+        .append("thead")
+        .append("tr");
+
+      let style_align = `table${target_table_id} tbody tr td:nth-child(1)`
+      style_align += `{text-align: right; color: #000;}\n`;
+      head.append("th")
+        .attr("data-id", idlabel)
+        .attr("sortable", true)
+        .html(idlabel)
+
+      Object.entries(content[0]).forEach(function ([k, v], i) {
+        style_align += `table${target_table_id} tbody tr td:nth-child(${i + 2})`
+        if (typeof (v) == "number") {
+          style_align += `{text-align: right; color: #000;}\n`;
+        } else {
+          style_align += `{text-align: left; font-size: .9em;}\n`;
+        }
+        head.append("th")
+          .attr("data-id", k)
+          .attr("sortable", true)
+          .html(k)
+      })
+
+      if (style_align) {
+        var headtag = document.getElementsByTagName('head').item(0);
+        var style = document.createElement('style');
+        var rule = document.createTextNode(style_align);
+        style.media = 'screen';
+        style.type = 'text/css';
+        style.appendChild(rule);
+        headtag.appendChild(style);
+      }
+
+      sortableTable.setTable(document.querySelector(target_table_id));
+
+      sortableTable.setData(
+        content.map(function (d, i) {
+          d["ID"] = i + 1;
+          return d;
+        })
+      );
+    }
+
+
+    function appendArrows(selection, arrowLength, gapLength, arrowHeadSize, arrowColor) {
       let totalDashArrayLength = arrowLength + gapLength
 
       arrows = selection
         .append('path')
-        .attr('d', function(d) {
-          return d.path;
-        })
+        .attr('d', l => l.path)
         .style('stroke-width', 1)
-        .style('stroke', 'black')
+        .style('stroke', arrowColor)
         .style('stroke-dasharray', arrowLength + ',' + gapLength)
 
-      arrows.each(function(arrow) {
+      arrows.each(function (arrow) {
         let thisPath = d3.select(this).node()
         let parentG = d3.select(this.parentNode)
         let pathLength = thisPath.getTotalLength()
@@ -408,7 +468,7 @@
           numberOfArrows = numberOfArrows - 1
         }
 
-        let arrowHeadData = d3.range(numberOfArrows).map(function(d, i) {
+        let arrowHeadData = d3.range(numberOfArrows).map(function (d, i) {
           let length = i * totalDashArrayLength + arrowLength
 
           let point = thisPath.getPointAtLength(length)
@@ -442,87 +502,330 @@
           .data(arrowHeadData)
           .enter()
           .append('path')
-          .attr('d', function(d) {
+          .attr('d', function (d) {
             return (
               'M' +
-              d.x + ',' +
+              d.x +
+              ',' +
               (d.y - arrowHeadSize / 2) +
-              ' L' +
-              (d.x + arrowHeadSize) + ',' +
+              ' ' +
+              'L' +
+              (d.x + arrowHeadSize) +
+              ',' +
               d.y +
-              ' L' +
-              d.x + ',' +
+              ' ' +
+              'L' +
+              d.x +
+              ',' +
               (d.y + arrowHeadSize / 2)
             )
           })
           .attr('class', 'arrow-head')
-          .attr('transform', function(d) {
+          .attr('transform', function (d) {
             return 'rotate(' + d.rotation + ',' + d.x + ',' + d.y + ')'
           })
-          .style('fill', 'black')
+          .style('fill', arrowColor)
       })
     }
 
-    /* refs https://bl.ocks.org/tomshanley/d01b00c17a5ebe76779c26f82ab9d7ec#index.html */
-    function addMinardLabels(link) {
-      let position = this.getPointAtLength(3)
-      if (!(typeof(link.value) == "string" || link.value instanceof String))
-        link.value = String(link.value)
+    function init(event) {
+      if (sankey)
+        d3.selectAll("svg").remove()
 
-      /* thanks for https://stackoverflow.com/questions/39974264/how-to-pack-text-inside-svg-rect */
-      let length = String(link.value).length;
-      let count = (link.value.match(/\n/g) || [1]).length;
+      sankey = d3.sankeyCircular()
+        .nodeWidth(nodewidth)
+        .nodePadding(nodePadding) //note that this will be overridden by nodePaddingRatio
+        .nodePaddingRatio(nodepaddingratio)
+        .size([width, height])
+        .nodeId(function (d) {
+          return d.name;
+        })
+        .nodeAlign(nodealign)
+        .iterations(nodeiterations)
+        .circularLinkGap(circularLinkGap)
+      // .sortNodes("col")
 
-      g.append("title").text(link.source.name + "→" + link.target.name + " = " + link.value)
-      let label = g.append("foreignObject")
-        .attr("class", "link-label")
-        .attr("_source", link.source.name)
-        .attr("_target", link.target.name)
-        .attr("x", position.x)
-        .attr("y", position.y - 15)
-        .attr("width", 32 + (length - 1) * 9)
-        .attr("height", count * 32)
+      //run the Sankey + circular over the data
+      sankeyData = sankey(data);
+      sankeyNodes = sankeyData.nodes;
+      sankeyLinks = sankeyData.links;
+
+      let depthExtent = d3.extent(sankeyNodes, function (d) { return d.depth; });
+
+      svg = d3.select("#chart").append("svg")
+        .attr("width", outerwidth)
+        .attr("height", outerheight)
+        .attr("viewBox", "0 0 " + String(outerwidth) + " " + String(outerheight));
+
+      g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    };
+
+    function makenode(event = null) {
+      nodeG = g.append("g")
+        .attr("class", "nodes")
+        .style("opacity", nodeopacity)
+        .selectAll("g");
+
+      node = nodeG.data(sankeyNodes)
+        .enter()
+        .append("g")
+        .each(function (d) {
+          d.name = String(d.name)
+          if (d.name.indexOf("\n") != -1)
+            d.name = d.name.replaceAll("\n", "<br/>");
+          d.innertext = d.name;
+          if (d.innertext.indexOf("<") != -1) {
+            /* thanks for https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro */
+            let div = document.createElement('div');
+            div.innerHTML = d.innertext.replaceAll(/<br\s*\/?\s*>/gi, "\n").trim();
+            if (div.firstChild)
+              d.innertext = div.firstChild.innerText || div.firstChild.textContent;
+          }
+
+          let array = d.innertext.split("\n");
+          d.innertext_maxline = array.length;
+          if (d.innertext_maxline > 1)
+            d.innertext_maxlength = d3.max(array, t => t.length);
+          else
+            d.innertext_maxlength = d.innertext.length;
+
+        })
+        .call(d3.drag()
+          .subject(d => d)
+          .on('start', function () {
+            this.parentNode.appendChild(this);
+          })
+          .on('drag', dragmove));
+
+      let nodetmp = node.append("rect")
+        .attr("x", function (d) { return d.x0; })
+        .attr("y", function (d) { return d.y0; })
+        .attr("height", function (d) { return d.y1 - d.y0; })
+        .attr("width", function (d) { return d.x1 - d.x0; })
+        .style("shape-rendering", "crispEdges")
+        .style("fill", d => nodecolor(d.x0))
+        .style("opacity", nodeopacity)
+
+      if (highlighttype != "nohighlight") {
+        nodetmp.on("mouseover", function (d) {
+
+          let thisName = d.name;
+
+          node.selectAll("rect,text,.node-label")
+            .style("opacity", function (d) {
+
+              let opacity = hideopacity
+              if (d.name == thisName) {
+                opacity = nodeopacity;
+              }
+              d.sourceLinks.forEach(function (link) {
+                if (link.target.name == thisName) {
+                  opacity = nodeopacity;
+                };
+              })
+              d.targetLinks.forEach(function (link) {
+                if (link.source.name == thisName) {
+                  opacity = nodeopacity;
+                };
+              })
+              return opacity;
+            })
+
+          d3.selectAll(".sankey-link,.g-arrow")
+            .style("opacity", function (l) {
+              return l.source.name == thisName || l.target.name == thisName ? linkopacity : hideopacity;
+            })
+
+        })
+          .on("mouseout", function (d) {
+            d3.selectAll("rect,.node-label").style("opacity", nodeopacity);
+            d3.selectAll(".sankey-link,.g-arrow").style("opacity", linkopacity);
+            d3.selectAll("text").style("opacity", 1);
+          })
+      }
+
+      node.append("foreignObject")
+        .attr("x", function (d) { return ((d.x0 + d.x1 - (nodetextfontsize / 2 + d.innertext_maxlength * 9)) / 2); })
+        .attr("y", function (d) { return d.y0 - (d.innertext_maxline * nodetextfontsize) - 12; })
+        .attr("width", d => (nodetextfontsize * 1.33) + (d.innertext_maxlength * 9))
+        .attr("height", d => d.innertext_maxline * nodetextfontsize)
+        .append("xhtml:div")
+        .attr("class", "node-label")
+        .attr("style", function (d) {
+          return `
+            position: relative; \
+            text-align : ${textalign};
+            color: ${nodetextfontcolor(d.x0)}; \
+            text-shadow: #fff 2px 0, #fff -2px 0, #fff 0 -2px, #fff 0 2px, #fff 2px 2px, #fff -2px 2px, #fff 2px -2px, #fff -2px -2px, #fff 1px 2px, #fff -1px 2px, #fff 1px -2px, #fff -1px -2px, #fff 2px 1px, #fff -2px 1px, #fff 2px -1px, #fff -2px -1px, rgba(0, 0, 0, .5) 3px 3px 3px; \
+            font-size: ${nodetextfontsize}px; \
+            font-weight : ${nodetextfontweight}; \
+            font-family: ${fontfamily}; \
+            `})
+        .html(function (d) { return d.name; });
+
+      node.append("title")
+        .text(function (d) { return d.innertext + "\n" + (d.value); });
+
+    };
+    function makelink(event = null) {
+      linkG = g.append("g")
+        .attr("class", "links")
+        .attr("fill", "none")
+        .attr("stroke-opacity", strokeopacity)
+        .selectAll("path");
+
+      link = linkG.data(sankeyLinks)
+        .enter()
+        .append("g")
+        .each(function (d) {
+          d.value = d.innertext = String(d.value);
+          if (d.innertext.indexOf("<") != -1) {
+            /* thanks for https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro */
+            let div = document.createElement('div');
+            div.innerHTML = d.innertext.replaceAll(/<br\s*\/?\s*>/gi, "\n").trim();
+            if (div.firstChild)
+              d.innertext = div.firstChild.innerText;
+          }
+
+          let array = d.innertext.split("\n");
+          d.innertext_maxline = array.length;
+          if (d.innertext_maxline > 1)
+            d.innertext_maxlength = d3.max(array, t => t.length);
+          else
+            d.innertext_maxlength = d.innertext.length;
+
+        });
+      link.append("path")
+        .attr("class", "sankey-link")
+        .attr("d", l => l.path)
+        .style("stroke-width", function (d) { return Math.max(1, d.width); })
+        .style("opacity", linkopacity)
+        .style("stroke", function (link, i) {
+          return link.circular ? linkreversecolor : linkforwardcolor
+        })
+
+      link.append("title")
+        .text(function (d) {
+          return d.source.innertext + " → " + d.target.innertext + " = " + (d.value);
+        });
+    };
+
+    function makebadge(event = null) {
+      let ut = badgetextsize * (sankey.size()[1] / height / 1.33);
+      badge = link.append("foreignObject")
+        .attr("class", "sankey-link badge")
+        .attr("_sourcename", l => l.source.name)
+        .attr("_targetname", l => l.target.name)
+        .attr("x", l => l.source.x1 + 3)
+        .attr("y", l => l.y0)
+        .attr("width", l => badgetextsize + l.innertext_maxlength * 9)
+        .attr("height", l => l.innertext_maxline * badgetextsize)
         .append("xhtml:div")
         .append("button")
         .attr("type", "button")
+        .attr("style", function (l) {
+          return `\
+            filter: drop-shadow(3px 3px 3px rgba(60, 60, 60, 0.432));\
+            min-height: ${ut}px;\
+            min-width: ${ut}px;\
+            background: ${badgebgcolor};\
+            font-weight: ${ut < 10 ? 'normal' : 'bold'};\
+            color: ${badgetextcolor};\
+            font-size: ${ut}pt;\
+            border: none;\
+            padding: ${ut / 10};\
+            stroke: black;\
+            outline: none;\
+            border-radius: ${ut / 2}px ${ut / 2}px ${ut / 2}px ${ut / 2}px;\
+            `})
+        .attr("mouseover", "this.style.filter='drop-shadow(3px 5px 5px rgba(0, 0, 0, 0.45))';")
+        .attr("mouseout", "this.style.filter='drop-shadow(3px 3px 3px rgba(60, 60, 60, 0.432))';")
 
-      let result = re_markdownlink.exec(link.value)
-      if (result) {
-        link.value = link.value.replace(re_markdownlink, result[2])
-        label
-          .attr("onclick", 'location.href="' + result[3] + '"')
+      if (link.value != link.innertext) {
+        let result = link.value.match(/(href=[\"\'][^\"\']+[\"\'])/g)
+        badge = badge
+          .attr("onclick", 'transform: scale(.95);location.' + result[1])
           .style("cursor", "pointer")
       } else {
-        label.attr("disabled", false)
+        badge = badge.attr("disabled", false)
       }
-      label.text(link.value)
-      
+      badge.html(l => l.value)
+
+    };
+
+    function makearrow(event = null) {
+      arrowsG = linkG.data(sankeyLinks)
+        .enter()
+        .append("g")
+        .attr("class", "g-arrow")
+        .attr("_sourcename", l => l.source.name)
+        .attr("_targetname", l => l.target.name)
+        .call(appendArrows, arrowlen, arrowgaplen, arrowheadsize, arrowcolor)
+
+      function updateDash() {
+        arrowsG.selectAll(".g-arrow path")
+          .style("stroke-dashoffset", percentageOffset * maxOffset)
+
+        percentageOffset = percentageOffset <= 0.0 ? 10 : percentageOffset - 0.01
+      }
+
+      arrowsG.selectAll(".g-arrow path")
+        .style("stroke-width", l => l.width / 4)
+        .style("stroke-dasharray", "10,40")
+      if (animateDash == null)
+        animateDash = setInterval(updateDash, duration);
+
+      const container = d3.select('svg').classed('container', true);
+
     }
 
-    /* thanks for https://qiita.com/Nikkely/items/aa485ebdbec51e49ecbc */
+    /* thanks for https://embed.plnkr.co/plunk/JjvFDnYpEc68hpzi */
+    function dragmove(d) {//@todo
+      var rectY = d3.select(this).select("rect").attr("y"),
+        rectX = d3.select(this).select("rect").attr("x");
+
+      d.x0 = d.x0 + d3.event.dx;
+      d.x1 = d.x1 + d3.event.dx;
+      d.y0 = d.y0 + d3.event.dy;
+      d.y1 = d.y1 + d3.event.dy;
+
+      var yTranslate = d.y0 - rectY,
+        xTranslate = d.x0 - rectX;
+
+      d3.select(this).attr("transform", moved = "translate(" + xTranslate + "," + yTranslate + ")");
+      d3.selectAll(".sankey-link").attr("d", l => l.path)
+
+      sankey.update(sankeyData);
+      d3.selectAll(".g-arrow,foreignObject.sankey-link").remove()
+      makearrow(d3.event);
+      makebadge(d3.event);
+    }
+
     function getSVGdata(SVGElement = document.querySelector("svg")) {
       SVGElement.version = 1.1
       SVGElement.xmlns = 'http://www.w3.org/2000/svg'
 
-      SVGElement.querySelectorAll("text,button")
-      .forEach(function(f) {
-        let queue = []
-        queue.push(f)
-        while (queue.length != 0) {
-          let element = queue.pop()
+      // SVGElement.querySelectorAll("text,button")
+      // .forEach(function(f) {
+      // /* thanks for https://qiita.com/Nikkely/items/aa485ebdbec51e49ecbc */
+      //   let queue = []
+      //   queue.push(f)
+      //   while (queue.length != 0) {
+      //     let element = queue.pop()
 
-          let computedStyle = window.getComputedStyle(element, '')
-          for (let property of computedStyle) {
-            element.style[property] = computedStyle.getPropertyValue(property)
-          }
+      //     let computedStyle = window.getComputedStyle(element, '')
+      //     for (let property of computedStyle) {
+      //       element.style[property] = computedStyle.getPropertyValue(property)
+      //     }
 
-          let children = element.children
+      //     let children = element.children
 
-          for (let child of children) {
-            queue.push(child)
-          }
-        }
-      })
+      //     for (let child of children) {
+      //       queue.push(child)
+      //     }
+      //   }
+      // })
       return new XMLSerializer().serializeToString(SVGElement);
     }
 
@@ -571,7 +874,7 @@
 
       let ctx = canvas.getContext("2d");
       let image = new Image;
-      image.onload = function() {
+      image.onload = function () {
 
         if (width && height)
           ctx.drawImage(image, 0, 0, width, height);
@@ -597,297 +900,126 @@
       browser_download(getSVGdata(elem), 'image/svg+xml', 'sankeydiagram.svg')
     }
 
-    function highlightNodes(node, name) {
+    function animation_on() {
+      arrowsG.selectAll(".g-arrow path")
+        .style("stroke", arrowcolor)
+    };
+    function animation_off() {
+      arrowsG.selectAll(".g-arrow path")
+        .style("stroke", null);
+    };
 
-      let opacity = 0.3
-
-      if (node.name == name) {
-        opacity = 1;
-      }
-      node.sourceLinks.forEach(function(link) {
-        if (link.target.name == name) {
-          opacity = 1;
-        };
-      })
-      node.targetLinks.forEach(function(link) {
-        if (link.source.name == name) {
-          opacity = 1;
-        };
-      })
-
-      return opacity;
-
-    }
-
-    /* thanks for https://bl.ocks.org/shimizu/44ac0be6f0ce6e75bd62 */
-    function leftLinebreak(data) {
-      let text = data.name
-      if (text.indexOf('\n') == -1)
-        return text
-
-      let array = text.replace("\r", "").split("\n")
-      let alen = array.length
-      if (alen < 2)
-        return text
-
-      let ret = "";
-
-      const maxTextLength = d3.max(array, d => d.length)
-      const ax = data.x0
-      const ay = data.y0
-      array.forEach((t, i) => {
-        let adjast_x = ax + t.length * 5
-        let adjast_y = (ay - (alen - 1) * 35) + (i * 25)
-        ret += `<tspan y="${adjast_y}" x="${adjast_x}">${t}</tspan>`;
-      });
-      return ret;
-    }
-
-    function rightLinebreak(data) {
-      let text = data.name
-      if (text.indexOf('\n') == -1)
-        return text
-
-      let array = text.replace("\r", "").split("\n")
-      let alen = array.length
-      if (alen < 2)
-        return text
-
-      let ret = "";
-
-      const maxTextLength = d3.max(array, d => d.length)
-      const ax = data.x0
-      const ay = data.y0
-      array.forEach((t, i) => {
-        let adjast_x = ax + (2 * maxTextLength - t.length) * 5
-        let adjast_y = (ay - (alen - 1) * 35) + (i * 25)
-        ret += `<tspan y="${adjast_y}" x="${adjast_x}">${t}</tspan>`;
-      });
-      return ret;
-    }
-
-    function centerLinebreak(data) {
-      let text = data.name
-      if (text.indexOf('\n') == -1)
-        return text
-
-      let array = text.replace("\r", "").split("\n")
-      let alen = array.length
-      if (alen < 2)
-        return text
-
-      let ret = "";
-      const maxTextLength = d3.max(array, d => d.length)
-      const ax = data.x0
-      const ay = data.y0
-      array.forEach((t, i) => {
-        let adjast_x = ax + (maxTextLength + t.length) * 2.5
-        let adjast_y = (ay - (alen - 1) * 35) + (i * 25)
-        ret += `<tspan y="${adjast_y}" x="${adjast_x}">${t}</tspan>`;
-      });
-      return ret
-    }
-
-
-    /* My Handling Section */
-
-    function initialize() {
-      if (sankey)
-        d3.selectAll("svg").remove()
-
-      sankey = d3.sankeyCircular()
-        .nodeWidth(10)
-        .nodePadding(nodePadding) //note that this will be overridden by nodePaddingRatio
-        .nodePaddingRatio(nodePaddingRatio)
-        .size([width, height])
-        .nodeId(function(d) {
-          return d.name;
-        })
-        .nodeAlign(d3.sankeyJustify)
-        .iterations(32)
-        .circularLinkGap(2);
-
-      svg = d3.select("#chart").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .attr("viewBox", "0 0 " + String(width+60) + " " + String(height+60))
-        .attr("xmlns:xlink", "http://www.w3.org/1999/xlink");
-
-      g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-
-      linkG = g.append("g")
-        .attr("class", "links")
-        .attr("fill", "none")
-        .attr("stroke-opacity", 0.2)
-        .selectAll("path");
-
-      nodeG = g.append("g")
-        .attr("class", "nodes")
-        .attr("font-family", "sans-serif")
-        .attr("font-size", 10)
-        .selectAll("g");
-
-      //run the Sankey + circular over the data
-      sankeyData = sankey(data);
-      sankeyNodes = sankeyData.nodes;
-      sankeyLinks = sankeyData.links;
-
-      // console.log(sankeyLinks);
-
-      depthExtent = d3.extent(sankeyNodes, function(d) { return d.depth; });
-
-      nodeColour = d3.scaleSequential(d3.interpolateCool)
-        .domain([0, width]);
-    }
-
-    function nodes_setup() {
-      node = nodeG.data(sankeyNodes)
-        .enter()
-        .append("g");
-
-      node.append("rect")
-        .attr("class", "node-rect")
-        .attr("x", function(d) { return d.x0; })
-        .attr("y", function(d) { return d.y0; })
-        .attr("height", function(d) { return d.y1 - d.y0; })
-        .attr("width", function(d) { return d.x1 - d.x0; })
-        .style("fill", function(d) { return nodeColour(d.x0); })
-        .style("opacity", 0.5)
-        .on("mouseover", function(d) {
-
-          let thisName = d.name;
-
-          link.selectAll(".sankey-link")
-            .style("opacity", function(l) {
-              return l.source.name == thisName || l.target.name == thisName ? 1 : 0.3;
-            })
-
-          node.selectAll("text, .node-rect")
-            .style("opacity", function(d) {
-              return highlightNodes(d, thisName)
-            })
-
-          node.selectAll(".link-label")
-            .style("opacity", function(d) {
-              let src = this.attributes[1].nodeValue;
-              let tar = this.attributes[2].nodeValue;
-              return thisName == src || thisName == tar ? 1 : 0.1;
-            })
-
-        })
-        .on("mouseout", function(d) {
-          d3.selectAll("text").style("opacity", 1);
-          d3.selectAll(".node-rect").style("opacity", 0.5);
-          d3.selectAll(".link-label").style("opacity", 1);
-          d3.selectAll(".sankey-link").style("opacity", 0.7);
-        })
-
-      let nodelabel = node.append("text")
-        .attr("class", "node-label")
-        .attr("x", function(d) { return (d.x0 + d.x1) / 2; })
-        .attr("y", function(d) { return d.y0 - 20; })
-        .attr("dy", "0.35em")
-        .attr("text-anchor", "middle")
-
-      let nodeposition = document.f_nodepos.R4.value
-
-      nodelabel.append("a").attr("xlink:href", function(d) {
-          var result = re_markdownlink.exec(d.name)
-          if (result) {
-            d.name = d.name.replace(re_markdownlink, result[2])
-            return result[3];
-          }
-          return null
-        }).style("text-decoration", "underline")
-        .html(function(d) {
-          //LF thanks for https://gunmagisgeek.com/blog/d3v4/4686
-          if (nodeposition == "left")
-            return leftLinebreak(d)
-          else if (nodeposition == "right")
-            return rightLinebreak(d)
-          else
-            return centerLinebreak(d)
-        })
-      node.append("title")
-        .text(function(d) { return d.name + "\n" + (d.value); });
-
-    }
-
-    function links_setup() {
-      link = linkG.data(sankeyLinks)
-        .enter()
-        .append("g")
-
-      linkpathes = link.append("path")
-        .attr("class", "sankey-link")
-        .attr("d", function(link) {
-          return link.path;
-        })
-        .style("stroke-width", function(d) { return Math.max(1, d.width); })
-        .style("opacity", 0.7)
-        .style("stroke", function(link, i) {
-          return link.circular ? "red" : "black"
-        })
-
-      link.append("title")
-        .text(function(l) {
-          return l.source.name + " → " + l.target.name + " = " + l.value;
-        });
-    }
-
-    //VALUES
-    function value_on() {
-      linkpathes.each(addMinardLabels);
-    }
-
-    //ARROWS
-    function arrows_initialize() {
-      arrowsG = linkG.data(sankeyLinks)
-        .enter()
-        .append("g")
-        .attr("class", "g-arrow")
-        .call(appendArrows, 50, 100, 10) //arrow length, gap, arrow head size
-    }
 
     function arrow_on() {
-      arrowsG.selectAll(".arrow-head")
-        .attr("markerWidth", "0")
-        .style('fill', 'gray')
-    }
-
+      arrowsG.selectAll('.arrow-head')
+        .style("fill", arrowcolor);
+    };
     function arrow_off() {
-      arrowsG.selectAll(".arrow-head").remove()
+      arrowsG.selectAll('.arrow-head')
+        .style("fill", null);
+    };
+
+
+    function value_on() {
+      badge.attr("hidden", null)
+    };
+    function value_off() {
+      badge.attr("hidden", true)
+    };
+
+
+    function nodetext_left() {
+      node.selectAll(".node-label")
+        .style("text-align", "left")
+      node.selectAll("foreignObject").attr("x", function (l) {
+        return l.x0;
+      })
+    }
+    function nodetext_center() {
+      node.selectAll(".node-label")
+        .style("text-align", "center")
+      node.selectAll("foreignObject").attr("x", function (l) {
+        return l.x0 - nodewidth / 2 - this.clientWidth / 2.66;
+      })
+    }
+    function nodetext_right() {
+      node.selectAll(".node-label")
+        .style("text-align", "right")
+      node.selectAll("foreignObject").attr("x", function (l) {
+        return l.x0 - this.clientWidth + nodewidth;
+      })
     }
 
-    function updateDash() {
-      arrowsG.selectAll("path")
-        .style("stroke-dashoffset", percentageOffset * maxOffset)
+    function redraw(event = null) {
+      width = Number(document.SVGSIZE.width.value);
+      height = Number(document.SVGSIZE.height.value);
 
-      percentageOffset = percentageOffset <= 0.0 ? 10 : percentageOffset - 0.01
-    }
+      margin = { top: height * 0.05, right: width * 0.1, bottom: height * 0.13, left: width * 0.1 };
+      outerwidth = width + margin.left + margin.right;
+      outerheight = height + margin.top + margin.bottom;
 
-    function animation_on() {
-      arrowsG.selectAll("path")
-        .style("stroke-width", "5")
-        .style("stroke-dasharray", "10,40")
+      nodewidth = Number(document.getElementById('nodewidth').value)
+      nodepaddingratio = parseFloat(document.getElementById('nodepaddingratio').value)
+      strokeopacity = parseFloat(document.getElementById('strokeopacity').value)
+      linkopacity = 1 - strokeopacity;
+      nodeiterations = Number(document.getElementById('nodeiterations').value)
+      nodeopacity = parseFloat(document.getElementById('nodeopacity').value)
+      hideopacity = parseFloat(document.getElementById('hideopacity').value)
+      nodetextfontsize = Number(document.getElementById('nodetextfontsize').value)
+      badgetextsize = Number(document.getElementById('badgetextsize').value)
+      nodetextfontweight = Number(document.getElementById('nodetextfontweight').value)
+      arrowlen = Number(document.getElementById('arrowlen').value)
+      arrowgaplen = Number(document.getElementById('arrowgaplen').value)
+      arrowheadsize = Number(document.getElementById('arrowheadsize').value)
+      circularLinkGap = Number(document.getElementById('circularLinkGap').value)
+      maxOffset = Number(document.getElementById('maxOffset').value)
 
-      if (animateDash == null)
-        animateDash = setInterval(updateDash, duration);
-    }
+      linkforwardcolor = document.getElementById('linkforwardcolor').value;
+      linkreversecolor = document.getElementById('linkreversecolor').value;
 
-    function animation_off() {
-      arrowsG.selectAll("path")
-        .style("stroke-width", "0")
-    }
+      highlighttype = document.getElementById('highlighttype').value;
 
-    /* Startup Handling Section */
+      _nv = document.getElementById('nodealign').value;
+      if (_nv == "Left")
+        nodealign = d3.sankeyLeft;
+      else if (_nv == "Center")
+        nodealign = d3.sankeyCenter;
+      else if (_nv == "Right")
+        nodealign = d3.sankeyRight;
+      else
+        nodealign = d3.sankeyJustify;
 
-    function func() {
-      initialize()
-      nodes_setup()
-      links_setup()
-      arrows_initialize()
+      _nc = document.getElementById('nodecolor').value;
+      if (_nc == "#ffffff")
+        nodecolor = d3.scaleSequential(d3.interpolateCool).domain([0, width]);
+      else
+        nodecolor = function (d) { return _nc }
+
+      _ntc = document.getElementById('nodetextfontcolor').value
+      if (_ntc == "#ffffff")
+        nodetextfontcolor = nodecolor;
+      else
+        nodetextfontcolor = function (d) { return _ntc }
+
+      document.f_nodepos.R4.forEach(function (d) {
+        if (d.checked)
+          textalign = d.value;
+      })
+      fontfamily = document.getElementById('fontfamily').value;
+      arrowcolor = document.getElementById('arrowcolor').value;
+
+      badgebgcolor = document.getElementById('badgebgcolor').value;
+      badgetextcolor = document.getElementById('badgetextcolor').value;
+      scale = 1
+
+      if (event == null)
+        init(event);
+      else
+        d3.selectAll(".nodes,.links").remove();
+      makenode(event);
+      makelink(event);
+      makearrow(event);
+      makebadge(event);
 
       if (document.f_animation.R1[0].checked) {
         animation_on()
@@ -903,166 +1035,410 @@
 
       if (document.f_value.R3[0].checked) {
         value_on()
+      } else {
+        value_off()
       }
 
-    }
+      if (textalign == "left")
+        return nodetext_left();
+      else if (textalign == "right")
+        return nodetext_right();
+      else
+        return nodetext_center();
+
+    };
+
   </script>
+
+
   <!-- My Sankey Data Section -->
   <script>
     var data = {
-      "nodes": [
-        { "name": "abc" },
-        { "name": "b\nbb" },
-        { "name": "ccc" },
-        { "name": "aaあa" },
+      nodes: [
+        { name: "startA", col: 0},
+        { name: "startB", col: 0 },
+        { name: "process1", col: 1 },
+        { name: "process2", col: 1 },
+        { name: "process3", col: 2 },
+        { name: "process4", col: 2 },
+        { name: "process5", col: 3 },
+        { name: "process6", col: 4 },
+        { name: "process7", col: 5 },
+        { name: "process8", col: 6 },
+        { name: "process9", col: 7 },
+        { name: "process10", col: 6 },
+        { name: "process11", col: 8 },
+        { name: "process12", col: 6 },
+        { name: "process13", col: 9 },
+        { name: "process14", col: 9 },
+        { name: "process15", col: 8 },
+        { name: "process16", col: 9 },
+        { name: "finishA", col: 10 },
+        { name: "finishB", col: 10 },
       ],
-      "links": [
-        { "source": "b\nbb", "target": "abc", "value": 1 },
-        { "source": "ccc", "target": "aaあa", "value": 1 },
-        { "source": "abc", "target": "b\nbb", "value": 1 },
-        { "source": "b\nbb", "target": "ccc", "value": 1 },
-        { "source": "aaあa", "target": "b\nbb", "value": 1 },
-      ]
-    };
-  </script>
+      links: [
+        { source: "startA", target: "process8", value: 20, optimal: "yes" },
+        { source: "startA", target: "process5", value: 20, optimal: "yes" },
+        { source: "startA", target: "process6", value: 20, optimal: "yes" },
+        { source: "startB", target: "process1", value: 15, optimal: "yes" },
+        { source: "startB", target: "process5", value: 15, optimal: "yes" },
+        { source: "process1", target: "process4", value: 30, optimal: "yes" },
+        { source: "process4", target: "process1", value: 10, optimal: "yes" },
+        { source: "process2", target: "process7", value: 35, optimal: "yes" },
+        { source: "process1", target: "process3", value: 20, optimal: "yes" },
+        { source: "process5", target: "process1", value: 20, optimal: "yes" },
+        { source: "process6", target: "startA", value: 5, optimal: "yes" },
+        { source: "process4", target: "process2", value: 5, optimal: "yes" },
+        { source: "process6", target: "process8", value: 15, optimal: "yes" },
+        { source: "process4", target: "startB", value: 5, optimal: "yes" },
+        { source: "process3", target: "process2", value: 15, optimal: "yes" },
+        { source: "process3", target: "startB", value: 5, optimal: "yes" },
+        { source: "process15", target: "process13", value: 10, optimal: "yes" },
+        { source: "process13", target: "process9", value: 10, optimal: "yes" },
+        { source: "process7", target: "startB", value: 20, optimal: "yes" },
+        { source: "process8", target: "process1", value: 10, optimal: "yes" },
+        { source: "process8", target: "process16", value: 10, optimal: "yes" },
+        { source: "process16", target: "process9", value: 10, optimal: "yes" },
+        { source: "process8", target: "process11", value: 25, optimal: "yes" },
+        { source: "process11", target: "process10", value: 20, optimal: "yes" },
+        { source: "process4", target: "process12", value: 10, optimal: "yes" },
+        { source: "process12", target: "process11", value: 10, optimal: "yes" },
+        { source: "process7", target: "process15", value: 15, optimal: "yes" },
+        { source: "process15", target: "process14", value: 10, optimal: "yes" },
+        { source: "process10", target: "process13", value: 10, optimal: "yes" },
+        { source: "process10", target: "process16", value: 10, optimal: "yes" },
+        { source: "process14", target: "finishB", value: 10, optimal: "yes" },
+        { source: "process9", target: "finishA", value: 10, optimal: "yes" },
+        { source: "process16", target: "process8", value: 10, optimal: "yes" },
+        { source: "process9", target: "finishB", value: 10, optimal: "yes" },
+        { source: "process15", target: "finishB", value: 10, optimal: "yes" },
+        { source: "process15", target: "finishA", value: 10, optimal: "yes" },
+        { source: "process11", target: "process15", value: 25, optimal: "yes" },
+      ],
+    };</script>
+
 </head>
 
 <body>
+
   <h1>Sankey Diagram Output Page
     <div class="viewsetting">
-      <!-- <div class="horizon" style="padding-left: 10px;">アニメーション</div> -->
-      <div class="horizon">
-        <div class="segmented_header">アニメーション</div>
-        <form class="segmented" name="f_animation" action="#">
-          <label><input type="radio" name="R1" value="on" onclick="func()" checked><span class="label">入</span></label>
-          <label><input type="radio" name="R1" value="off" onclick="func()"><span class="label">切</span></label>
-        </form>
-      </div>
-      <!-- <div class="horizon" style="padding-left: 10px;"></div> -->
-      <div class="horizon">
-        <div class="segmented_header">矢印</div>
-        <form class="segmented" name="f_arrow" action="#">
-          <label><input type="radio" name="R2" value="on" onclick="func()" checked><span class="label">入</span></label>
-          <label><input type="radio" name="R2" value="off" onclick="func()"><span class="label">切</span></label>
-        </form>
-      </div>
-      <div class="horizon">
-        <div class="segmented_header">値表示</div>
-        <form class="segmented" name="f_value" action="#">
-          <label><input type="radio" name="R3" value="on" onclick="func()" checked><span class="label">入</span></label>
-          <label><input type="radio" name="R3" value="off" onclick="func()"><span class="label">切</span></label>
-        </form>
-      </div>
-      <div class="horizon">
-        <div class="segmented_header">ノード文字揃え</div>
-        <form class="segmented" name="f_nodepos" action="#">
-          <label><input type="radio" name="R4" value="left" onclick="func()" checked><span class="label">左</span></label>
-          <label><input type="radio" name="R4" value="center" onclick="func()"><span class="label">中</span></label>
-          <label><input type="radio" name="R4" value="right" onclick="func()"><span class="label">右</span></label>
-        </form>
-      </div>
-      <div class="horizon" style="padding-left: 15px">
-        <form name="F1" action="#">
-          <div class="horizon">
-            <div>
-              <input type="text" name="T1" size="3" maxlength="4" placeholder="幅pixel" oninput="value = value.replace(/[^0-9]+/i,'');" title="解像度 幅ピクセルを4桁数値で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
+
+      <div class="horizon-center">
+
+        <fieldset onchange="redraw(event)">
+
+          <legend>全体設定</legend>
+          <form name="SVGSIZE" action="#">
+            <div class="horizon-left">
+              <div>
+                図幅<input type="text" name="width" size="3" maxlength="4" placeholder="幅pixel" value="1100"
+                  oninput="value = value.replace(/[^0-9]+/i,'');" title="図全体幅ピクセルを4桁数値以下で指定">
+              </div>
+              <div>
+                図高<input type="text" name="height" size="3" maxlength="4" placeholder="高pixel" value="900"
+                  oninput="value = value.replace(/[^0-9]+/i,'');" title="図全体高さピクセルを4桁数値以下で指定">
+              </div>
             </div>
-            <div>
-              <input type="text" name="T1" size="3" maxlength="4" placeholder="高pixel" oninput="value = value.replace(/[^0-9]+/i,'');" title="解像度 高さピクセルを4桁数値で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
+          </form>
+
+          <div class='cp_ipselect cp_sl01'>
+            <select id="fontfamily" title="フォントは？">
+              <option value='MS UI Gothic' style='font-family: MS UI Gothic'>MS UI Gothic</option>
+              <option value='ＭＳ Ｐゴシック' style='font-family: ＭＳ Ｐゴシック'>ＭＳ Ｐゴシック</option>
+              <option value='MS PGothic' style='font-family: MS PGothic'>MS PGothic</option>
+              <option value='ＭＳ ゴシック' style='font-family: ＭＳ ゴシック'>ＭＳ ゴシック</option>
+              <option value='MS Gothic' style='font-family: MS Gothic'>MS Gothic</option>
+              <option value='ＭＳ Ｐ明朝' style='font-family: ＭＳ Ｐ明朝'>ＭＳ Ｐ明朝</option>
+              <option value='MS PMincho' style='font-family: MS PMincho'>MS PMincho</option>
+              <option value='ＭＳ 明朝' style='font-family: ＭＳ 明朝'>ＭＳ 明朝</option>
+              <option value='MS Mincho' style='font-family: MS Mincho'>MS Mincho</option>
+              <option value='メイリオ' style='font-family: メイリオ'>メイリオ</option>
+              <option value='Meiryo' style='font-family: Meiryo'>Meiryo</option>
+              <option value='Meiryo UI' style='font-family: Meiryo UI'>Meiryo UI</option>
+              <option value='游ゴシック' style='font-family: 游ゴシック'>游ゴシック</option>
+              <option value='Yu Gothic' style='font-family: Yu Gothic'>Yu Gothic</option>
+              <option value='游明朝' style='font-family: 游明朝'>游明朝</option>
+              <option value='Yu Mincho' style='font-family: Yu Mincho'>Yu Mincho</option>
+              <option value='ヒラギノ角ゴ Pro W3' style='font-family: ヒラギノ角ゴ Pro W3'>ヒラギノ角ゴ Pro W3</option>
+              <option value='Hiragino Kaku Gothic Pro' style='font-family: Hiragino Kaku Gothic Pro'>Hiragino Kaku
+                Gothic Pro</option>
+              <option value='ヒラギノ角ゴ ProN W3' style='font-family: ヒラギノ角ゴ ProN W3'>ヒラギノ角ゴ ProN W3</option>
+              <option value='Hiragino Kaku Gothic ProN' style='font-family: Hiragino Kaku Gothic ProN'>Hiragino Kaku
+                Gothic ProN</option>
+              <option value='HiraKakuProN-W3' style='font-family: HiraKakuProN-W3'>HiraKakuProN-W3</option>
+              <option value='ヒラギノ角ゴ Pro W6' style='font-family: ヒラギノ角ゴ Pro W6'>ヒラギノ角ゴ Pro W6</option>
+              <option value='HiraKakuPro-W6' style='font-family: HiraKakuPro-W6'>HiraKakuPro-W6</option>
+              <option value='ヒラギノ角ゴ ProN W6' style='font-family: ヒラギノ角ゴ ProN W6'>ヒラギノ角ゴ ProN W6</option>
+              <option value='HiraKakuProN-W6' style='font-family: HiraKakuProN-W6'>HiraKakuProN-W6</option>
+              <option value='HiraKakuProN-W6' style='font-family: HiraKakuProN-W6'>HiraKakuProN-W6</option>
+              <option value='ヒラギノ角ゴ Std W8' style='font-family: ヒラギノ角ゴ Std W8'>ヒラギノ角ゴ Std W8</option>
+              <option value='Hiragino Kaku Gothic Std' style='font-family: Hiragino Kaku Gothic Std'>Hiragino Kaku
+                Gothic Std</option>
+              <option value='ヒラギノ角ゴ StdN W8' style='font-family: ヒラギノ角ゴ StdN W8'>ヒラギノ角ゴ StdN W8</option>
+              <option value='Hiragino Kaku Gothic StdN' style='font-family: Hiragino Kaku Gothic StdN'>Hiragino Kaku
+                Gothic StdN</option>
+              <option value='ヒラギノ丸ゴ Pro W4' style='font-family: ヒラギノ丸ゴ Pro W4'>ヒラギノ丸ゴ Pro W4</option>
+              <option value='Hiragino Maru Gothic Pro' style='font-family: Hiragino Maru Gothic Pro'>Hiragino Maru
+                Gothic Pro</option>
+              <option value='ヒラギノ丸ゴ ProN W4' style='font-family: ヒラギノ丸ゴ ProN W4'>ヒラギノ丸ゴ ProN W4</option>
+              <option value='Hiragino Maru Gothic ProN' style='font-family: Hiragino Maru Gothic ProN'>Hiragino Maru
+                Gothic ProN</option>
+              <option value='ヒラギノ明朝 Pro W3' style='font-family: ヒラギノ明朝 Pro W3'>ヒラギノ明朝 Pro W3</option>
+              <option value='Hiragino Mincho Pro' style='font-family: Hiragino Mincho Pro'>Hiragino Mincho Pro</option>
+              <option value='ヒラギノ明朝 ProN W3' style='font-family: ヒラギノ明朝 ProN W3'>ヒラギノ明朝 ProN W3</option>
+              <option value='Hiragino Mincho ProN' style='font-family: Hiragino Mincho ProN'>Hiragino Mincho ProN
+              </option>
+              <option value='HiraMinProN-W3' style='font-family: HiraMinProN-W3'>HiraMinProN-W3</option>
+              <option value='ヒラギノ明朝 Pro W6' style='font-family: ヒラギノ明朝 Pro W6'>ヒラギノ明朝 Pro W6</option>
+              <option value='HiraMinPro-W6' style='font-family: HiraMinPro-W6'>HiraMinPro-W6</option>
+              <option value='ヒラギノ明朝 ProN W6' style='font-family: ヒラギノ明朝 ProN W6'>ヒラギノ明朝 ProN W6</option>
+              <option value='HiraMinProN-W6' style='font-family: HiraMinProN-W6'>HiraMinProN-W6</option>
+              <option value='HiraMinProN-W6' style='font-family: HiraMinProN-W6'>HiraMinProN-W6</option>
+              <option value='游ゴシック体' style='font-family: 游ゴシック体'>游ゴシック体</option>
+              <option value='YuGothic' style='font-family: YuGothic'>YuGothic</option>
+              <option value='游明朝体' style='font-family: 游明朝体'>游明朝体</option>
+              <option value='YuMincho' style='font-family: YuMincho'>YuMincho</option>
+              <option value='Osaka' style='font-family: Osaka'>Osaka</option>
+              <option value='Osaka－等幅' style='font-family: Osaka－等幅'>Osaka－等幅</option>
+              <option value='Osaka-Mono' style='font-family: Osaka-Mono'>Osaka-Mono</option>
+              <option value='Droid Sans' style='font-family: Droid Sans'>Droid Sans</option>
+              <option value='Roboto' style='font-family: Roboto'>Roboto</option>
+
+            </select>
+          </div>
+
+          <div class='cp_ipselect cp_sl01'>
+            <select id="nodealign" title="並びのアルゴリズムは？">
+              <option value="Justify" selected>sankeyJustify</option>
+              <option value="Left">sankeyLeft</option>
+              <option value="Center">sankeyCenter</option>
+              <option value="Right">sankeyRight</option>
+            </select>
+          </div>
+
+          <div class='cp_ipselect cp_sl01'>
+            <select id="highlighttype" title="マウスオーバー時のハイライト動作は？">
+              <option value="highlightneighbor" selected>隣までハイライトさせる</option>
+              <option value="nohighlight">ハイライトなし</option>
+            </select>
+          </div>
+
+        </fieldset>
+
+      </div>
+
+      <div class="horizon-center">
+
+        <fieldset>
+
+          <legend>ノード</legend>
+
+          <form class="segmented" name="f_nodepos" action="#">
+            <label title="左寄せ"><input type="radio" name="R4" value="left" onclick="nodetext_left()"><span
+                class="label">左</span></label>
+            <label title="中央揃え"><input type="radio" name="R4" value="center" onclick="nodetext_center()" checked><span
+                class="label">中</span></label>
+            <label title="右寄せ"><input type="radio" name="R4" value="right" onclick="nodetext_right()"><span
+                class="label">右</span></label>
+          </form>
+
+          <div class="horizon-left" onchange="redraw(event)">
+            <div><input type="range" id="nodewidth" value="10" min="0" max="100" step="1"
+                title="ノード幅サイズをピクセル指定します"><label for="nodewidth">幅</label></div>
+            <div><input type='range' id='nodepaddingratio' value='0.5' min='0' max='1' step='0.01' title=''><label
+                for='nodepaddingratio'>間隔</label></div>
+            <div><input type='range' id='nodeopacity' value='0.9' min='0' max='1' step='0.01' title=''><label
+                for='nodeopacity'>不透明度</label></div>
+          </div>
+
+          <div class="horizon-left" onchange="redraw(event)">
+            <div><input type='range' id='nodetextfontsize' value='26' min='0' max='64' step='1' title=''><label
+                for='nodetextfontsize'>フォントサイズ</label></div>
+            <div><input type='range' id='nodetextfontweight' value='600' min='0' max='1000' step='100' title=''><label
+                for='nodetextfontweight'>文字太さ</label></div>
+            <div hidden><input type='range' id='nodeiterations' value='5' min='1' max='32' step='1' title=''><label
+                for='nodeiterations'>イテレーション</label></div>
+          </div>
+
+          <div onchange="redraw(event)">
+            <input type="color" id="nodecolor" name="nodecolor" value="#ffffff" title="デフォルトはランダムカラー">
+            <label for="nodecolor">ノード色</label>
+            <input type="color" id="nodetextfontcolor" name="nodetextfontcolor" value="#ffffff" title="デフォルトはランダムカラー">
+            <label for="nodetextfontcolor">文字色</label>
+          </div>
+
+        </fieldset>
+
+      </div>
+
+      <div class="horizon-center">
+        <fieldset>
+
+          <legend>ルート</legend>
+          <div class="horizon-center">
+            <form class="segmented" name="f_animation" action="#"><label>アニメーション</label>
+              <label><input type="radio" name="R1" value="on" onclick="animation_on()" checked><span
+                  class="label">入</span></label>
+              <label><input type="radio" name="R1" value="off" onclick="animation_off()"><span
+                  class="label">切</span></label>
+            </form>
+
+            <input type='range' id='maxOffset' value='10' min='0' max='60' step='1' title=''
+              onchange="redraw(event)"><label for='maxOffset'>速さ</label>
+          </div>
+
+          <div>
+            <div class="horizon-left" onchange="redraw(event)">
+              <div><input type='range' id='strokeopacity' value='0.2' min='0' max='1' step='0.01' title=''><label
+                  for='strokeopacity'>経路の不透明度</label></div>
+              <div><input type='range' id='hideopacity' value='0.1' min='0' max='1' step='0.01' title=''><label
+                  for='hideopacity'>非表示時不透明度</label></div>
+              <div><input type='range' id='circularLinkGap' value='2' min='1' max='20' step='1' title=''><label
+                  for='circularLinkGap'>逆行経路の間隔</label></div>
             </div>
           </div>
-          <div class="horizon">
-            <!-- <a href="javascript:download_PNG();" id="DLPNG" download><span>Download</span><span>PNG</span></a> -->
-            <a href="javascript:download_PNG();" id="DLPNG" download><span>Download</span><span>PNG</span></a>
-            <a href="javascript:download_SVG();" id="DLSVG" download><span>Download</span><span>SVG</span></a>
+
+          <div class="horizon-left" onchange="redraw(event)">
+            <input type="color" id="linkforwardcolor" name="linkforwardcolor" value="#000000">
+            <label for="linkforwardcolor">通常ルート色</label>
+            <input type="color" id="linkreversecolor" name="linkreversecolor" value="#FF0000">
+            <label for="linkreversecolor">逆行ルート色</label>
           </div>
-        </form>
+
+        </fieldset>
+
       </div>
+
+      <div class="horizon-center">
+        <fieldset>
+
+          <legend>バッヂ</legend>
+
+          <form class="segmented" name="f_value" action="#">
+            <label><input type="radio" name="R3" value="on" onclick="value_on()" checked><span
+                class="label">入</span></label>
+            <label><input type="radio" name="R3" value="off" onclick="value_off()"><span class="label">切</span></label>
+          </form>
+
+          <div class="horizon-left" onchange="redraw(event)">
+            <div><input type='range' id='badgetextsize' value='26' min='0' max='64' step='1' title=''><label
+                for='badgetextsize'>バッヂサイズ</label></div>
+          </div>
+
+          <div onchange="redraw(event)">
+            <input type="color" id="badgebgcolor" name="badgebgcolor" value="#0000FF">
+            <label for="badgebgcolor">背景色</label>
+            <input type="color" id="badgetextcolor" name="badgetextcolor" value="#FFFFFF">
+            <label for="badgetextcolor">文字色</label>
+          </div>
+
+        </fieldset>
+
+      </div>
+
+      <div class="horizon-center">
+
+        <fieldset>
+
+          <legend>矢印</legend>
+
+          <form class="segmented" name="f_arrow" action="#">
+            <label><input type="radio" name="R2" value="on" onclick="arrow_on()" checked><span
+                class="label">入</span></label>
+            <label><input type="radio" name="R2" value="off" onclick="arrow_off()"><span class="label">切</span></label>
+          </form>
+
+          <div class="horizon-left" onchange="redraw(event)">
+            <div><input type='range' id='arrowlen' value='40' min='0' max='200' step='1' title=''><label
+                for='arrowlen'>矢印長さ</label></div>
+            <div><input type='range' id='arrowgaplen' value='300' min='0' max='1000' step='10' title=''><label
+                for='arrowgaplen'>矢印間隔</label></div>
+            <div><input type='range' id='arrowheadsize' value='4' min='0' max='20' step='1' title=''><label
+                for='arrowheadsize'>矢尻サイズ</label></div>
+          </div>
+          <div onchange="redraw(event)">
+            <input type="color" id="arrowcolor" name="arrowcolor" value="#000000">
+            <label for="arrowcolor">色</label>
+          </div>
+
+        </fieldset>
+
+      </div>
+
+      <div class="horizon-center">
+        <fieldset>
+
+          <legend>ダウンロード</legend>
+
+          <form name="F1" action="#">
+            <div class="horizon-left">
+              <div>
+                <input type="text" name="T1" size="3" maxlength="4" placeholder="幅pixel"
+                  oninput="value = value.replace(/[^0-9]+/i,'');"
+                  title="解像度 幅ピクセルを4桁数値以下で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
+              </div>
+              <div>
+                <input type="text" name="T1" size="3" maxlength="4" placeholder="高pixel"
+                  oninput="value = value.replace(/[^0-9]+/i,'');"
+                  title="解像度 高さピクセルを4桁数値以下で指定します&#13;&#10;PNGのみ設定可&#13;&#10;無指定の場合は原寸大の解像度を自動設定します">
+              </div>
+            </div>
+            <div class="horizon-left">
+              <a href="javascript:download_PNG();" id="DLPNG" download><span>Download</span><span>PNG</span></a>
+            </div>
+            <div class="horizon-left">
+              <a href="javascript:download_SVG();" id="DLSVG" download><span>Download</span><span>SVG</span></a>
+            </div>
+          </form>
+
+        </fieldset>
+
+      </div>
+
     </div>
+
   </h1>
+
+
   <div id="chart"></div>
+
+  <hr>
+
+  <h2>ノード一覧</h2>
+  <div class="sortable-table">
+    <table id="nodes-table"></table>
+  </div>
+
+  <hr>
+
+  <h2>ルート一覧</h2>
+  <div class="sortable-table">
+    <table id="links-table"></table>
+  </div>
+
+  <hr>
+
   <script>
-    func()
+    maketable("#nodes-table", data["nodes"])
+    maketable("#links-table", data["links"])
+    redraw()
+    window.addEventListener('resize', redraw);
   </script>
-  <!-- @todo -->
-  <!-- thanks for https://codepen.io/estelle/pen/RJpreX -->
-  <div class="table-container">
-    <h2>リンク一覧</h2>
-    <div style="padding: 15px;">
-      <table>
-        <thead>
-          <tr>
-            <th>Header</th>
-            <th>Header</th>
-            <th>Header</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th>Column one</th>
-            <td>Column two</td>
-            <td>Column three</td>
-          </tr>
-          <tr>
-            <th>Column one</th>
-            <td>Column two</td>
-            <td>Column three</td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr>
-            <td>Footer</td>
-            <td>Footer</td>
-            <td>Footer</td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  </div>
-  <div class="table-container">
-    <h2>ノード一覧</h2>
-    <div style="padding: 15px;">
-      <table>
-        <thead>
-          <tr>
-            <th>Header</th>
-            <th>Header</th>
-            <th>Header</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th>Column one</th>
-            <td>Column two</td>
-            <td>Column three</td>
-          </tr>
-          <tr>
-            <th>Column one</th>
-            <td>Column two</td>
-            <td>Column three</td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr>
-            <td>Footer</td>
-            <td>Footer</td>
-            <td>Footer</td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  </div>
-  <div><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></div>
-  <div>
-    <footer>
-      csankey Copyright © 2021 kirin123kirin see <a href="https://opensource.org/licenses/MIT">MIT
-        Liscense</a>&nbsp;&nbsp;|
-      Powered by &nbsp;<a href="https://d3js.org/d3.v4.min.js">d3.js</a>
-      &nbsp;|&nbsp;Referenced by Tom Shanley’s&nbsp;<a href="https://bl.ocks.org/tomshanley/raw/6eb025290888935f10b142e4bc576d8d/d3-sankey-circular.js">Sankey circular
-        links1</a>
-      <a href="https://bl.ocks.org/tomshanley/874923fe54b173735b456479423ac7d6">Sankey circular links2</a>
-    </footer>
-  </div>
+
+
 </body>
+
+<footer>
+  csankey Copyright © 2021 kirin123kirin see <a href="https://opensource.org/licenses/MIT">MIT
+    Liscense</a>&nbsp;&nbsp;|
+  Powered by &nbsp;<a href="https://d3js.org/d3.v4.min.js">d3.js</a>
+  &nbsp;|&nbsp;<a href="https://github.com/tomshanley/d3-sankey-circular">tomshanley's d3-sankey-circular(fork of
+    d3-sankey copyright Mike Bostock)</a>
+  &nbsp;|<a
+    href="https://bl.ocks.org/tomshanley/raw/6f3fcf68c0dbc401548733dd0c64e3c3/d3-sankey-circular.js">d3-sankey-circular.js</a>|&nbsp;<a
+    href="https://www.npmjs.com/package/@riversun/sortable-table">sortable-table.js copyright riversun</script>
+
+</footer>
 
 </html>

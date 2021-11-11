@@ -52,10 +52,11 @@ TODO
 
 # Libraries used
 * https://d3js.org/d3.v4.min.js
-* https://bl.ocks.org/tomshanley/raw/6eb025290888935f10b142e4bc576d8d/d3-sankey-circular.js
-* https://bl.ocks.org/tomshanley/6eb025290888935f10b142e4bc576d8d#d3-path-arrows.js
-* https://bl.ocks.org/tomshanley/874923fe54b173735b456479423ac7d6#d3-sankey-circular.js (function appendArrows)
+* https://bl.ocks.org/tomshanley/raw/6f3fcf68c0dbc401548733dd0c64e3c3/d3-sankey-circular.js
+* https://www.npmjs.com/package/@riversun/sortable-table sortable-table.js copyright riversun
 
 # References used
 * https://github.com/tomshanley/d3-sankey-circular
 * https://github.com/d3/d3-sankey copyright Mike Bostock
+* https://bl.ocks.org/tomshanley/6eb025290888935f10b142e4bc576d8d#d3-path-arrows.js
+* https://bl.ocks.org/tomshanley/874923fe54b173735b456479423ac7d6#d3-sankey-circular.js (function appendArrows)

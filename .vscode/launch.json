@@ -216,7 +216,7 @@
       "request": "launch",
       "type": "chrome",
       "internalConsoleOptions": "openOnSessionStart",
-      "file": "${workspaceFolder}/src/index.html",
+      "file": "${file}",
       // "url": "http://localhost:3000/src/index.html",
       "webRoot": "${workspaceFolder}/src/",
       // "sourceMaps": true,
