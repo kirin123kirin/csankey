@@ -1,0 +1,339 @@
+:root {
+    --main-font-family: "MS Gothic";
+    --sub-font-family: "メイリオ", "Meiryo";
+}
+
+body {
+    font-family: var(--main-font-family);
+}
+
+h1 {
+    position: relative;
+    padding: 0.1em 0.3em;
+    font-family: var(--main-font-family);
+    /* background: -webkit-linear-gradient(to right, gray, transparent);
+    background: linear-gradient(to right, gray, transparent); */
+    background: #C0C0C0;
+    color: white;
+    text-shadow: 1px 1px black;
+}
+
+h2 {
+    width: 100%;
+    background-color: #fff;
+    /* 縦スクロール時に固定する */
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 0;
+}
+
+footer {
+    width: 100%;
+    font-size: 9px;
+    background: -webkit-linear-gradient(to right, gray, transparent);
+    background: linear-gradient(to right, gray, transparent);
+    color: #fff;
+    text-align: left;
+    padding: 5px 0;
+    float: left;
+    position: fixed;
+    bottom: 0;
+}
+
+.viewsetting {
+    width: 900px;
+    display: table;
+    border-collapse: collapse;
+    /* background: -webkit-linear-gradient(to right, gray, transparent);
+    background: linear-gradient(to right, gray, transparent); */
+    /* color: white; */
+    text-align: center;
+    text-shadow: 1px 1px #050505;
+    font-size: 14px;
+    font-family: var(--sub-font-family);
+}
+
+.viewsetting .horizon-center {
+    display: table-cell;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+.viewsetting .horizon-left {
+    display: table-cell;
+    vertical-align: top;
+    text-align: left;
+}
+
+svg {
+    /* position: absolute; */
+    /* top: 0;
+    left: 0; */
+    pointer-events: all;
+}
+
+
+.segmented_header {
+    margin-top: 5px;
+    text-align: center;
+    height: 10px;
+}
+
+/*
+    * thanks for https://ginpen.com/2012/12/11/segmented-control
+    */
+.segmented {
+    display: inline-block;
+    padding: 10px;
+}
+
+.segmented .label {
+    background-color: #eee;
+    background-image: linear-gradient(to bottom, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
+    border: 1px #ccc;
+    border-style: solid none solid solid;
+    color: #777;
+    cursor: pointer;
+    float: left;
+    padding: 4px;
+    text-align: center;
+    text-shadow: 1px 1px #fff;
+    /* width: 40px; */
+}
+
+.segmented :first-child .label {
+    border-radius: 5px 0 0 5px;
+    /* border-radius: 5px 5px 5px 5px; */
+}
+
+.segmented :last-child .label {
+    border-radius: 0 5px 5px 0;
+    /* border-radius: 5px 5px 5px 5px; */
+    border-right-style: solid;
+}
+
+.segmented input {
+    display: none;
+}
+
+.segmented input:checked+.label {
+    background-color: #00f;
+    background-image: linear-gradient(to bottom, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
+    border-color: hsl(214, 90%, 60%);
+    box-shadow: 3px 2px 10px rgba(0, 0, 0, .2) inset, -3px 2px 10px rgba(0, 0, 0, .2) inset;
+    color: #fff;
+    text-shadow: -1px -1px rgba(0, 0, 0, .3);
+}
+
+.segmented .label {
+    background-image: -moz-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
+    background-image: -ms-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
+    background-image: -webkit-linear-gradient(top, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
+    background-image: linear-gradient(to bottom, hsl(0, 0%, 98%) 0%, hsl(0, 0%, 77%) 100%);
+}
+
+.segmented input:checked+span,
+[download] span {
+    background-image: -moz-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
+    background-image: -ms-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
+    background-image: -webkit-linear-gradient(top, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
+    background-image: -webkit-linear-gradient(to bottom, hsl(214, 90%, 40%) 0%, hsl(214, 90%, 70%) 100%);
+}
+
+/* thanks for https://pecopla.net/web-column/table-design */
+table {
+    line-height: 1.25;
+    border-collapse: collapse;
+    margin: 0 30px;
+    padding: 0;
+    /* width: 650px; */
+    box-shadow: 0 0 15px -6px #00000073;
+    min-width: 200px;
+}
+
+table tr {
+    background-color: #fff;
+}
+
+table tbody tr:hover {
+    background-color: #d6eff5;
+}
+
+table th,
+table td {
+    padding: .35em 1em;
+    border: 1px solid #bbb;
+}
+
+table thead th {
+    font-size: .85em;
+    padding: 1em;
+    background-color: #C0C0C0;
+    color: #fff;
+
+    border-right: 1px solid white;
+    /* 縦スクロール時に固定する */
+    position: -webkit-sticky;
+    position: sticky;
+    top: 26px;
+    z-index: 1;
+}
+
+table tbody th {
+    text-align: left;
+    font-size: .8em;
+}
+
+/* 
+    * thanks for https://devsnap.me/css-download-buttons
+    */
+[download] {
+    background: none;
+    /* 		border: solid 1px #e6e6e6; */
+    border-radius: 3px;
+    display: inline-block;
+    height: 65px;
+    line-height: 65px;
+    /* margin: 5px; */
+    position: relative;
+    text-align: center;
+    vertical-align: middle;
+    width: 80px;
+}
+
+[download] span {
+    /* background: orange; */
+    border-radius: 4px;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: normal;
+    padding: 5px 10px;
+    position: relative;
+    text-transform: uppercase;
+    z-index: 1;
+}
+
+[download] span:last-child {
+    margin-left: -20px;
+}
+
+[download]:before,
+[download]:after {
+    background: #ffffff;
+    border: solid 3px #9fb4cc;
+    border-radius: 4px;
+    content: '';
+    display: block;
+    height: 35px;
+    left: 50%;
+    margin: -17px 0 0 -12px;
+    position: absolute;
+    top: 50%;
+    /*transform:translate(-50%,-50%);*/
+
+    width: 25px;
+}
+
+[download]:hover:before,
+[download]:hover:after {
+    background: #e2e8f0;
+}
+
+/* [download]:before{transform:translate(-30%,-60%);} */
+
+[download]:before {
+    margin: -23px 0 0 -5px;
+}
+
+[download]:hover {
+    background: #e2e8f0;
+    border-color: #9fb4cc;
+}
+
+[download]:active {
+    background: #dae0e8;
+    box-shadow: inset 0 2px 2px rgba(0, 0, 0, .25);
+}
+
+[download] span:first-child {
+    display: none;
+}
+
+[download]:hover span:first-child {
+    display: inline-block;
+}
+
+[download]:hover span:last-child {
+    display: none;
+}
+
+
+input[type='range'] {
+    margin: 0;
+    padding: 0;
+    /* font-size: inherit; */
+    width: 5em;
+    height: 1em;
+    font-family: var(--sub-font-family);
+    color: black;
+}
+
+input[type='range']+label {
+    font-size: 12px;
+    padding: 5px;
+}
+
+.cp_ipselect {
+    overflow: hidden;
+    width: 100%;
+    margin: 5px;
+    text-align: center;
+}
+
+.cp_ipselect select {
+    width: 100%;
+    padding-right: 3px;
+    cursor: pointer;
+    text-indent: 0.01px;
+    text-overflow: ellipsis;
+    border: none;
+    outline: none;
+    background: transparent;
+    background-image: none;
+    box-shadow: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.cp_ipselect select::-ms-expand {
+    display: none;
+}
+
+.cp_ipselect.cp_sl01 {
+    position: relative;
+    border: 1px solid #bbbbbb;
+    border-radius: 2px;
+    background: #ffffff;
+}
+
+.cp_ipselect.cp_sl01::before {
+    position: absolute;
+    top: 0.8em;
+    right: 0.9em;
+    width: 0;
+    height: 0;
+    padding: 0;
+    content: '';
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #666666;
+    pointer-events: none;
+}
+
+.cp_ipselect.cp_sl01 select {
+    /* padding: 8px 38px 8px 8px; */
+    color: #666666;
+}

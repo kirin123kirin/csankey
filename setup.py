@@ -11,7 +11,7 @@ from os.path import dirname, join as pjoin
 from setup_preinit import TARGET, SRCDIR
 from glob import glob
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 DESCRIPTION = "Sakey Diagram HTML builder"
 KEYWORDS = ["sankey", "d3", "visualization"]
@@ -25,7 +25,7 @@ PLATFORMS = ["Windows", "Linux", "Mac OS-X"]
 
 # # https://pypi.org/classifiers/
 CLASSIFIERS = """
-Development Status :: 2 - Pre-Alpha
+Development Status :: 4 - Beta
 License :: OSI Approved :: MIT License
 Programming Language :: C++
 Programming Language :: Python :: 3.6

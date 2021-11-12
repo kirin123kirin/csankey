@@ -5,6 +5,7 @@ from urllib import request
 SRCDIR = pathjoin(dirname(__file__), "src")
 TARGET = normpath(pathjoin(SRCDIR, "index.html"))
 
+
 def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
     if minify:
         re_minify = re.compile("^\s+", re.MULTILINE).sub
@@ -15,8 +16,20 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
         dat = f.read()
 
     if dat:
-        scripts = "<script>"
+        for re_css in re.finditer('<link\s+href=[\"\']([^\"\']+)[\"\']\s+rel=[\"\']stylesheet[\"\']\s*>', dat):
+            cssname = re_css.group(1)
+            if(cssname.startswith("http")):
+                opener = request.build_opener()
+                opener.addheaders = [('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
+                request.install_opener(opener)
+                with request.urlopen(cssname) as res:
+                    dat = dat.replace(re_css.group(0), "<style>\n" + res.read().decode() + "\n</style>")
+            else:
+                cssfile = normpath(pathjoin(SRCDIR, cssname))
+                with open(cssfile, "r", encoding="utf-8") as f:
+                    dat = dat.replace(re_css.group(0), "<style>\n" + f.read() + "\n</style>")
 
+        scripts = "<script>"
         start = 0
         end = 0
 
@@ -71,3 +84,5 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
 
     else:
         raise ValueError("Is Empty" + target + "?")
+
+make_compiler_input()
