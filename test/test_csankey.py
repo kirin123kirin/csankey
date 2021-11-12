@@ -25,19 +25,19 @@ except:
 def memusage():
     return process.memory_info()[0] / 1024
 
-def runtimeit(funcstr, number=10000, normalize=10000):
+def runtimeit(funcstr, number=100000):
     i = 0
+
     for fc in funcstr.strip().splitlines():
         fc = fc.strip()
         if i == 0:
             timeit(fc, globals=globals(), number=number)
         bm = memusage()
         p = timeit(fc, globals=globals(), number=number)
+        
         am = (memusage() - bm)
-        try:
-            print("{}: {} ns (mem after {}KB)".format(fc, int(p * normalize), am))
-        except UnicodeEncodeError:
-            print("???: {} ns (mem after {}KB)".format(int(p * normalize), am))
+        assert am < 1000, "{} function {}KB Memory Leak Error".format(fc, am)
+        print("{}: {} ns (mem after {}KB)".format(fc, int(1000000000 * p / number), am))
         i += 1
 
 

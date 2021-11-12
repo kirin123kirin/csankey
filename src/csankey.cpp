@@ -165,7 +165,7 @@ struct SankeyData {
 
         for(Py_ssize_t n = startrowidx; n < len; ++n) {
             PyObject* row = PySequence_GetItem(data, n);
-            PyObject *pysrc, *pytar;
+            PyObject *pysrc, *pytar, *pyval;
             int val = 1;
 
             if(row == NULL)
@@ -183,7 +183,7 @@ struct SankeyData {
             pysrc = PySequence_GetItem(row, srcidx);
             pytar = PySequence_GetItem(row, taridx);
             if(_nlen > 2) {
-                PyObject* pyval = PySequence_GetItem(row, taridx + 1);
+                pyval = PySequence_GetItem(row, taridx + 1);
                 val = PyLong_AsLong(pyval);
             }
 
@@ -200,7 +200,7 @@ struct SankeyData {
         return true;
     }
 
-    bool parse(bool header) {
+    bool parse(int header) {
         PyObject* row;
         const char* errmsg = "argument is 2d list or tuple object?";
         Py_ssize_t startrowidx = 0, nlen = -1;
@@ -221,15 +221,12 @@ struct SankeyData {
             Py_DECREF(row);
             return false;
         }
-        if(header) {
-            Py_DECREF(row);
-            ++startrowidx;
-        }
+        Py_DECREF(row);
 
         if(nlen == 2 || nlen == 3) {
-            return _table_parse(startrowidx, nlen, 0, 1);
+            return _table_parse(header, nlen, 0, 1);
         } else if(nlen == 4) {
-            return _table_parse(startrowidx, nlen, 1, 2);
+            return _table_parse(header, nlen, 1, 2);
         } else {
             PyErr_Format(PyExc_ValueError,
                          "If you want to use this feature, at least 2 - 4 columns are needed.\n"
