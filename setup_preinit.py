@@ -12,6 +12,7 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
     else:
         def re_minify(a, b): return b
     dat = None
+    UA = [('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
     with open(target, "r", encoding="utf-8") as f:
         dat = f.read()
 
@@ -20,14 +21,14 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
             cssname = re_css.group(1)
             if(cssname.startswith("http")):
                 opener = request.build_opener()
-                opener.addheaders = [('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
+                opener.addheaders = UA
                 request.install_opener(opener)
                 with request.urlopen(cssname) as res:
-                    dat = dat.replace(re_css.group(0), "<style>\n" + res.read().decode() + "\n</style>")
+                    dat = dat.replace(re_css.group(0), "<style>\n" + re_minify("", res.read().decode()) + "\n</style>")
             else:
                 cssfile = normpath(pathjoin(SRCDIR, cssname))
                 with open(cssfile, "r", encoding="utf-8") as f:
-                    dat = dat.replace(re_css.group(0), "<style>\n" + f.read() + "\n</style>")
+                    dat = dat.replace(re_css.group(0), "<style>\n" + re_minify("", f.read()) + "\n</style>")
 
         scripts = "<script>"
         start = 0
@@ -40,7 +41,7 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
             scpname = re_scp.group(1)
             if (scpname.startswith("http")):
                 opener = request.build_opener()
-                opener.addheaders = [('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
+                opener.addheaders = UA
                 request.install_opener(opener)
                 with request.urlopen(scpname) as res:
                     scripts += res.read().decode()
@@ -48,7 +49,7 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
                 scpfile = normpath(pathjoin(SRCDIR, scpname))
                 with open(scpfile, "r", encoding="utf-8") as f:
                     scripts += f.read()
-        
+
         scripts += "</script>"
 
         bf = dat[:start] + scripts
@@ -85,4 +86,4 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
     else:
         raise ValueError("Is Empty" + target + "?")
 
-make_compiler_input()
+

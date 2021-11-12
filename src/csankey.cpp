@@ -60,21 +60,28 @@ struct SankeyData {
     ~SankeyData() {}
 
     std::wstring to_json() {  //_to_datajson
-        std::wstring res = L"{\n\"nodes\":[\n";
+        std::wstring res(L"{\n\"nodes\":[\n");
         std::size_t i = 0, j = 0;
 
-        for(auto&& node : nodes)
-            res += LR"({"ID":)" + std::to_wstring(++i) + LR"(,"name":")" + node + L"\"},\n";
+        for(auto&& node : nodes) {
+            res += LR"({"ID":)";
+            res += std::to_wstring(++i);
+            res += LR"(,"name":")" + node + L"\"},\n";
+        }
         res += L"],\n\"links\":[\n";
 
-        for(auto&& link : links)
-            res += LR"({"ID":)" + std::to_wstring(++j) + link.first + std::to_wstring(link.second) + L"},\n";
-
+        for(auto&& link : links) {
+            res += LR"({"ID":)";
+            res += std::to_wstring(++j);
+            res += link.first;
+            res += std::to_wstring(link.second);
+            res += L"},\n";
+        }
         return res + L"]}\n";
     }
 
-    bool mapper(PyObject* pysrc, PyObject* pytar) {  //_append_data
-        std::wstring src, tar, key;
+    bool mapper(PyObject* pysrc, PyObject* pytar, int value = 1) {  //_append_data
+        std::wstring src, tar;
         src = pyto_wstring(pysrc);
         if(src.empty()) {
             PyErr_Format(PyExc_ValueError, "Parse string Error.");
@@ -86,9 +93,13 @@ struct SankeyData {
             return false;
         }
 
-        key = LR"(,"source":")" + src + LR"(","target":")" + tar + LR"(","value":)";
+        std::wstring key(LR"(,"source":")");
+        key += src;
+        key += LR"(","target":")";
+        key += tar;
+        key += LR"(","value":)";
 
-        links[key] += 1;
+        links[key] += value;
         if(nodes.find(src) == nodes.end())
             nodes.emplace(src);
         if(nodes.find(tar) == nodes.end())
@@ -104,21 +115,36 @@ struct SankeyData {
         if(len == -1) {
             PyErr_Format(PyExc_IndexError, errmsg);
             return false;
+        } else if(len == 0) {
+            PyErr_Format(PyExc_ValueError, "argument list is empty data.");
+            return false;
         }
 
         for(Py_ssize_t n = 0; n < len; ++n) {
             PyObject* row = PySequence_GetItem(data, n);
+            Py_ssize_t count;
 
             if(row == NULL || (_nlen = PyObject_Length(row)) == -1) {
-                PyErr_Format(PyExc_IndexError, errmsg);
+                Py_XDECREF(row);
                 return false;
             }
 
-            for(Py_ssize_t i = 0, count = (_nlen >> 1) + 1; i < count; ++i) {
-                if((mapper(PySequence_GetItem(row, i), PySequence_GetItem(row, i + 1))) == false) {
+            if(_nlen == 1) {
+                std::wstring src = pyto_wstring(PySequence_GetItem(row, 0));
+                if(src.empty()) {
                     Py_DECREF(row);
-                    PyErr_Format(PyExc_IndexError, errmsg);
+                    PyErr_Format(PyExc_ValueError, "Parse string Error.");
                     return false;
+                }
+                nodes.emplace(src);
+            } else {
+                count = _nlen == 2 ? 1 : (_nlen >> 1) + 1;
+
+                for(Py_ssize_t i = 0; i < count; ++i) {
+                    if((mapper(PySequence_GetItem(row, i), PySequence_GetItem(row, i + 1))) == false) {
+                        Py_DECREF(row);
+                        return false;
+                    }
                 }
             }
 
@@ -128,7 +154,7 @@ struct SankeyData {
         return true;
     }
 
-    bool _table_parse(Py_ssize_t needcolsize, Py_ssize_t srcidx, Py_ssize_t taridx) {
+    bool _table_parse(Py_ssize_t startrowidx, Py_ssize_t needcolsize, Py_ssize_t srcidx, Py_ssize_t taridx) {
         Py_ssize_t _nlen;
         const char* errmsg = "argument is 2d list or tuple object?";
 
@@ -137,50 +163,78 @@ struct SankeyData {
             return false;
         }
 
-        for(Py_ssize_t n = 0; n < len; ++n) {
+        for(Py_ssize_t n = startrowidx; n < len; ++n) {
             PyObject* row = PySequence_GetItem(data, n);
+            PyObject *pysrc, *pytar;
+            int val = 1;
 
-            if(row == NULL) {
-                PyErr_Format(PyExc_IndexError, errmsg);
+            if(row == NULL)
                 return false;
-            }
 
-            if((_nlen = PyObject_Length(row)) != needcolsize ||
-               (mapper(PySequence_GetItem(row, srcidx), PySequence_GetItem(row, taridx))) == false) {
+            if((_nlen = PyObject_Length(row)) != needcolsize) {
+                PyErr_Format(PyExc_ValueError,
+                             "UnExpected column size Error. expected %d columns.\n"
+                             "but you input %d columns",
+                             needcolsize, _nlen);
                 Py_DECREF(row);
-                PyErr_Format(PyExc_IndexError, errmsg);
                 return false;
             }
+
+            pysrc = PySequence_GetItem(row, srcidx);
+            pytar = PySequence_GetItem(row, taridx);
+            if(_nlen > 2) {
+                PyObject* pyval = PySequence_GetItem(row, taridx + 1);
+                val = PyLong_AsLong(pyval);
+            }
+
+            if((mapper(pysrc, pytar, val)) == false) {
+                Py_DECREF(row);
+                return false;
+            }
+
             Py_DECREF(row);
+
+            if(PyErr_Occurred())
+                return false;
         }
         return true;
     }
 
     bool parse(bool header) {
         PyObject* row;
-        Py_ssize_t n = 0, nlen = -1;
+        const char* errmsg = "argument is 2d list or tuple object?";
+        Py_ssize_t startrowidx = 0, nlen = -1;
+
+        if(len == -1) {
+            PyErr_Format(PyExc_IndexError, errmsg);
+            return false;
+        } else if(len == 0) {
+            PyErr_Format(PyExc_ValueError, "argument list is empty data.");
+            return false;
+        }
 
         if((row = PySequence_GetItem(data, 0)) == NULL) {
             Py_DECREF(row);
-            PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object?");
             return false;
         }
         if((nlen = PyObject_Length(row)) == -1) {
             Py_DECREF(row);
-            PyErr_Format(PyExc_IndexError, "argument is 2d list or tuple object?");
             return false;
         }
         if(header) {
             Py_DECREF(row);
-            ++n;
+            ++startrowidx;
         }
 
         if(nlen == 2 || nlen == 3) {
-            return _table_parse(nlen, 0, 1);
+            return _table_parse(startrowidx, nlen, 0, 1);
         } else if(nlen == 4) {
-            return _table_parse(nlen, 1, 2);
+            return _table_parse(startrowidx, nlen, 1, 2);
         } else {
-            PyErr_Format(PyExc_ValueError, "Unknow List Values.");
+            PyErr_Format(PyExc_ValueError,
+                         "If you want to use this feature, at least 2 - 4 columns are needed.\n"
+                         "But you input %d columns",
+                         nlen);
             return false;
         }
     }
@@ -248,7 +302,7 @@ extern "C" PyObject* to_sankeyhtml_py(PyObject* self, PyObject* args, PyObject* 
         return NULL;
 
     if(!PyList_Check(o) && !PyTuple_Check(o))
-        return PyErr_Format(PyExc_ValueError, "argument is list or tuple object only.");
+        return PyErr_Format(PyExc_TypeError, "argument is list or tuple object only.");
 
     SankeyData arr(o);
     std::wstring jsondata;
@@ -283,7 +337,7 @@ extern "C" PyObject* to_sankeyjson_py(PyObject* self, PyObject* args, PyObject* 
         return NULL;
 
     if(!PyList_Check(o) && !PyTuple_Check(o))
-        return PyErr_Format(PyExc_ValueError, "argument is list or tuple object only.");
+        return PyErr_Format(PyExc_TypeError, "argument is list or tuple object only.");
 
     SankeyData arr(o);
     std::wstring jsondata;

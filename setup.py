@@ -11,7 +11,7 @@ from os.path import dirname, join as pjoin
 from setup_preinit import TARGET, SRCDIR
 from glob import glob
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 DESCRIPTION = "Sakey Diagram HTML builder"
 KEYWORDS = ["sankey", "d3", "visualization"]
@@ -118,7 +118,7 @@ tests = {}
 if sys.version_info[:2] >= (3, 3):
     tests = dict(
         setup_requires=["pytest-runner"],
-        tests_require=["pytest", "pytest-cov", "psutil"])
+        tests_require=["pytest", "pytest-cov", "psutil", "lxml"])
 
 # make input data for csankey.cpp
 if (exists(TARGET)):
