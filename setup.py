@@ -11,7 +11,7 @@ from os.path import dirname, join as pjoin
 from setup_preinit import TARGET, SRCDIR
 from glob import glob
 
-__version__ = '0.1.3'
+__version__ = '0.2.0'
 
 DESCRIPTION = "Sakey Diagram HTML builder"
 KEYWORDS = ["sankey", "d3", "visualization"]

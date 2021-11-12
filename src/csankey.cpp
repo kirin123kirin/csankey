@@ -61,13 +61,14 @@ struct SankeyData {
 
     std::wstring to_json() {  //_to_datajson
         std::wstring res = L"{\n\"nodes\":[\n";
+        std::size_t i = 0, j = 0;
 
         for(auto&& node : nodes)
-            res += LR"({"name":")" + node + L"\"},\n";
+            res += LR"({"ID":)" + std::to_wstring(++i) + LR"(,"name":")" + node + L"\"},\n";
         res += L"],\n\"links\":[\n";
 
         for(auto&& link : links)
-            res += link.first + std::to_wstring(link.second) + L"},\n";
+            res += LR"({"ID":)" + std::to_wstring(++j) + link.first + std::to_wstring(link.second) + L"},\n";
 
         return res + L"]}\n";
     }
@@ -85,7 +86,7 @@ struct SankeyData {
             return false;
         }
 
-        key = LR"({"source":")" + src + LR"(","target":")" + tar + LR"(","value":)";
+        key = LR"(,"source":")" + src + LR"(","target":")" + tar + LR"(","value":)";
 
         links[key] += 1;
         if(nodes.find(src) == nodes.end())
@@ -312,8 +313,8 @@ extern "C" PyObject* to_sankeyjson_py(PyObject* self, PyObject* args, PyObject* 
 
 /* {{{ */
 // this module description
-#define MODULE_DOCS                       \
-    "Make html data of Sankey Diagram.\n" \
+#define MODULE_DOCS                                            \
+    "Make html data of Sankey Diagram.\n"                      \
     "Sankey diagram made using d3.js and the sankey plugin.\n" \
     ""
 

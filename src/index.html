@@ -159,7 +159,7 @@
     }
 
     table tbody tr:hover {
-      background-color: #fffae9;
+      background-color: #d6eff5;
     }
 
     table th,
@@ -395,22 +395,16 @@
     var arrowsG = null;
 
     function maketable(target_table_id, content) {
-      let idlabel = "ID";
       let sortableTable = new SortableTable();
       let tbl = d3.select(target_table_id)
       let head = tbl
         .append("thead")
         .append("tr");
-
-      let style_align = `table${target_table_id} tbody tr td:nth-child(1)`
-      style_align += `{text-align: right; color: #000;}\n`;
-      head.append("th")
-        .attr("data-id", idlabel)
-        .attr("sortable", true)
-        .html(idlabel)
+      
+      let style_align = "";
 
       Object.entries(content[0]).forEach(function ([k, v], i) {
-        style_align += `table${target_table_id} tbody tr td:nth-child(${i + 2})`
+        style_align += `table${target_table_id} tbody tr td:nth-child(${i + 1})`
         if (typeof (v) == "number") {
           style_align += `{text-align: right; color: #000;}\n`;
         } else {
@@ -434,12 +428,7 @@
 
       sortableTable.setTable(document.querySelector(target_table_id));
 
-      sortableTable.setData(
-        content.map(function (d, i) {
-          d["ID"] = i + 1;
-          return d;
-        })
-      );
+      sortableTable.setData(content);
     }
 
 
