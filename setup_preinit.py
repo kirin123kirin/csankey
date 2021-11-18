@@ -24,13 +24,13 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
                 opener.addheaders = UA
                 request.install_opener(opener)
                 with request.urlopen(cssname) as res:
-                    dat = dat.replace(re_css.group(0), "<style>\n" + re_minify("", res.read().decode()) + "\n</style>")
+                    dat = dat.replace(re_css.group(0), '<style type="text/css" media="screen">\n' + re_minify("", res.read().decode()) + "\n</style>")
             else:
                 cssfile = normpath(pathjoin(SRCDIR, cssname))
                 with open(cssfile, "r", encoding="utf-8") as f:
-                    dat = dat.replace(re_css.group(0), "<style>\n" + re_minify("", f.read()) + "\n</style>")
+                    dat = dat.replace(re_css.group(0), '<style type="text/css" media="screen">\n' + re_minify("", f.read()) + "\n</style>")
 
-        scripts = "<script>"
+        scripts = '<script type="text/javascript">'
         start = 0
         end = 0
 

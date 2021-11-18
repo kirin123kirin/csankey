@@ -109,7 +109,9 @@
         "span": "cpp",
         "*.inc": "cpp",
         "generator": "cpp",
-        "*.txt": "cpp"
+        "*.txt": "cpp",
+        "*.html": "cpp",
+        "cp950": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

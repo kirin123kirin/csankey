@@ -1,5 +1,5 @@
 # Python C Extention Easy Core functions
-[![Upload pypi.org](https://github.com/kirin123kirin/csankey/actions/workflows/pypi.yml/badge.svg?branch=v0.2.3)](https://github.com/kirin123kirin/csankey/actions/workflows/pypi.yml)
+[![Upload pypi.org](https://github.com/kirin123kirin/csankey/actions/workflows/pypi.yml/badge.svg?branch=v0.3.0)](https://github.com/kirin123kirin/csankey/actions/workflows/pypi.yml)
 
 # Overview
 There is an exciting application that uses d3.js sankey-circular.js.
@@ -54,6 +54,7 @@ TODO
 * https://d3js.org/d3.v4.min.js
 * https://bl.ocks.org/tomshanley/raw/6f3fcf68c0dbc401548733dd0c64e3c3/d3-sankey-circular.js
 * https://www.npmjs.com/package/@riversun/sortable-table sortable-table.js copyright riversun
+* https://github.com/kirin123kirin/csv-parser/parser.hpp copyright kirin123kirin
 
 # References used
 * https://github.com/tomshanley/d3-sankey-circular
