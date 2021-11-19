@@ -19,6 +19,41 @@ static constexpr const wchar_t AFTER_TEXT[] =
 #include "af.cc"
     ;
 
+template <class T>
+struct PyMallocator {
+    typedef T value_type;
+
+    PyMallocator() = default;
+    template <class U>
+    constexpr PyMallocator(const PyMallocator<U>&) noexcept {}
+
+    [[nodiscard]] T* allocate(std::size_t n) {
+        if(n > std::numeric_limits<std::size_t>::max() / sizeof(T))
+            throw std::bad_array_new_length();
+        if(auto p = PyMem_New(T, n)) {
+            // report(p, n);
+            return p;
+        }
+        throw std::bad_alloc();
+    }
+
+    void deallocate(T* p, std::size_t n) noexcept {
+        PyMem_Del(p);
+        ;
+    }
+
+    bool operator==(const PyMallocator<T>&) { return true; }
+
+    bool operator!=(const PyMallocator<T>&) { return false; }
+
+    //    private:
+    //     void report(T* p, std::size_t n, bool alloc = true) const {
+    //         std::cout << (alloc ? "Alloc: " : "Dealloc: ") << sizeof(T) * n << " bytes at " << std::hex <<
+    //         std::showbase
+    //                   << reinterpret_cast<void*>(p) << std::dec << '\n';
+    //     }
+};
+
 template <typename CharT, typename Container = std::vector<std::vector<std::basic_string<CharT>>>>
 class SankeyData {
    public:
@@ -119,37 +154,42 @@ class SankeyData {
     }
 
     void parse() {
-        std::size_t _nlen;
+        std::size_t i, j, _nlen, c = 0;
         parsed = true;
 
         for(auto&& row : data) {
-            std::size_t count;
+            _nlen = row.size();
 
-            _nlen = (std::size_t)std::count_if(row.begin(), row.end(), [](auto x) { return !x.empty(); });
-            if(_nlen < row.size()) {
-                row_type tmp;
-                std::copy_if(row.begin(), row.end(), std::back_inserter(tmp), [](auto x) { return !x.empty(); });
-                row.swap(tmp);
-            }
+            for(i = 0; i < _nlen; ++i) {
+                j = i;
+                std::basic_string<CharT> src, tar, vs;
 
-            if((_nlen = row.size()) == 0)
-                return;
+                if((_nlen = row.size()) == 0)
+                    continue;
 
-            if(_nlen == 1) {
-                if(row[0].empty())
-                    throw std::runtime_error("Parse string Error.");
-                nodes.emplace(row[0]);
-            } else {
-                count = _nlen == 2 ? 1 : (_nlen >> 1) + 1;
+                while(j < _nlen) {
+                    vs = row[j];
+                    if(!vs.empty())
+                        src.swap(vs);
 
-                for(std::size_t i = 0; i < count; ++i) {
-                    auto src = row[i];
-                    if(src.empty())
-                        src = row[i - 1];
-                    mapper(src, row[i + 1]);
+                    if(++j == _nlen)
+                        break;
+
+                    tar = row[j];
+                    if(!tar.empty()) {
+                        ++j;
+                        break;
+                    }
+                }
+                if(!src.empty()) {
+                    mapper(src, tar);
+                    ++c;
                 }
             }
         }
+
+        if (c == 0)
+            throw std::runtime_error("Cannot Parse Empty Data.\n");
     }
 
     void parse(bool header) {
@@ -247,7 +287,7 @@ class SankeyData<wchar_t, PyObject*> {
     }
 
     bool parse() {
-        Py_ssize_t _nlen;
+        Py_ssize_t _nlen, c = 0;
         const char* errmsg = "argument is 2d list or tuple object?";
         parsed = true;
 
@@ -261,33 +301,55 @@ class SankeyData<wchar_t, PyObject*> {
 
         for(Py_ssize_t n = 0; n < len; ++n) {
             PyObject* row = PySequence_GetItem(data, n);
-            Py_ssize_t count;
+            Py_ssize_t i, j;
 
-            if(row == NULL || (_nlen = PyObject_Length(row)) == -1) {
-                Py_XDECREF(row);
+            if(row == NULL) {
                 return false;
             }
 
-            if(_nlen == 1) {
-                std::wstring src = pyto_wstring(PySequence_GetItem(row, 0));
-                if(src.empty()) {
-                    Py_DECREF(row);
-                    PyErr_Format(PyExc_ValueError, "Parse string Error.");
-                    return false;
-                }
-                nodes.emplace(src);
-            } else {
-                count = _nlen == 2 ? 1 : (_nlen >> 1) + 1;
+            if((_nlen = PyObject_Length(row)) == -1) {
+                Py_DECREF(row);
+                return false;
+            }
 
-                for(Py_ssize_t i = 0; i < count; ++i) {
-                    if((mapper(PySequence_GetItem(row, i), PySequence_GetItem(row, i + 1))) == false) {
-                        Py_DECREF(row);
-                        return false;
+            for(i = 0; i < _nlen; ++i) {
+                j = i;
+                PyObject *src = NULL, *tar = NULL, *vs = NULL;
+
+                while(j < _nlen) {
+                    vs = PySequence_GetItem(row, j);
+                    if(vs && (PyObject_IsTrue(vs) || PyObject_RichCompareBool(vs, Py_False, Py_EQ)))
+                        std::swap(src, vs);
+
+                    if(++j == _nlen)
+                        break;
+
+                    tar = PySequence_GetItem(row, j);
+                    if(tar && (PyObject_IsTrue(tar) || PyObject_RichCompareBool(tar, Py_False, Py_EQ))) {
+                        ++j;
+                        break;
                     }
                 }
+
+                if(src && (PyObject_IsTrue(src) || PyObject_RichCompareBool(src, Py_False, Py_EQ))) {
+                    mapper(src, tar);
+                    ++c;
+                }
+
+                if(src)
+                    Py_CLEAR(src);
+                if(tar)
+                    Py_CLEAR(tar);
+                if(vs)
+                    Py_CLEAR(vs);
             }
 
             Py_DECREF(row);
+        }
+
+        if(c == 0) {
+            PyErr_Format(PyExc_ValueError, "argument list is empty data.");
+            return false;
         }
 
         return true;
@@ -388,14 +450,9 @@ class SankeyData<wchar_t, PyObject*> {
     std::wstring pyto_wstring(PyObject* o) {
         wchar_t* ws;
         Py_ssize_t _len = -1;
-        if(o == NULL) {
-            PyErr_Format(PyExc_ValueError, "Failed Parse unicode Object.");
+
+        if(o == NULL || PyObject_Not(o))
             return L"";
-        }
-        if(PyObject_Not(o)) {
-            PyErr_Format(PyExc_ValueError, "Failed Parse unicode Object.");
-            return L"";
-        }
 
         if(PyUnicode_Check(o)) {
             if((ws = PyUnicode_AsWideCharString(o, &_len)) == NULL) {

@@ -1,8 +1,4 @@
 ﻿
-#include <io.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "csankey.hpp"
 #include "cxxopts/include/cxxopts.hpp"
 
@@ -10,6 +6,9 @@
 #include <Windows.h>
 #else
 #include <unistd.h>
+// #include <io.h>
+// #include <stdio.h>
+// #include <stdlib.h>
 #endif
 
 std::string gettmpdir() {

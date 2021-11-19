@@ -92,6 +92,51 @@ ans4 = """{
 ]}
 """
 
+ans5 = """{
+"nodes":[
+{"ID":1,"name":"abc"},
+{"ID":2,"name":"bbb"},
+{"ID":3,"name":"ccc"},
+{"ID":4,"name":"aaa"},
+],
+"links":[
+{"ID":1,"source":"ccc","target":"aaa","value":1},
+{"ID":2,"source":"abc","target":"bbb","value":1},
+{"ID":3,"source":"aaa","target":"abc","value":1},
+{"ID":4,"source":"bbb","target":"ccc","value":1},
+]}
+"""
+
+ans6 = """{
+"nodes":[
+{"ID":1,"name":"abc"},
+{"ID":2,"name":"bbb"},
+{"ID":3,"name":"ccc"},
+{"ID":4,"name":"aaa"},
+],
+"links":[
+{"ID":1,"source":"ccc","target":"aaa","value":1},
+{"ID":2,"source":"abc","target":"bbb","value":1},
+{"ID":3,"source":"bbb","target":"ccc","value":1},
+]}
+"""
+
+ans7 = """{
+"nodes":[
+{"ID":1,"name":"abc"},
+{"ID":2,"name":"bbb"},
+{"ID":3,"name":"ccc"},
+{"ID":4,"name":"aaa"},
+{"ID":5,"name":"ddd"},
+],
+"links":[
+{"ID":1,"source":"ccc","target":"aaa","value":1},
+{"ID":2,"source":"abc","target":"bbb","value":1},
+{"ID":3,"source":"bbb","target":"ccc","value":1},
+{"ID":4,"source":"aaa","target":"ddd","value":1},
+]}
+"""
+
 def test_to_sankeyjson_regular_case():
     assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]]) == ans1)
     assert(to_sankeyjson([["1", "3"],["a", "b"]]) == ans2)
@@ -101,6 +146,17 @@ def test_to_sankeyjson_regular_case_Ncolumns():
     assert(to_sankeyjson([["1", "3"],["a", "b"]], False) == ans2)
     assert(to_sankeyjson([["1", "3", 20],["a", "b", 40]], False) == ans4)
 
+def test_to_sankeyjson_half_regular_case_interval():
+    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "abc"]]) == ans5)
+    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", "abc"]]) == ans5)
+    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, None]]) == ans6)
+    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", ""]]) == ans6)
+    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, ""]]) == ans6)
+    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", None]]) == ans6)
+    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", None, "ddd"]]) == ans7)
+    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, None, "ddd"]]) == ans7)
+    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "", "ddd"]]) == ans7)
+    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", "", "ddd"]]) == ans7)
 
 def test_to_sankeyhtml_regular_case():
     assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]]), etree.HTMLParser())))
@@ -110,6 +166,18 @@ def test_to_sankeyhtml_regular_case():
 def test_to_sankeyhtml_regular_case_Ncolumns():
     assert(len(etree.fromstring(to_sankeyhtml([["1", "3"],["a", "b"]], False), etree.HTMLParser())))
     assert(len(etree.fromstring(to_sankeyhtml([["1", "3", 20],["a", "b", 40]], False), etree.HTMLParser())))
+
+def test_to_sankeyhtml_half_regular_case_interval():
+    assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "abc"]]), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", "", "abc"]]), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", None, None]]), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", "", ""]]), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", None, ""]]), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", "", None]]), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", "", None, "ddd"]]), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", None, None, "ddd"]]), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "", "ddd"]]), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", "", "", "ddd"]]), etree.HTMLParser())))
 
 def _irregular_case(errtype, func, args):
     try:
@@ -178,6 +246,18 @@ def test_to_sankeyjson_regular_case_perf():
 def test_to_sankeyjson_regular_case_Ncolumns_perf():
     runtimeit('to_sankeyjson([["1", "3"],["a", "b"]], False)')
     runtimeit('to_sankeyjson([["1", "3", 20],["a", "b", 40]], False)')
+
+def test_to_sankeyjson_half_regular_case_interval_perf():
+    runtimeit('to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "abc"]])')
+    runtimeit('to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", "abc"]])')
+    runtimeit('to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, None]])')
+    runtimeit('to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", ""]])')
+    runtimeit('to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, ""]])')
+    runtimeit('to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", None]])')
+    runtimeit('to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", None, "ddd"]])')
+    runtimeit('to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, None, "ddd"]])')
+    runtimeit('to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "", "ddd"]])')
+    runtimeit('to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", "", "ddd"]])')
 
 def test_to_sankeyhtml_regular_case_perf():
     runtimeit('to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]])')

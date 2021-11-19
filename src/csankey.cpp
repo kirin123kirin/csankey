@@ -18,7 +18,7 @@ extern "C" PyObject* to_sankeyhtml_py(PyObject* self, PyObject* args, PyObject* 
     if(header == -1)
         r = snk.parse();
     else
-        r = snk.parse(header);
+        r = snk.parse((bool)header);
     
     if (r && (res = snk.to_html()) != NULL)
         return res;
@@ -44,10 +44,10 @@ extern "C" PyObject* to_sankeyjson_py(PyObject* self, PyObject* args, PyObject* 
     if(header == -1)
         r = snk.parse();
     else
-        r = snk.parse(header);
+        r = snk.parse((bool)header);
     
     if (r && !(jsondata = snk.to_json()).empty())
-        return PyUnicode_FromWideChar(jsondata.data(), jsondata.size());
+        return PyUnicode_FromWideChar(jsondata.data(), (Py_ssize_t)jsondata.size());
 
     return PyErr_Format(PyExc_ValueError, "Unknown Error Occured.");
 }
