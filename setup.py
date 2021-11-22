@@ -1,153 +1,115 @@
-#!/usr/bin/env python
-from genericpath import exists
-import re
-
-from setuptools import Extension, setup
-from distutils.ccompiler import get_default_compiler
-import os
-import io
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import sys
-from os.path import dirname, join as pjoin
-from setup_preinit import TARGET, SRCDIR
+import os
+from os.path import exists, dirname, join as pjoin
+thisdir = dirname(__file__)
+from tools.setup_preinit import TARGET, SRCDIR
 from glob import glob
 
-__version__ = '0.3.1'
+__version__ = open(pjoin(thisdir, "VERSION"), "r").read().strip()
 
-DESCRIPTION = "Sakey Diagram HTML builder"
-KEYWORDS = ["sankey", "d3", "visualization"]
-LISCENSE = "MIT"
-LANGUAGE = 'c++, javascript, html, python'
-MOD_NAME = 'csankey'
-MOD_SRC = ['src/csankey.cpp']
-AUTHOR = 'kirin123kirin'
-URL = 'https://github.com/' + AUTHOR + '/' + MOD_NAME
-PLATFORMS = ["Windows", "Linux", "Mac OS-X"]
+import shutil
+import argparse
+from distutils.ccompiler import get_default_compiler
+from tools import updatebadge
+import skbuild.constants
 
-# # https://pypi.org/classifiers/
-CLASSIFIERS = """
-Development Status :: 4 - Beta
-License :: OSI Approved :: MIT License
-Programming Language :: C++
-Programming Language :: Python :: 3.6
-Programming Language :: Python :: 3.7
-Programming Language :: Python :: 3.8
-Programming Language :: Python :: 3.9
-Operating System :: OS Independent
-Operating System :: Microsoft :: Windows
-Operating System :: MacOS
-Operating System :: POSIX
-"""
-UNDEF_MACROS = []
+from distutils.dist import Distribution
 
+# setup.cfg metadata Infomation (`meta` of py dictionary)
+_dt = Distribution()
+_dt.parse_config_files()
+_dt.parse_command_line()
+_meta = _dt.get_option_dict('metadata')
+def meta(s):
+    return _meta[s][1]
+
+# Please Setting ----------------------------------------------------------
+# If you wan't install compiled scripts by C++ etc
+
+
+PROJECT_NAME = meta("name")
+
+skbuild.constants.SKBUILD_DIR = lambda: "build"  # If you wan't change build directory name
+
+skbuild_opts = [
+    '--skip-generator-test',
+]
+
+compiled_executefiles = [
+    skbuild.constants.CMAKE_BUILD_DIR() + '/sankey.exe',
+]
+
+cmake_args = {
+    "common": [
+    ],
+    "nt": [
+        '-G', "Visual Studio 16 2019",
+    ],
+    "posix": [
+    ]
+}
+# -------------------------------------------------------------------------
+
+from skbuild import setup
+
+# OS Environment Infomation
 iswin = os.name == "nt"
 isposix = os.name == "posix"
 ismsvc = get_default_compiler() == "msvc"
 
-globalinc = '/IC:/usr/lib/' if iswin else '-I/usr/include/'
-is_debug = any("--debug" in x or "-g" in x for x in sys.argv)
-
-def sep(*x):
-    return (":" if ismsvc else "=").join(x)
+sys.argv.extend(skbuild_opts)
+sys.argv.extend(cmake_args["common"] + cmake_args.get(os.name, []))
 
 
-COMPILE_ARGS = [
-    sep('-std', 'c++14'),
-    # globalinc + 'boost',
-    # Reason unicode string crash #
-    sep("-source-charset", "utf-8"),
-]
+ps = argparse.ArgumentParser()
+ps.add_argument('-f', '--force', action="store_true", dest="is_force")
+ps.add_argument('-g', '--debug', action="store_true", dest="is_debug")
+ps.add_argument('--build-type', default="Release")
+arg = ps.parse_known_args(sys.argv)[0]
 
-if is_debug:
-    if ismsvc:
-        UNDEF_MACROS.extend(
-            [
-                "_DEBUG",
-            ]
-        )
-        COMPILE_ARGS.extend(
-            [
-                # Reason https://docs.microsoft.com/ja-jp/cpp/build/reference/ltcg-link-time-code-generation?view=msvc-160
-                "/GL",
-                # Reason IDE warning link crash #
-                "/FC",
-            ]
-        )
+if arg.is_force:
+    for d in [skbuild.constants.SKBUILD_DIR(), "dist", PROJECT_NAME + ".egg-info"]:
+        if exists(pjoin(thisdir, d)):
+            shutil.rmtree(pjoin(thisdir, d))
 
-    elif isposix:
-        COMPILE_ARGS.extend(
-            [
-                "-O0",
-            ]
-        )
+if arg.is_debug and arg.build_type != "Debug":
+    sys.argv.extend(['--build-type', "Debug"])
+
+
+# Readme badge link update.
+updatebadge.readme(pjoin(thisdir, "README.md"), new_version=__version__)
+
+
+if compiled_executefiles:
+    import distutils.command.build_scripts
+    distutils.command.build_scripts.tokenize.detect_encoding = lambda x: ("utf-8", [])
+
 
 # Edit posix platname for pypi upload error
 if isposix and any(x.startswith("bdist") for x in sys.argv) \
         and not ("--plat-name" in sys.argv or "-p" in sys.argv):
-
     if "64" in os.uname()[-1]:
-        from setup_platname import get_platname_64bit
-
-        plat = get_platname_64bit()
+        from tools.platforms import get_platname_64bit
+        sys.argv.extend(["--plat-name", get_platname_64bit()])
     else:
-        from setup_platname import get_platname_32bit
-
-        plat = get_platname_32bit()
-    sys.argv.extend(["--plat-name", plat])
-
-
-# Readme read or edit
-readme = pjoin(dirname(__file__), "README.md")
-badge = re.compile(r'(\[!\[.*?\]\(https://.*?badge\.(?:svg|png)\?branch=([^\)]+)\)\])')
-description = ""
-is_change = False
-with io.open(readme, encoding="utf-8") as f:
-    for line in f:
-        res = badge.search(line)
-        if res and __version__ not in res.group(2):
-            for b, k in badge.findall(line):
-                line = line.replace(b, b.replace(k, "v" + __version__))
-            is_change = True
-        description += line
-
-if is_change:
-    with io.open(readme, "w", encoding="utf-8") as f:
-        f.write(description)
-
-# for python2.7
-tests = {}
-if sys.version_info[:2] >= (3, 3):
-    tests = dict(
-        setup_requires=["pytest-runner"],
-        tests_require=["pytest", "pytest-cov", "psutil", "lxml"])
+        from tools.platforms import get_platname_32bit
+        sys.argv.extend(["--plat-name", get_platname_32bit()])
 
 # make input data for csankey.cpp
 if (exists(TARGET)):
-    from setup_preinit import make_compiler_input
-    make_compiler_input(minify=is_debug == False)
+    from tools.setup_preinit import make_compiler_input
+    make_compiler_input(minify=arg.is_debug == False)
 
-setup(name=MOD_NAME,
-      version=__version__,
-      description=DESCRIPTION,
-      long_description_content_type='text/markdown',
-      long_description=description,
-      url=URL,
-      author=AUTHOR,
-      ext_modules=[
-          Extension(
-              MOD_NAME,
-              sources=MOD_SRC,
-              undef_macros=UNDEF_MACROS,
-              extra_compile_args=COMPILE_ARGS,
-              language=LANGUAGE
-          )
-      ],
-      keywords=KEYWORDS,
-      license=LISCENSE,
-      platforms=PLATFORMS,
-      classifiers=CLASSIFIERS.strip().splitlines(),
-      **tests
-      )
+# Require pytest-runner only when running tests
+is_test = 'pytest' in sys.argv or 'test' in sys.argv
+# Other Setting to setup.cfg
+setup(
+    packages=[PROJECT_NAME],
+    scripts=compiled_executefiles,
+    setup_requires=['pytest-runner>=2.0,<3dev'] if is_test else []
+)
 
 for cc in glob(pjoin(SRCDIR, "*.cc")):
     os.remove(cc)
-

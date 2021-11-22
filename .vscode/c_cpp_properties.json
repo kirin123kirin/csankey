@@ -4,13 +4,8 @@
             "name": "win64_d",
             "includePath": [
                 ".",
-                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\ATLMFC\\include",
-                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\include",
-                "C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\ucrt",
-                "C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\shared",
-                "C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\um",
-                "C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\winrt",
-                "C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\cppwinrt",
+                "C:\\usr\\local\\LLVM\\include\\clang-c",
+                "C:\\usr\\local\\LLVM\\include\\llvm-c",
                 "${env:PYTHONPATH}\\include",
                 "${env:APPROOT}\\usr\\local\\include",
                 "C:\\usr\\lib\\boost",
@@ -21,18 +16,25 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "windowsSdkVersion": "10.0.18362.0",
-            "compilerPath": "cl.exe",
+            // "windowsSdkVersion": "10.0.18362.0",
+            "compilerPath": "C:/usr/local/LLVM/bin/clang++.exe",
             "cStandard": "c11",
             "cppStandard": "c++14",
-            "intelliSenseMode": "windows-msvc-x64"
+            "intelliSenseMode": "windows-clang-x64",
+            "configurationProvider": "ms-vscode.cmake-tools"
         },
         {
             "name": "linux64_d",
             "includePath": [
                 ".",
                 "/usr/include/python3.6m",
+                "/usr/include/python3.7m",
+                "/usr/include/python3.8m",
+                "/usr/include/python3.9m",
+                "/usr/include/python3.10m",
+                "/usr/include/boost",
                 "/usr/local/include",
+                "/usr/include",
                 "${workspaceFolder}/**"
             ],
             "defines": [
@@ -40,12 +42,11 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "/usr/bin/g++",
+            "compilerPath": "/usr/bin/clang++",
             "cStandard": "c11",
             "cppStandard": "c++14",
-            "intelliSenseMode": "gcc-x64"
+            "intelliSenseMode": "linux-clang-x64"
         }
-
     ],
     "version": 4
 }

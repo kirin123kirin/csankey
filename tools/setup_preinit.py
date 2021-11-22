@@ -2,7 +2,7 @@ import re
 from os.path import dirname, normpath, join as pathjoin
 from urllib import request
 
-SRCDIR = pathjoin(dirname(__file__), "src")
+SRCDIR = normpath(pathjoin(dirname(__file__), "../csankey"))
 TARGET = normpath(pathjoin(SRCDIR, "index.html"))
 
 
@@ -66,8 +66,9 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
         maf = re.search("</script>", af)
         if not maf:
             raise ValueError("unexpected `after` template data.")
-
+        BOM = b"\xEF\xBB\xBF".decode()
         with open(normpath(pathjoin(srcdir, "bf.cc")), "w", encoding="utf-8") as w:
+            w.write(BOM)
             w.write("{")
             for d in map(repr, re_minify("", bf)):
                 if d == '"\'"':
@@ -76,6 +77,7 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
             w.write("NULL}")
 
         with open(normpath(pathjoin(srcdir, "af.cc")), "w", encoding="utf-8") as w:
+            w.write(BOM)
             w.write("{")
             for d in map(repr, re_minify("", af[maf.start():])):
                 if d == '"\'"':

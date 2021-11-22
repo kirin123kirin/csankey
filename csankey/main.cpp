@@ -1,6 +1,7 @@
-﻿
+
 #include "csankey.hpp"
-#include "cxxopts/include/cxxopts.hpp"
+
+#include "../extern/cxxopts/include/cxxopts.hpp"
 
 #if _WIN32 || _WIN64
 #include <Windows.h>

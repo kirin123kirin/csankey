@@ -10,14 +10,15 @@
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
-#include "csv-parser/parser.hpp"
+#include "../extern/csv-parser/parser.hpp"
 
 static constexpr const wchar_t BEFORE_TEXT[] =
 #include "bf.cc"
-    ;
+;
+
 static constexpr const wchar_t AFTER_TEXT[] =
 #include "af.cc"
-    ;
+;
 
 template <class T>
 struct PyMallocator {

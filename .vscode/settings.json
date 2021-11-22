@@ -1,4 +1,260 @@
 {
+    // "editor.renderLineHighlight": "all", // 選択中の行を強調する
+    // "editor.fontFamily": "'Roboto Mono'", // フォント
+    // "editor.fontSize": 20, //  文字サイズ
+    // "editor.glyphMargin": false, // 行の左端に余白を作る
+    // "editor.quickSuggestions": {
+    //     "comments": false, // コメント内では無効
+    //     "strings": true, // 文字列内では有効
+    //     "other": true //  その他の場所で有効
+    // }, // 補完候補の自動表示
+    "editor.formatOnType": true, // コード整形
+    // "editor.rulers": [100], // 右端のルーラー位置
+    // "editor.folding": false, // コードの折りたたみを許可
+    // "editor.letterSpacing": -1, // 文字の間隔を詰める
+    // "editor.lineNumbers": "false", // 行番号の表示
+    // "editor.minimap.enabled": false, // ミニマップの表示
+    "editor.minimap.maxColumn": 50, // ミニマップの幅
+    // "editor.scrollBeyondLastLine": false, // 最終行よりも下へのスクロールを許可
+    "editor.renderWhitespace": "boundary", // 連続した空白文字を可視化
+    "editor.insertSpaces": true, // Tabキーで半角スペースを入力
+    // "editor.renderIndentGuides": false, // インデントのガイドラインを表示
+    // "editor.minimap.renderCharacters": false, // ミニマップを簡略化
+    "editor.minimap.showSlider": "always", // ミニマップのハイライトを常に表示
+    // "editor.minimap.side": "right", // ミニマップを右に表示
+    "editor.autoIndent": "brackets", // オートインデント
+    // "editor.cursorStyle": "line", // カーソルの形状
+    // "editor.cursorBlinking": "smooth", // カーソルの表示形式
+    // "editor.cursorWidth": 5, // カーソル幅
+    // "editor.emptySelectionClipboard": true, // 選択範囲無しでのコピーを許可
+    "editor.links": true, // リンクをクリック可能に
+    "editor.matchBrackets": "near", // 対応する括弧の強調表示をオンに
+    // "editor.mouseWheelScrollSensitivity": 0.7, // マウスホイール回転の移動係数
+    // "editor.mouseWheelZoom": false, // Ctrl+マウスホイールによるズームを無効化
+    // "editor.suggestFontSize": 16, // サジェストの文字サイズ
+    // "editor.suggestLineHeight": 16, // サジェスト欄の行の高さ
+    "editor.renderControlCharacters": true, // 制御コードの表示
+    // ターミナル
+    // "terminal.integrated.shell.windows": "cmd.exe", // PowerShell嫌い
+    "terminal.integrated.profiles.windows": {
+        // "PowerShell": null,
+        // "Command Prompt": {
+        //     "path": "C:\\WINDOWS\\System32\\cmd.exe"
+        // },
+        "Git Bash": null,
+        "IPython": {
+            "path": "${env:PYTHONPATH}/Scripts/ipython.exe",
+            "args": [
+                "-i",
+                "--no-banner"
+            ]
+        },
+        "base": {
+            "path": "${env:APPROOT}/usr/bin/connbase.cmd"
+        }
+    },
+    // "terminal.integrated.fontFamily": "'Roboto Mono'", // フォント
+    "terminal.integrated.fontSize": 13, // フォントサイズ
+    "terminal.integrated.copyOnSelection": true,
+    "terminal.integrated.cursorBlinking": true,
+    // "terminal.integrated.detectLocale": "off",
+    "terminal.integrated.scrollback": 10000,
+    // ファイル設定
+    "files.autoSave": "off", //ダーティファイルの作成を無効
+    "files.eol": "\n", // 改行コードをLF(Linux/OSX)にする
+    "files.insertFinalNewline": true, // ファイルの終端に空の行を追加
+    "files.autoGuessEncoding": true, // 文字コードを自動判別
+    // エクスプローラーから除外するファイルとフォルダ
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.DS_Store": true,
+        "**/.egg": true,
+        "**/.git": true,
+        "**/.hg": true,
+        "**/.history": true,
+        "**/.pylint.d": true,
+        "**/.pytest_cache": true,
+        "**/.svn": true,
+        "**/*.dll": true,
+        "**/*.idb": true,
+        "**/*.ilk": true,
+        "**/*.o": true,
+        "**/*.obj": true,
+        "**/*.pdb": true,
+        "**/*.pyd": true,
+        "**/*.tlog": true,
+        "**/*.vs": true,
+        "**/CVS": true
+    },
+    // ワークベンチ設定
+    "debug.terminal.clearBeforeReusing": true,
+    "workbench.editorAssociations": {
+        "*.ipynb": "jupyter-notebook"
+    },
+    "workbench.editor.enablePreview": false,
+    // "workbench.editor.showTabs": true, // アクティビティバー(左端)を非表示に
+    "workbench.editor.tabSizing": "shrink", // タブが多い場合,文字を非表示にしてもタブ表示を優先する
+    // "workbench.statusBar.visible": true, // ステータスバー(下端)を表示
+    // "workbench.sideBar.location": "left", // サイドバーを左に
+    // "workbench.colorTheme": "Breeze Dark Theme", // カラーテーマ
+    // "workbench.iconTheme": "eq-material-theme-icons", // アイコンの適用
+    "workbench.colorCustomizations": { // カラーテーマに上書きする個別の設定
+        // "statusBar.background": "#000000", // ステータスバー背景色
+        // "statusBar.noFolderBackground": "#000000",
+        // "statusBar.foreground": "#ffffff", // ステータスバー前景色
+        // "statusBar.noFolderForeground": "#ffffff",
+        "statusBar.border": "#ffffff", // ステータスバーの境界線
+        // "sideBar.background": "#000000", // サイドバーの背景色
+        // "sideBar.foreground": "#ffffff", // サイドバーの前景色
+        // "sideBar.border": "#ffffff", // サイドバーの境界線
+        // "activityBar.background": "#000000", // アクティビティバーの背景色
+        // "activityBar.foreground": "#ffffff", // アクティビティバーの前景色
+        // "activityBar.border": "#ffffff", // アクティビティバーの境界線
+        // "editor.background": "#121817", // エディタ背景色
+        // "editor.lineHighlightBackground": "#002255", // 選択している行の強調色
+        // "editor.selectionBackground": "#660000", // 選択領域の強調色
+        "editorError.border": "#ff0000", // エラー部分の下線
+        // "editorLineNumber.foreground": "#0077ffbb",
+        // "editorLineNumber.activeForeground": "#ffffff",
+        // "scrollbarSlider.background": "#0077ff99", // スクロールバーの色
+        // "scrollbarSlider.hoverBackground": "#00ccffcc", // 移動中のスクロールバーの色
+        // "tab.activeBorder": "#ffffff", // アクティブタブの下線
+        // "tab.inactiveForeground": "#999999", // 非選択タブの文字色
+        // "editorBracketMatch.background": "#ffff0077", // 対応する括弧の背景色
+        // "editorSuggestWidget.selectedBackground": "#0044ff", // サジェスト欄,選択中項目の背景色
+        // "scrollbar.shadow": "#0077ff99",
+        "editorLink.activeForeground": "#5555ce",
+    },
+    // クラッシュレポートを送信する(for Global Setting)
+    // "telemetry.enableCrashReporter": false,
+    // "telemetry.enableTelemetry": false,
+    // 拡張機能関連(for Global Setting)
+    //"extensions.autoUpdate": true, // 自動更新
+    //"extensions.ignoreRecommendations": false, // 推奨事項の通知をOFF
+    // Git(for Global Setting)
+    // "git.path": "${env:APPROOT}/usr/libexec/git-core/git.exe",
+    // markdown
+    "markdown.preview.breaks": true, // 改行を反映
+    "markdown.preview.fontSize": 22, // 文字サイズ
+    "markdown.preview.lineHeight": 1.1, // 行幅
+    // C/C++
+    "C_Cpp.clang_format_style": "{ BasedOnStyle: Chromium, BreakBeforeBraces: Attach, SpaceBeforeParens: Never, IndentWidth: 4, ColumnLimit: 120 }",
+    // "C_Cpp.default.compilerPath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.28.29910\\bin\\HostX64\\x64\\cl.exe",
+    "C_Cpp.default.compilerPath": "C:\\usr\\local\\LLVM\bin\\clang++.exe",
+    //Python
+    "python.pythonPath": "${env:PYTHONPATH}/python.exe",
+    "python.terminal.launchArgs": [
+        "-c",
+        "from IPython import start_ipython; start_ipython()",
+        "-i",
+        "--no-banner"
+    ],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.lintOnSave": true,
+    "python.linting.flake8Args": [
+        "--max-line-length=160",
+        "--ignore=E302,W504,W391",
+        "--exclude=test/*,.*",
+        "max-complexity=10"
+    ],
+    "python.formatting.provider": "autopep8",
+    "python.formatting.autopep8Args": [
+        "--max-line-length=160"
+        //"--aggressive", "--aggressive",
+    ],
+    "code-runner.executorMap": {
+        "javascript": "node",
+        "java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
+        "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "objective-c": "cd $dir && gcc -framework Cocoa $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "php": "php",
+        "python": "%PYTHONPATH%/python.exe -u",
+        "perl": "perl",
+        "perl6": "perl6",
+        "ruby": "ruby",
+        "go": "go run",
+        "lua": "lua",
+        "groovy": "groovy",
+        "powershell": "powershell -ExecutionPolicy ByPass -File",
+        "bat": "cmd /c",
+        "shellscript": "bash",
+        "fsharp": "fsi",
+        "csharp": "scriptcs",
+        "vbscript": "cscript //Nologo",
+        "typescript": "ts-node",
+        "coffeescript": "coffee",
+        "scala": "scala",
+        "swift": "swift",
+        "julia": "julia",
+        "crystal": "crystal",
+        "ocaml": "ocaml",
+        "r": "Rscript",
+        "applescript": "osascript",
+        "clojure": "lein exec",
+        "haxe": "haxe --cwd $dirWithoutTrailingSlash --run $fileNameWithoutExt",
+        "rust": "cd $dir && rustc $fileName && $dir$fileNameWithoutExt",
+        "racket": "racket",
+        "scheme": "csi -script",
+        "ahk": "autohotkey",
+        "autoit": "autoit3",
+        "dart": "dart",
+        "pascal": "cd $dir && fpc $fileName && $dir$fileNameWithoutExt",
+        "d": "cd $dir && dmd $fileName && $dir$fileNameWithoutExt",
+        "haskell": "runhaskell",
+        "nim": "nim compile --verbosity:0 --hints:off --run",
+        "lisp": "sbcl --script",
+        "kit": "kitc --run",
+        "v": "v run",
+        "sass": "sass --style expanded",
+        "scss": "scss --style expanded",
+        "less": "cd $dir && lessc $fileName $fileNameWithoutExt.css",
+        "FortranFreeForm": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "fortran-modern": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "fortran_fixed-form": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "fortran": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt"
+    },
+    "code-runner.saveFileBeforeRun": true,
+    "code-runner.runInTerminal": true,
+    "code-runner.preserveFocus": true,
+    "code-runner.clearPreviousOutput": true,
+    // "[python]": {
+    //     "editor.defaultFormatter": "ms-python.python"
+    // },
+    // "editor.defaultFormatter": "formulahendry.code-runner",
+    // "[cpp]": {
+    //     "editor.defaultFormatter": "ms-vscode.cpptools"
+    // },
+    "debug.openExplorerOnEnd": true,
+    "git.confirmSync": false,
+    "git.autofetch": true,
+    "python.experiments.optOutFrom": [],
+    "debug.openDebug": "openOnSessionStart",
+    "terminal.integrated.tabs.enabled": true,
+    "editor.acceptSuggestionOnEnter": "smart",
+    "editor.quickSuggestionsDelay": 3000,
+    "editor.snippetSuggestions": "top",
+    "editor.quickSuggestions": false,
+    "editor.parameterHints.enabled": false,
+    "problems.showCurrentInStatus": true,
+    "editor.hover.delay": 3000,
+    "explorer.confirmDelete": false,
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "gitlens.defaultDateFormat": "YYYY/MM/DD hh:mm",
+    "gitlens.defaultTimeFormat": "hh:mm",
+    "gitlens.defaultDateShortFormat": "YYYY/MM/DD",
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "remote.SSH.remotePlatform": {
+        "base": "linux"
+    },
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "cmake.configureOnOpen": true,
     "files.associations": {
         "*.ipp": "cpp",
         "nkf.c": "cpp",
@@ -109,9 +365,9 @@
         "span": "cpp",
         "*.inc": "cpp",
         "generator": "cpp",
-        "*.txt": "cpp",
+        "CMakeLists.txt": "CMake",
         "*.html": "cpp",
         "cp950": "cpp"
     },
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Enabled",
 }

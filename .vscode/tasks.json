@@ -18,116 +18,45 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "process",
-      "label": "Win : ReleaseSetup.py",
-      "command": "${env:PYTHONPATH}\\python.exe",
-      "args": [
-        "setup.py",
-        "build",
-        "-f"
-      ],
-      "group": //"build",
-      {
-        "kind": "build",
-        "isDefault": true
-      },
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": [
-        "$msCompile"
-      ],
-    },
-    {
-      "type": "process",
-      "label": "Win : DebugSetup.py",
-      "command": "${env:PYTHONPATH}\\python.exe",
-      "args": [
-        "setup.py",
-        "build",
-        "-gf"
-      ],
-      "group": //"build",
-      {
-        "kind": "build",
-        "isDefault": true
-      },
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": [
-        "$msCompile"
-      ],
-    },
-    {
-      "type": "cppbuild",
+      "type": "shell",
       "label": "Win : Debug C++",
-      "command": "cmd.exe",
+      "command": "clang++",
       "args": [
-        "/C",
-        "chcp",
-        "65001",
-        ">nul",
-        "&&",
-        // https://docs.microsoft.com/ja-jp/cpp/build/reference/compiler-options-listed-alphabetically?view=msvc-160
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\bin\\HostX86\\x64\\cl.exe",
-        "/DDBUG",
-        // "/c", //リンクを行わないでコンパイルします。
-        "/source-charset:utf-8",
-        "/std:c++14",
-        "/Wall",
-        "/errorReport:prompt", // すぐにエラーメッセージを表示する
-        "/wd 4127",
-        "/wd 4514",
-        "/wd 4820",
-        "/wd 5027",
-        "/wd 5045",
-        "/wd 4100",
-        "/wd 4191",
-        "/wd 4710",
-        "/wd 4668",
-        "/wd 4623",
-        "/wd 4625",
-        "/wd 4626",
-        "/wd 4668",
-        "/wd 4201",
-        // "/sdl",
-        "-IC:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\ATLMFC\\include",
-        "-IC:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\include",
-        "-IC:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\ucrt",
-        "-IC:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\shared",
-        "-IC:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\um",
-        "-IC:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\winrt",
-        "-IC:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\cppwinrt",
-        "/I${env:PYTHONPATH}\\include",
-        "/I${env:PYTHONPATH}\\libs",
-        "/IY:\\usr\\local\\include",
-        "/IC:\\usr\\lib\\boost",
-        "/Zi",
-        "/EHs",
-        "/Od",
-        "/nologo",
-        "/Fe:",
-        "${workspaceFolder}\\build\\${fileBasenameNoExtension}.exe",
+        "-DNDEBUG",
+        "-g",
+        "-fwrapv",
+        "-O0",
+        "-Wall",
+        "-fstack-protector-strong",
+        "-Wformat",
+        "-Werror=format-security",
+        "-Wdate-time",
+        "-D_FORTIFY_SOURCE=2",
+        "-g",
+        "-I${env:PYTHONPATH}/include",
+        "-IC:/usr/lib/include/boost",
+        "-c",
         "${file}",
-        "/link",
-        // "/LIBPATH:${workspaceFolder}\\build",
-        "/LIBPATH:${workspaceFolder}\\src",
-        "/LIBPATH:${env:PYTHONPATH}\\libs",
-        "/LIBPATH:${env:PYTHONPATH}\\PCbuild\\amd64",
-        "/LIBPATH:C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\ATLMFC\\lib\\x64",
-        "/LIBPATH:C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\lib\\x64",
-        "/LIBPATH:C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64",
-        "/LIBPATH:C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64",
-        "/LIBPATH:C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.18362.0\\x64",
-        "/LIBPATH:C:\\usr\\lib\boost\\lib64-msvc-14.2",
-        "User32.lib",
+        "-o",
+        "${workspaceFolder}/build/${fileBasenameNoExtension}.o",
+        "&&",
+        "clang++",
+        "-g",
+        "-fstack-protector-strong",
+        "-Wformat",
+        "-Werror=format-security",
+        "-Wdate-time",
+        "-D_FORTIFY_SOURCE=2",
+        "-g",
+        "${workspaceFolder}/build/${fileBasenameNoExtension}.o",
+        "-o",
+        "${workspaceFolder}/build/${fileBasenameNoExtension}.exe"
       ],
       "options": {
-        "cwd": "${workspaceFolder}\\build"
+        "cwd": "${workspaceFolder}/build"
       },
       "problemMatcher": [
-        "$msCompile"
+        "$gcc"
       ],
       "presentation": {
         "echo": true,
@@ -138,84 +67,66 @@
         "clear": true
       },
       "dependsOrder": "sequence",
-      "dependsOn": [
-        "Win : prebuild"
-      ],
-      "group": "build",
-      "detail": "cl.exe"
-    },
-    {
-      "type": "cppbuild",
-      "label": "Win : Release C++",
-      "command": "cmd.exe",
-      "args": [
-        "/C",
-        "chcp",
-        "65001",
-        ">nul",
-        "&&",
-        // https://docs.microsoft.com/ja-jp/cpp/build/reference/compiler-options-listed-alphabetically?view=msvc-160
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\bin\\HostX86\\x64\\cl.exe",
-        // "/c", //リンクを行わないでコンパイルします。
-        "/source-charset:utf-8",
-        "/std:c++14",
-        // "/Wall",
-        // "/wd","4514", "/wd 4127", "/wd 4820", "/wd 5045", "/wd 4100", "/wd 4191","/wd 4710", "/wd 4668",
-        "-IC:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\ATLMFC\\include",
-        "-IC:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\include",
-        "-IC:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\ucrt",
-        "-IC:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\shared",
-        "-IC:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\um",
-        "-IC:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\winrt",
-        "-IC:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.18362.0\\cppwinrt",
-        "/I${env:PYTHONPATH}\\include",
-        "/I${env:PYTHONPATH}\\libs",
-        "/IY:\\usr\\local\\include",
-        "/IC:\\usr\\lib\\boost",
-        "/Zi",
-        "/EHs",
-        "/Ox",
-        "/nologo",
-        "/Fe:",
-        "${workspaceFolder}\\build\\${fileBasenameNoExtension}.exe",
-        "${file}",
-        "/link",
-        // "/LIBPATH:${workspaceFolder}\\build",
-        // "/LIBPATH:${workspaceFolder}\\build\\Debug\\src",
-        "/LIBPATH:${env:PYTHONPATH}\\libs",
-        "/LIBPATH:${env:PYTHONPATH}\\PCbuild\\amd64",
-        "/LIBPATH:C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\ATLMFC\\lib\\x64",
-        "/LIBPATH:C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30037\\lib\\x64",
-        "/LIBPATH:C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64",
-        "/LIBPATH:C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64",
-        "/LIBPATH:C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.18362.0\\x64",
-        "User32.lib",
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}\\build"
-      },
-      "problemMatcher": [
-        "$msCompile"
-      ],
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": true
-      },
-      "dependsOrder": "sequence",
-      "dependsOn": [
-        "Win : prebuild"
-      ],
-      "group": "build",
-      "detail": "cl.exe"
+      "dependsOn": [],
+      "group": "build"
     },
     {
       "type": "shell",
-      "label": "linux : Debug C++",
-      "command": "/usr/bin/gcc",
+      "label": "Win : Release C++",
+      "command": "clang++",
+      "args": [
+        "-g",
+        "-fwrapv",
+        "-O2",
+        "-Wall",
+        "-fstack-protector-strong",
+        "-Wformat",
+        "-Werror=format-security",
+        "-Wdate-time",
+        "-D_FORTIFY_SOURCE=2",
+        "-g",
+        "-I${env:PYTHONPATH}/include",
+        "-IC:/usr/lib/include/boost",
+        "-c",
+        "${file}",
+        "-o",
+        "${workspaceFolder}/build/${fileBasenameNoExtension}.o",
+        "&&",
+        "clang++",
+        "-g",
+        "-fstack-protector-strong",
+        "-Wformat",
+        "-Werror=format-security",
+        "-Wdate-time",
+        "-D_FORTIFY_SOURCE=2",
+        "-g",
+        "${workspaceFolder}/build/${fileBasenameNoExtension}.o",
+        "-o",
+        "${workspaceFolder}/build/${fileBasenameNoExtension}.exe"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "dependsOrder": "sequence",
+      "dependsOn": [],
+      "group": "build"
+    },
+
+    {
+      "type": "shell",
+      "label": "Linux : Debug C++",
+      "command": "clang++",
       "args": [
         "-pthread",
         "-DNDEBUG",
@@ -231,16 +142,15 @@
         "-fPIC",
         "-g",
         "-I/usr/include",
-        "`/usr/bin/env python3 -c 'import sys;print(\"-I{}/include/python{}.{}\".format(sys.prefix, sys.version_info.major, sys.version_info.minor))'`",
-        //"-I/usr/include/python3.6m",
         "-I/usr/local/include",
+        "`/usr/bin/env python3 -c 'import sys;print(\"-I{}/include/python{}.{}\".format(sys.prefix, sys.version_info.major, sys.version_info.minor))'`",
         "-I/usr/include/boost",
         "-c",
         "${file}",
         "-o",
         "${workspaceFolder}/build/${fileBasenameNoExtension}.o",
         "&&",
-        "/usr/bin/g++",
+        "clang++",
         "-pthread",
         "-Wl,-O1",
         "-Wl,-Bsymbolic-functions",
@@ -271,18 +181,15 @@
         "clear": true
       },
       "dependsOrder": "sequence",
-      "dependsOn": [
-        "linux : prebuild"
-      ],
+      "dependsOn": [],
       "group": "build"
     },
     {
       "type": "shell",
-      "label": "linux : Release C++",
-      "command": "/usr/bin/gcc",
+      "label": "Linux : Release C++",
+      "command": "clang++",
       "args": [
         "-pthread",
-        // "-DNDEBUG",
         "-g",
         "-fwrapv",
         "-O2",
@@ -295,16 +202,15 @@
         "-fPIC",
         "-g",
         "-I/usr/include",
-        "`/usr/bin/env python3 -c 'import sys;print(\"-I{}/include/python{}.{}\".format(sys.prefix, sys.version_info.major, sys.version_info.minor))'`",
-        //"-I/usr/include/python3.6m",
         "-I/usr/local/include",
+        "`/usr/bin/env python3 -c 'import sys;print(\"-I{}/include/python{}.{}\".format(sys.prefix, sys.version_info.major, sys.version_info.minor))'`",
         "-I/usr/include/boost",
         "-c",
         "${file}",
         "-o",
         "${workspaceFolder}/build/${fileBasenameNoExtension}.o",
         "&&",
-        "/usr/bin/g++",
+        "clang++",
         "-pthread",
         "-Wl,-O1",
         "-Wl,-Bsymbolic-functions",
@@ -335,15 +241,14 @@
         "clear": true
       },
       "dependsOrder": "sequence",
-      "dependsOn": [
-        "linux : prebuild"
-      ],
+      "dependsOn": [],
       "group": "build"
     },
+
     {
       "type": "process",
-      "label": "linux : ReleaseSetup.py",
-      "command": "/usr/bin/python3",
+      "label": "Win : ReleaseSetup.py",
+      "command": "python",
       "args": [
         "setup.py",
         "build",
@@ -363,8 +268,8 @@
     },
     {
       "type": "process",
-      "label": "linux : DebugSetup.py",
-      "command": "/usr/bin/python3",
+      "label": "Win : DebugSetup.py",
+      "command": "python",
       "args": [
         "setup.py",
         "build",
@@ -381,52 +286,6 @@
       "problemMatcher": [
         "$gcc"
       ],
-    },
-    {
-      "type": "cppbuild",
-      "label": "Win : prebuild",
-      "command": "mkdir",
-      "args": [
-        "build\\Debug",
-        ">nul",
-        "2>&1",
-        "&",
-        "echo",
-        ">nul"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "presentation": {
-        "echo": false,
-        "reveal": "never",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": true
-      },
-    },
-    {
-      "type": "cppbuild",
-      "label": "linux : prebuild",
-      "command": "mkdir",
-      "args": [
-        "-p",
-        "build/Debug",
-        ">/dev/null",
-        "2>&1",
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "presentation": {
-        "echo": false,
-        "reveal": "never",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": true
-      },
     },
   ]
 }

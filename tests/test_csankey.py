@@ -1,31 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from timeit import timeit
-from datetime import datetime, timezone, timedelta
 import os
-import sys
-from psutil import virtual_memory, Process
+from timeit import timeit
+from psutil import Process
 from lxml import etree
 
-process = Process(os.getpid())
-
 try:
-    from csankey.csankey import *
-except:
-    try:
-        from csankey.build.csankey import *
-    except:
-        try:
-            from build.csankey import *
-        except:
-            from csankey import *
+    from csankey import csankey
+except (ModuleNotFoundError, ImportError):
+    from csankey.csankey import csankey
 
 
+process = Process(os.getpid())
 def memusage():
     return process.memory_info()[0] / 1024
 
-def runtimeit(funcstr, number=100000):
+def runtimeit(funcstr, number=10000):
     i = 0
 
     for fc in funcstr.strip().splitlines():
@@ -34,11 +25,12 @@ def runtimeit(funcstr, number=100000):
             timeit(fc, globals=globals(), number=number)
         bm = memusage()
         p = timeit(fc, globals=globals(), number=number)
-        
+
         am = (memusage() - bm)
         assert am < 1000, "{} function {}KB Memory Leak Error".format(fc, am)
         print("{}: {} ns (mem after {}KB)".format(fc, int(1000000000 * p / number), am))
         i += 1
+
 
 
 ans1 = """{

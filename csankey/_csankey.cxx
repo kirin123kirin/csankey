@@ -1,4 +1,4 @@
-﻿/* csankey.cpp | MIT License | https://github.com/kirin123kirin/csankey/raw/main/LICENSE */
+/* csankey.cpp | MIT License | https://github.com/kirin123kirin/csankey/raw/main/LICENSE */
 #include "csankey.hpp"
 
 extern "C" PyObject* to_sankeyhtml_py(PyObject* self, PyObject* args, PyObject* kwargs) {
@@ -52,8 +52,8 @@ extern "C" PyObject* to_sankeyjson_py(PyObject* self, PyObject* args, PyObject* 
     return PyErr_Format(PyExc_ValueError, "Unknown Error Occured.");
 }
 
-#define MODULE_NAME csankey
-#define MODULE_NAME_S "csankey"
+#define MODULE_NAME _csankey
+#define MODULE_NAME_S "_csankey"
 
 /* {{{ */
 // this module description
