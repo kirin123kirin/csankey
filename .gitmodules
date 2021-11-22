@@ -1,6 +1,6 @@
-[submodule "src/csv-parser"]
-	path = src/csv-parser
+[submodule "extern/csv-parser"]
+	path = extern/csv-parser
 	url = https://github.com/kirin123kirin/csv-parser.git
-[submodule "src/cxxopts"]
-	path = src/cxxopts
+[submodule "extern/cxxopts"]
+	path = extern/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git
