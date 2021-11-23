@@ -14,10 +14,13 @@ import argparse
 from distutils.ccompiler import get_default_compiler
 from tools import updatebadge
 import skbuild.constants
+import platform
 
 # OS Environment Infomation
 iswin = os.name == "nt"
 isposix = os.name == "posix"
+islinux = platform.system() == "Linux"
+
 # ismsvc = get_default_compiler() == "msvc"
 
 # Please Setting ----------------------------------------------------------
@@ -77,7 +80,7 @@ if compiled_executefiles:
 
 
 # Edit posix platname for pypi upload error
-if isposix and any(x.startswith("bdist") for x in sys.argv) \
+if islinux and any(x.startswith("bdist") for x in sys.argv) \
         and not ("--plat-name" in sys.argv or "-p" in sys.argv):
     if "64" in os.uname()[-1]:
         from tools.platforms import get_platname_64bit
@@ -94,6 +97,7 @@ if (exists(TARGET)):
 # Require pytest-runner only when running tests
 is_test = 'pytest' in sys.argv or 'test' in sys.argv
 # Other Setting to setup.cfg
+
 setup(
     packages=[PROJECT_NAME],
     scripts=compiled_executefiles,
