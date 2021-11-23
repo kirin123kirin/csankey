@@ -12,6 +12,11 @@
 #include <unordered_set>
 #include "../extern/csv-parser/parser.hpp"
 
+#if !(_WIN32 || _WIN64)
+#include <ext/string_conversions.h>
+#include <limits>
+#endif
+
 static constexpr const wchar_t BEFORE_TEXT[] =
 #include "bf.cc"
 ;

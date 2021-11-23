@@ -125,7 +125,7 @@
 
     {
       "type": "shell",
-      "label": "Linux : Debug C++",
+      "label": "linux : Debug C++",
       "command": "clang++",
       "args": [
         "-pthread",
@@ -143,7 +143,11 @@
         "-g",
         "-I/usr/include",
         "-I/usr/local/include",
-        "`/usr/bin/env python3 -c 'import sys;print(\"-I{}/include/python{}.{}\".format(sys.prefix, sys.version_info.major, sys.version_info.minor))'`",
+        "-I/usr/include/python3.9m",
+        "-I/usr/include/python3.8m",
+        "-I/usr/include/python3.7m",
+        "-I/usr/include/python3.6m",
+        "-I/usr/include/python2.7m",
         "-I/usr/include/boost",
         "-c",
         "${file}",
@@ -186,7 +190,7 @@
     },
     {
       "type": "shell",
-      "label": "Linux : Release C++",
+      "label": "linux : Release C++",
       "command": "clang++",
       "args": [
         "-pthread",
@@ -203,7 +207,11 @@
         "-g",
         "-I/usr/include",
         "-I/usr/local/include",
-        "`/usr/bin/env python3 -c 'import sys;print(\"-I{}/include/python{}.{}\".format(sys.prefix, sys.version_info.major, sys.version_info.minor))'`",
+        "-I/usr/include/python3.9m",
+        "-I/usr/include/python3.8m",
+        "-I/usr/include/python3.7m",
+        "-I/usr/include/python3.6m",
+        "-I/usr/include/python2.7m",
         "-I/usr/include/boost",
         "-c",
         "${file}",
@@ -270,6 +278,48 @@
       "type": "process",
       "label": "Win : DebugSetup.py",
       "command": "python",
+      "args": [
+        "setup.py",
+        "build",
+        "-gf"
+      ],
+      "group": //"build",
+      {
+        "kind": "build",
+        "isDefault": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+    },
+    {
+      "type": "process",
+      "label": "linux : ReleaseSetup.py",
+      "command": "python3",
+      "args": [
+        "setup.py",
+        "build",
+        "-f"
+      ],
+      "group": //"build",
+      {
+        "kind": "build",
+        "isDefault": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+    },
+    {
+      "type": "process",
+      "label": "linux : DebugSetup.py",
+      "command": "python3",
       "args": [
         "setup.py",
         "build",
