@@ -142,7 +142,8 @@ class SankeyData {
 #if _WIN32 || _WIN64
             res += std::_UIntegral_to_string<CharT>(++i);
 #else
-            res += __gnu_cxx::__to_xstring<CharT>(++i);
+            // res += __gnu_cxx::__to_xstring<CharT>(++i); //@todo error: no matching function for call to '__gnu_cxx::__to_xstring'
+            res += std::wstring(++i);
 #endif
             res += TYPED_LITERAL(CharT*, R"(,"name":")") + node + TYPED_LITERAL(CharT*, "\"},\n");
         }
@@ -153,13 +154,15 @@ class SankeyData {
 #if _WIN32 || _WIN64
             res += std::_UIntegral_to_string<CharT>(++j);
 #else
-            res += __gnu_cxx::__to_xstring<CharT>(++j);
+            // res += __gnu_cxx::__to_xstring<CharT>(++j); //@todo error: no matching function for call to '__gnu_cxx::__to_xstring'
+            res += std::wstring(++j);
 #endif
             res += link.first;
 #if _WIN32 || _WIN64
             res += std::_Integral_to_string<CharT>(link.second);
 #else
-            res += __gnu_cxx::__to_xstring<CharT>(link.second);
+            // res += __gnu_cxx::__to_xstring<CharT>(link.second); //@todo error: no matching function for call to '__gnu_cxx::__to_xstring'
+            res += std::wstring(link.second);
 #endif
             res += TYPED_LITERAL(CharT*, "},\n");
         }
