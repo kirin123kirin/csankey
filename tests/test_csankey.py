@@ -6,15 +6,14 @@ import sys
 from timeit import timeit
 from psutil import Process
 from lxml import etree
+
 from os.path import dirname, abspath, join as pjoin
-
 shome = abspath(pjoin(dirname(__file__), ".."))
-sadd = sys.path.append
-sadd(pjoin(shome, "_skbuild", "cmake-install"))
-sadd(pjoin(shome, "build", "cmake-install"))
-sadd(pjoin(shome, "build"))
-
+sys.path.insert(0, pjoin(shome, "build"))
+sys.path.insert(0, pjoin(shome, "_skbuild", "cmake-install"))
+sys.path.insert(0, pjoin(shome, "build", "cmake-install"))
 from csankey import *
+
 
 process = Process(os.getpid())
 def memusage():
