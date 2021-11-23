@@ -25,6 +25,13 @@ set(EXE_SOURCES ${PJNAME}/main.cpp ${CMAKE_CURRENT_BINARY_DIR})
 
 #----------------------------------------------------
 
+# pre setting
+project(${PJNAME})
+
+find_package(Python3 COMPONENTS Interpreter Development)
+
+set(CMAKE_MODULE_PATH ${Python3_SITELIB}/skbuild/resources/cmake)
+
 # print variables
 message(STATUS "\n\n*** dump start cmake variables ***\n\n")
 
@@ -34,14 +41,6 @@ foreach(_variableName ${_variableNames})
 endforeach()
 
 message(STATUS "\n*** dump end ***")
-
-
-# pre setting
-project(${PJNAME})
-
-find_package(Python3 COMPONENTS Interpreter Development)
-
-set(CMAKE_MODULE_PATH ${Python3_SITELIB}/skbuild/resources/cmake)
 
 find_package(PythonExtensions REQUIRED)
 
