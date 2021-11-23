@@ -139,16 +139,28 @@ class SankeyData {
 
         for(auto&& node : nodes) {
             res += TYPED_LITERAL(CharT*, R"({"ID":)");
+#if _WIN32 || _WIN64
             res += std::_UIntegral_to_string<CharT>(++i);
+#else
+            res += std::__to_xstring<CharT>(++i);
+#endif
             res += TYPED_LITERAL(CharT*, R"(,"name":")") + node + TYPED_LITERAL(CharT*, "\"},\n");
         }
         res += TYPED_LITERAL(CharT*, "],\n\"links\":[\n");
 
         for(auto&& link : links) {
             res += TYPED_LITERAL(CharT*, R"({"ID":)");
+#if _WIN32 || _WIN64
             res += std::_UIntegral_to_string<CharT>(++j);
+#else
+            res += std::__to_xstring<CharT>(++j);
+#endif
             res += link.first;
+#if _WIN32 || _WIN64
             res += std::_Integral_to_string<CharT>(link.second);
+#else
+            res += std::__to_xstring<CharT>(link.second);
+#endif
             res += TYPED_LITERAL(CharT*, "},\n");
         }
         return res + TYPED_LITERAL(CharT*, "]}\n");
@@ -396,7 +408,6 @@ class SankeyData<wchar_t, PyObject*> {
     PyObject* to_html() {
         PyObject* res = NULL;
         wchar_t *ret, *p;
-        errno_t err;
         std::size_t json_len, bf_len, af_len, wsize, datasize;
 
         std::wstring jsondata = to_json();
@@ -423,25 +434,25 @@ class SankeyData<wchar_t, PyObject*> {
 
         {
             /* Befor + json + After Writing */
-            err = memcpy_s(p, wsize * datasize, BEFORE_TEXT, wsize * bf_len);
-            if(err) {
+            if(wsize * datasize < wsize * bf_len) {
                 Py_CLEAR(res);
                 return PyErr_Format(PyExc_MemoryError, "Error. before_text data memory writing");
             }
+            memcpy(p, BEFORE_TEXT, wsize * bf_len);
             p += bf_len;
 
-            err = memcpy_s(p, wsize * (datasize - bf_len), jsondata.data(), wsize * json_len);
-            if(err) {
+            if(wsize * (datasize - bf_len) < wsize * json_len) {
                 Py_CLEAR(res);
                 return PyErr_Format(PyExc_MemoryError, "Error. after_text data memory writing");
             }
+            memcpy(p, jsondata.data(), wsize * json_len);
             p += json_len;
 
-            err = memcpy_s(p, wsize * af_len, AFTER_TEXT, wsize * af_len);
-            if(err) {
+            if(wsize * af_len < wsize * af_len){
                 Py_CLEAR(res);
                 return PyErr_Format(PyExc_MemoryError, "Error. after_text data memory writing");
             }
+            memcpy(p, AFTER_TEXT, wsize * af_len);
         }
 
         return res;
