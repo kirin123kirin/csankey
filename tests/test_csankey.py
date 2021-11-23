@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import builtins
 import os
 from timeit import timeit
 from psutil import Process
 from lxml import etree
 
 try:
-    from csankey import csankey
+    from csankey.csankey import *
 except (ModuleNotFoundError, ImportError):
-    from csankey.csankey import csankey
+    try:
+        from csankey.csankey.csankey import *
+    except (ModuleNotFoundError, ImportError):
+        import importlib
+        # os.chdir(os.path.join(os.path.dirname(__file__), ".."))
+        _csankey = importlib.import_module("build.cmake-build._csankey")
+        to_sankeyhtml = _csankey.to_sankeyhtml
+        to_sankeyjson = _csankey.to_sankeyjson
 
 
 process = Process(os.getpid())
