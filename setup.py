@@ -17,19 +17,11 @@ import skbuild.constants
 
 from distutils.dist import Distribution
 
-# setup.cfg metadata Infomation (`meta` of py dictionary)
-_dt = Distribution()
-_dt.parse_config_files()
-_dt.parse_command_line()
-_meta = _dt.get_option_dict('metadata')
-def meta(s):
-    return _meta[s][1]
-
 # Please Setting ----------------------------------------------------------
 # If you wan't install compiled scripts by C++ etc
 
 
-PROJECT_NAME = meta("name")
+PROJECT_NAME = "csankey"
 
 skbuild.constants.SKBUILD_DIR = lambda: "build"  # If you wan't change build directory name
 
