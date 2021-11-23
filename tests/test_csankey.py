@@ -3,6 +3,7 @@
 
 import os
 import sys
+import re
 from timeit import timeit
 from psutil import Process
 from lxml import etree
@@ -130,26 +131,30 @@ ans7 = """{
 ]}
 """
 
+_re = re.compile(r'"ID":\d').sub
+def fuzzy_assert(prog, anser, rep=lambda x: _re(r'"ID:*"', x)):
+    assert(rep(prog) == rep(anser))
+
 def test_to_sankeyjson_regular_case():
-    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]]) == ans1)
-    assert(to_sankeyjson([["1", "3"], ["a", "b"]]) == ans2)
-    assert(to_sankeyjson([["1"], ["a"]]) == ans3)
+    fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]]) , ans1)
+    fuzzy_assert(to_sankeyjson([["1", "3"], ["a", "b"]]) , ans2)
+    fuzzy_assert(to_sankeyjson([["1"], ["a"]]) , ans3)
 
 def test_to_sankeyjson_regular_case_Ncolumns():
-    assert(to_sankeyjson([["1", "3"], ["a", "b"]], False) == ans2)
-    assert(to_sankeyjson([["1", "3", 20], ["a", "b", 40]], False) == ans4)
+    fuzzy_assert(to_sankeyjson([["1", "3"], ["a", "b"]], False) , ans2)
+    fuzzy_assert(to_sankeyjson([["1", "3", 20], ["a", "b", 40]], False) , ans4)
 
 def test_to_sankeyjson_half_regular_case_interval():
-    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "abc"]]) == ans5)
-    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", "abc"]]) == ans5)
-    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, None]]) == ans6)
-    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", ""]]) == ans6)
-    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, ""]]) == ans6)
-    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", None]]) == ans6)
-    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", None, "ddd"]]) == ans7)
-    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, None, "ddd"]]) == ans7)
-    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "", "ddd"]]) == ans7)
-    assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", "", "ddd"]]) == ans7)
+    fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "abc"]]) , ans5)
+    fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", "abc"]]) , ans5)
+    fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, None]]) , ans6)
+    fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", ""]]) , ans6)
+    fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, ""]]) , ans6)
+    fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", None]]) , ans6)
+    fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", None, "ddd"]]) , ans7)
+    fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, None, "ddd"]]) , ans7)
+    fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "", "ddd"]]) , ans7)
+    fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "", "", "ddd"]]) , ans7)
 
 def test_to_sankeyhtml_regular_case():
     assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]]), etree.HTMLParser())))
