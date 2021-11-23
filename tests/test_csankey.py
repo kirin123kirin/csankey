@@ -133,7 +133,7 @@ ans7 = """{
 
 _re = re.compile(r'"ID":\d').sub
 def fuzzy_assert(prog, anser, rep=lambda x: _re(r'"ID:*"', x)):
-    assert(rep(prog) == rep(anser))
+    assert(sorted(rep(prog)) == sorted(rep(anser)))
 
 def test_to_sankeyjson_regular_case():
     fuzzy_assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]]) , ans1)
