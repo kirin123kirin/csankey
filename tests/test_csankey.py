@@ -15,7 +15,7 @@ sys.path.insert(0, pjoin(shome, "build", "cmake-install"))
 
 from glob import glob
 from pprint import pprint
-pprint(list(glob(pjoin(dirname(__file__), "../*build/*"))))
+pprint(list(glob(pjoin(dirname(__file__), "../build/*"), recursive=True)))
 from csankey import *
 
 process = Process(os.getpid())
