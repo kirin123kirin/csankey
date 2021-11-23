@@ -8,16 +8,19 @@ from psutil import Process
 from lxml import etree
 
 try:
-    from csankey.csankey import *
+    from csankey import *
 except (ModuleNotFoundError, ImportError):
     try:
-        from csankey.csankey.csankey import *
+        from csankey.csankey import *
     except (ModuleNotFoundError, ImportError):
-        import importlib
-        # os.chdir(os.path.join(os.path.dirname(__file__), ".."))
-        _csankey = importlib.import_module("build.cmake-build._csankey")
-        to_sankeyhtml = _csankey.to_sankeyhtml
-        to_sankeyjson = _csankey.to_sankeyjson
+        try:
+            from csankey.csankey.csankey import *
+        except (ModuleNotFoundError, ImportError):
+            import importlib
+            # os.chdir(os.path.join(os.path.dirname(__file__), ".."))
+            _csankey = importlib.import_module("build.cmake-build._csankey")
+            to_sankeyhtml = _csankey.to_sankeyhtml
+            to_sankeyjson = _csankey.to_sankeyjson
 
 
 process = Process(os.getpid())

@@ -32,15 +32,15 @@ find_package(Python3 COMPONENTS Interpreter Development)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Python3_SITELIB}/skbuild/resources/cmake)
 
-# print variables
-message(STATUS "\n\n*** dump start cmake variables ***\n\n")
+# # print variables
+# message(STATUS "\n\n*** dump start cmake variables ***\n\n")
 
-get_cmake_property(_variableNames VARIABLES)
-foreach(_variableName ${_variableNames})
-        message(STATUS "${_variableName}=${${_variableName}}")
-endforeach()
+# get_cmake_property(_variableNames VARIABLES)
+# foreach(_variableName ${_variableNames})
+#         message(STATUS "${_variableName}=${${_variableName}}")
+# endforeach()
 
-message(STATUS "\n*** dump end ***")
+# message(STATUS "\n*** dump end ***")
 
 find_package(PythonExtensions REQUIRED)
 
