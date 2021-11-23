@@ -15,7 +15,10 @@ from distutils.ccompiler import get_default_compiler
 from tools import updatebadge
 import skbuild.constants
 
-from distutils.dist import Distribution
+# OS Environment Infomation
+iswin = os.name == "nt"
+isposix = os.name == "posix"
+# ismsvc = get_default_compiler() == "msvc"
 
 # Please Setting ----------------------------------------------------------
 # If you wan't install compiled scripts by C++ etc
@@ -29,7 +32,7 @@ skbuild_opts = [
 ]
 
 compiled_executefiles = [
-    skbuild.constants.CMAKE_BUILD_DIR() + '/sankey.exe',
+    skbuild.constants.CMAKE_BUILD_DIR() + '/sankey' + (".exe" if iswin else ""),
 ]
 
 cmake_args = {
@@ -44,11 +47,6 @@ cmake_args = {
 # -------------------------------------------------------------------------
 
 from skbuild import setup
-
-# OS Environment Infomation
-iswin = os.name == "nt"
-isposix = os.name == "posix"
-ismsvc = get_default_compiler() == "msvc"
 
 sys.argv.extend(skbuild_opts)
 sys.argv.extend(cmake_args["common"] + cmake_args.get(os.name, []))
