@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import builtins
 import os
 from timeit import timeit
 from psutil import Process
@@ -14,7 +13,7 @@ except (ModuleNotFoundError, ImportError):
         from csankey._csankey import *
     except (ModuleNotFoundError, ImportError):
         try:
-            from csankey.csankey.csankey import *
+            from csankey.csankey._csankey import *
         except (ModuleNotFoundError, ImportError):
             import importlib
             # os.chdir(os.path.join(os.path.dirname(__file__), ".."))

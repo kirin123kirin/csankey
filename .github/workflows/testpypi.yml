@@ -70,6 +70,7 @@ jobs:
             if:    ${{ matrix.python-version != '2.7' }}
             run:   |
                    flake8
+                   python setup.py test
                    python setup.py bdist_wheel
                    twine check --strict dist/*
          -
