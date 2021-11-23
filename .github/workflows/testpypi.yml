@@ -71,7 +71,7 @@ jobs:
             run:   |
                    flake8
                    python setup.py bdist_wheel
-                   cd dist && pip install *.whl && cd ..
+                   for x in dist/*.whl then; do pip install $x; done
                    python setup.py test
                    twine check --strict dist/*
          -
