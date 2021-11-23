@@ -30,7 +30,7 @@ project(${PJNAME})
 
 find_package(Python3 COMPONENTS Interpreter Development)
 
-set(CMAKE_MODULE_PATH ${Python3_SITELIB}/skbuild/resources/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Python3_SITELIB}/skbuild/resources/cmake)
 
 # print variables
 message(STATUS "\n\n*** dump start cmake variables ***\n\n")
