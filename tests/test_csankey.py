@@ -12,8 +12,8 @@ shome = abspath(pjoin(dirname(__file__), ".."))
 sys.path.insert(0, pjoin(shome, "build"))
 sys.path.insert(0, pjoin(shome, "_skbuild", "cmake-install"))
 sys.path.insert(0, pjoin(shome, "build", "cmake-install"))
+print("hoge2", sys.path)
 from csankey import *
-
 
 process = Process(os.getpid())
 def memusage():
