@@ -2,25 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 from timeit import timeit
 from psutil import Process
 from lxml import etree
+from os.path import dirname, abspath, join as pjoin
 
-try:
-    from csankey import *
-except (ModuleNotFoundError, ImportError):
-    try:
-        from csankey._csankey import *
-    except (ModuleNotFoundError, ImportError):
-        try:
-            from csankey.csankey._csankey import *
-        except (ModuleNotFoundError, ImportError):
-            import importlib
-            # os.chdir(os.path.join(os.path.dirname(__file__), ".."))
-            _csankey = importlib.import_module("build.cmake-build._csankey")
-            to_sankeyhtml = _csankey.to_sankeyhtml
-            to_sankeyjson = _csankey.to_sankeyjson
+shome = abspath(pjoin(dirname(__file__), ".."))
+sadd = sys.path.append
+sadd(pjoin(shome, "_skbuild", "cmake-install"))
+sadd(pjoin(shome, "build", "cmake-install"))
+sadd(pjoin(shome, "build"))
 
+from csankey import *
 
 process = Process(os.getpid())
 def memusage():
@@ -40,7 +34,6 @@ def runtimeit(funcstr, number=10000):
         assert am < 1000, "{} function {}KB Memory Leak Error".format(fc, am)
         print("{}: {} ns (mem after {}KB)".format(fc, int(1000000000 * p / number), am))
         i += 1
-
 
 
 ans1 = """{
@@ -141,12 +134,12 @@ ans7 = """{
 
 def test_to_sankeyjson_regular_case():
     assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]]) == ans1)
-    assert(to_sankeyjson([["1", "3"],["a", "b"]]) == ans2)
-    assert(to_sankeyjson([["1"],["a"]]) == ans3)
+    assert(to_sankeyjson([["1", "3"], ["a", "b"]]) == ans2)
+    assert(to_sankeyjson([["1"], ["a"]]) == ans3)
 
 def test_to_sankeyjson_regular_case_Ncolumns():
-    assert(to_sankeyjson([["1", "3"],["a", "b"]], False) == ans2)
-    assert(to_sankeyjson([["1", "3", 20],["a", "b", 40]], False) == ans4)
+    assert(to_sankeyjson([["1", "3"], ["a", "b"]], False) == ans2)
+    assert(to_sankeyjson([["1", "3", 20], ["a", "b", 40]], False) == ans4)
 
 def test_to_sankeyjson_half_regular_case_interval():
     assert(to_sankeyjson([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "abc"]]) == ans5)
@@ -162,12 +155,12 @@ def test_to_sankeyjson_half_regular_case_interval():
 
 def test_to_sankeyhtml_regular_case():
     assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]]), etree.HTMLParser())))
-    assert(len(etree.fromstring(to_sankeyhtml([["1", "3"],["a", "b"]]), etree.HTMLParser())))
-    assert(len(etree.fromstring(to_sankeyhtml([["1"],["a"]]), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["1", "3"], ["a", "b"]]), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["1"], ["a"]]), etree.HTMLParser())))
 
 def test_to_sankeyhtml_regular_case_Ncolumns():
-    assert(len(etree.fromstring(to_sankeyhtml([["1", "3"],["a", "b"]], False), etree.HTMLParser())))
-    assert(len(etree.fromstring(to_sankeyhtml([["1", "3", 20],["a", "b", 40]], False), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["1", "3"], ["a", "b"]], False), etree.HTMLParser())))
+    assert(len(etree.fromstring(to_sankeyhtml([["1", "3", 20], ["a", "b", 40]], False), etree.HTMLParser())))
 
 def test_to_sankeyhtml_half_regular_case_interval():
     assert(len(etree.fromstring(to_sankeyhtml([["abc", "bbb", "ccc"], ["ccc", "aaa", None, "abc"]]), etree.HTMLParser())))
@@ -190,7 +183,7 @@ def _irregular_case(errtype, func, args):
         raise AssertionError
 
 def test_to_sankeyjson_irregular_case():
-    _irregular_case(ValueError, to_sankeyjson, ([["1"],["a"]], False))
+    _irregular_case(ValueError, to_sankeyjson, ([["1"], ["a"]], False))
     _irregular_case(ValueError, to_sankeyjson, ([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]], False))
 
 def test_to_sankeyjson_irregular_case():
@@ -201,7 +194,7 @@ def test_to_sankeyjson_irregular_case():
     _irregular_case(TypeError, to_sankeyjson, [""])
     _irregular_case(ValueError, to_sankeyjson, [[]])
     _irregular_case(ValueError, to_sankeyjson, [()])
-    _irregular_case(ValueError, to_sankeyjson, [[[],[]]])
+    _irregular_case(ValueError, to_sankeyjson, [[[], []]])
     _irregular_case(ValueError, to_sankeyjson, [[[]]])
 
 def test_to_sankeyjson_irregular_case2():
@@ -211,11 +204,11 @@ def test_to_sankeyjson_irregular_case2():
     _irregular_case(TypeError, to_sankeyjson, ["", False])
     _irregular_case(ValueError, to_sankeyjson, [[], False])
     _irregular_case(ValueError, to_sankeyjson, [(), False])
-    _irregular_case(ValueError, to_sankeyjson, [[[],[]], False])
+    _irregular_case(ValueError, to_sankeyjson, [[[], []], False])
     _irregular_case(ValueError, to_sankeyjson, [[[]], False])
 
 def test_to_sankeyhtml_irregular_case():
-    _irregular_case(ValueError, to_sankeyhtml, ([["1"],["a"]], False))
+    _irregular_case(ValueError, to_sankeyhtml, ([["1"], ["a"]], False))
     _irregular_case(ValueError, to_sankeyhtml, ([["abc", "bbb", "ccc"], ["ccc", "aaa", "bbb", "abc"]], False))
 
 def test_to_sankeyhtml_irregular_case():
@@ -226,7 +219,7 @@ def test_to_sankeyhtml_irregular_case():
     _irregular_case(TypeError, to_sankeyhtml, [""])
     _irregular_case(ValueError, to_sankeyhtml, [[]])
     _irregular_case(ValueError, to_sankeyhtml, [()])
-    _irregular_case(ValueError, to_sankeyhtml, [[[],[]]])
+    _irregular_case(ValueError, to_sankeyhtml, [[[], []]])
     _irregular_case(ValueError, to_sankeyhtml, [[[]]])
 
 def test_to_sankeyhtml_irregular_case2():
@@ -236,7 +229,7 @@ def test_to_sankeyhtml_irregular_case2():
     _irregular_case(TypeError, to_sankeyhtml, ["", False])
     _irregular_case(ValueError, to_sankeyhtml, [[], False])
     _irregular_case(ValueError, to_sankeyhtml, [(), False])
-    _irregular_case(ValueError, to_sankeyhtml, [[[],[]], False])
+    _irregular_case(ValueError, to_sankeyhtml, [[[], []], False])
     _irregular_case(ValueError, to_sankeyhtml, [[[]], False])
 
 
@@ -337,4 +330,3 @@ if __name__ == '__main__':
         raise (e)
     finally:
         os.chdir(curdir)
-
