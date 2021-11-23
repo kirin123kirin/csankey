@@ -73,7 +73,7 @@ class SankeyData {
 
    public:
     // SankeyData() : data(), nodes({}), links({}), parsed(false) {}
-    // SankeyData(nullptr_t) : data(), nodes({}), links({}), parsed(false) {}
+    // SankeyData(std::nullptr_t) : data(), nodes({}), links({}), parsed(false) {}
     SankeyData(Container _data) : data(_data), nodes({}), links({}), parsed(false) {}
     ~SankeyData() {}
 
@@ -142,7 +142,7 @@ class SankeyData {
 #if _WIN32 || _WIN64
             res += std::_UIntegral_to_string<CharT>(++i);
 #else
-            res += std::__to_xstring<CharT>(++i);
+            res += __gnu_cxx::__to_xstring<CharT>(++i);
 #endif
             res += TYPED_LITERAL(CharT*, R"(,"name":")") + node + TYPED_LITERAL(CharT*, "\"},\n");
         }
@@ -153,13 +153,13 @@ class SankeyData {
 #if _WIN32 || _WIN64
             res += std::_UIntegral_to_string<CharT>(++j);
 #else
-            res += std::__to_xstring<CharT>(++j);
+            res += __gnu_cxx::__to_xstring<CharT>(++j);
 #endif
             res += link.first;
 #if _WIN32 || _WIN64
             res += std::_Integral_to_string<CharT>(link.second);
 #else
-            res += std::__to_xstring<CharT>(link.second);
+            res += __gnu_cxx::__to_xstring<CharT>(link.second);
 #endif
             res += TYPED_LITERAL(CharT*, "},\n");
         }
@@ -268,7 +268,7 @@ class SankeyData<wchar_t, PyObject*> {
 
    public:
     SankeyData() : data(NULL), len(-1), nodes({}), links({}) {}
-    SankeyData(nullptr_t) : data(NULL), len(-1), nodes({}), links({}) {}
+    SankeyData(std::nullptr_t) : data(NULL), len(-1), nodes({}), links({}) {}
     SankeyData(PyObject*& _py2darraydata)
         : data(_py2darraydata), len(PyObject_Length(_py2darraydata)), nodes({}), links({}) {}
     ~SankeyData() {}
