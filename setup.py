@@ -23,7 +23,7 @@ from distutils.dist import Distribution
 
 PROJECT_NAME = "csankey"
 
-skbuild.constants.SKBUILD_DIR = lambda: "build"  # If you wan't change build directory name
+# skbuild.constants.SKBUILD_DIR = lambda: "build"  # If you wan't change build directory name
 
 skbuild_opts = [
 ]
