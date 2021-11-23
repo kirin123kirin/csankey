@@ -11,7 +11,7 @@ try:
     from csankey import *
 except (ModuleNotFoundError, ImportError):
     try:
-        from csankey.csankey import *
+        from csankey._csankey import *
     except (ModuleNotFoundError, ImportError):
         try:
             from csankey.csankey.csankey import *
