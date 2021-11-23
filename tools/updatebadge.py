@@ -12,5 +12,5 @@ def readme(fname, new_version):
         oldbadge = re_badge.group(0)
         newbadge = oldbadge.replace(re_badge.group(2), new_version.encode())
         if oldbadge != newbadge:
-            with open(readme, "wb") as f:
-                f.write(description.replace(oldbadge, newbadge))
+            with open(fname, "wb") as w:
+                w.write(description.replace(oldbadge, newbadge))

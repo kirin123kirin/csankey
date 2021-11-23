@@ -8,16 +8,17 @@ TARGET = normpath(pathjoin(SRCDIR, "index.html"))
 
 def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
     if minify:
-        re_minify = re.compile("^\s+", re.MULTILINE).sub
+        re_minify = re.compile(r"^\s+", re.MULTILINE).sub
     else:
-        def re_minify(a, b): return b
+        def re_minify(_, b):
+            return b
     dat = None
     UA = [('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
     with open(target, "r", encoding="utf-8") as f:
         dat = f.read()
 
     if dat:
-        for re_css in re.finditer('<link\s+href=[\"\']([^\"\']+)[\"\']\s+rel=[\"\']stylesheet[\"\']\s*>', dat):
+        for re_css in re.finditer(r'<link\s+href=[\"\']([^\"\']+)[\"\']\s+rel=[\"\']stylesheet[\"\']\s*>', dat):
             cssname = re_css.group(1)
             if(cssname.startswith("http")):
                 opener = request.build_opener()
@@ -34,7 +35,7 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
         start = 0
         end = 0
 
-        for i, re_scp in enumerate(re.finditer('<script\s+src="([^\"]+)"\s*>.*</script>', dat)):
+        for i, re_scp in enumerate(re.finditer(r'<script\s+src="([^\"]+)"\s*>.*</script>', dat)):
             if i == 0:
                 start = re_scp.start()
             end = re_scp.end()
@@ -55,7 +56,7 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
         bf = dat[:start] + scripts
         af = dat[end:]
 
-        mbf = re.search("<!-- My Sankey Data Section -->\s*<script>\s*var\s+data\s*=\s*", af, re.MULTILINE)
+        mbf = re.search(r"<!-- My Sankey Data Section -->\s*<script>\s*var\s+data\s*=\s*", af, re.MULTILINE)
         if not mbf:
             raise ValueError("unexpected `before` template data.")
 
@@ -87,5 +88,3 @@ def make_compiler_input(srcdir=SRCDIR, target=TARGET, minify=False):
 
     else:
         raise ValueError("Is Empty" + target + "?")
-
-

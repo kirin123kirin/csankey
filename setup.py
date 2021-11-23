@@ -100,7 +100,7 @@ if isposix and any(x.startswith("bdist") for x in sys.argv) \
 # make input data for csankey.cpp
 if (exists(TARGET)):
     from tools.setup_preinit import make_compiler_input
-    make_compiler_input(minify=arg.is_debug == False)
+    make_compiler_input(minify=not arg.is_debug)
 
 # Require pytest-runner only when running tests
 is_test = 'pytest' in sys.argv or 'test' in sys.argv
