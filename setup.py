@@ -11,7 +11,7 @@ __version__ = open(pjoin(thisdir, "VERSION"), "r").read().strip()
 
 import shutil
 import argparse
-from distutils.ccompiler import get_default_compiler
+
 from tools import updatebadge
 import skbuild.constants
 import platform
@@ -21,7 +21,6 @@ iswin = os.name == "nt"
 isposix = os.name == "posix"
 islinux = platform.system() == "Linux"
 
-# ismsvc = get_default_compiler() == "msvc"
 
 # Please Setting ----------------------------------------------------------
 # If you wan't install compiled scripts by C++ etc
