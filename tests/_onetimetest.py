@@ -2,15 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 from timeit import timeit
 from psutil import Process
 from lxml import etree
 
-try:
-    from csankey import csankey
-except (ModuleNotFoundError, ImportError):
-    from csankey.csankey import csankey
-
+from os.path import dirname, abspath, join as pjoin
+shome = abspath(pjoin(dirname(__file__), ".."))
+sys.path.insert(0, pjoin(shome, "build"))
+sys.path.insert(0, pjoin(shome, "_skbuild", "cmake-install"))
+sys.path.insert(0, pjoin(shome, "build", "cmake-install"))
+from csankey import *
 
 process = Process(os.getpid())
 def memusage():
@@ -49,6 +51,6 @@ from html.parser import HTMLParser
 #     w.write(r)
 
 
-print(to_sankeyjson([[[],[]]]))
+# print(to_sankeyjson([[[],[]]]))
 
 

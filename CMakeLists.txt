@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.12.0)
+# Check Run Command
+set(CMAKE_VERBOSE_MAKEFILE 1)
 
+# -- CMAKE Options https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/Useful-Variables
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_GENERATOR Ninja)
 set(CMAKE_AR llvm-lib)
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_C_COMPILER clang)

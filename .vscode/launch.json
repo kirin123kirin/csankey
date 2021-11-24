@@ -18,32 +18,60 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Win : C++ Debug",
-      "type": "cppvsdbg",
+      "name": "win : C++ Debug",
+      "type": "lldb",
       "request": "launch",
       "program": "${workspaceFolder}/build/${fileBasenameNoExtension}.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",
       "environment": [],
-      "preLaunchTask": "Win : Debug C++",
+      "preLaunchTask": "win : Debug C++",
       "console": "internalConsole"
     },
     {
-      "name": "Win : C++ Release",
-      "type": "cppvsdbg",
+      "name": "win : C++ Release",
+      "type": "lldb",
       "request": "launch",
       "program": "${workspaceFolder}/build/${fileBasenameNoExtension}.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",
       "environment": [],
-      "preLaunchTask": "Win : Release C++",
+      "preLaunchTask": "win : Release C++",
       "console": "internalConsole"
     },
     {
-      "name": "Win : Debug Setup.py",
-      "type": "cppvsdbg",
+      "name": "Win : Instant Debug from py",
+      "type": "lldb",
+      "request": "launch",
+      "program": "python",
+      "args": [
+        "${file}"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "console": "internalConsole",
+      "preLaunchTask": "win : Debug Setup.py"
+    },
+    {
+      "name": "Win : Instant Release from py",
+      "type": "lldb",
+      "request": "launch",
+      "program": "python",
+      "args": [
+        "${file}"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "console": "internalConsole",
+      "preLaunchTask": "win : Release Setup.py"
+    },
+    {
+      "name": "win : Debug Setup.py",
+      "type": "lldb",
       "request": "launch",
       "program": "python",
       "args": [
@@ -54,56 +82,30 @@
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/build",
       "environment": [],
-      "preLaunchTask": "Win : DebugSetup.py",
+      "preLaunchTask": "win : Debug Setup.py",
       "console": "internalConsole"
     },
     {
-      "name": "Win : Release Setup.py",
-      "type": "python",
+      "name": "win : Release Setup.py",
+      "type": "lldb",
       "request": "launch",
-      "program": "-m",
+      "program": "python",
       "args": [
+        "-m",
         "pytest",
         ".."
       ],
-      "justMyCode": false,
+      "stopAtEntry": false,
       "cwd": "${workspaceFolder}/build",
-      "preLaunchTask": "Win : ReleaseSetup.py",
+      "environment": [],
+      "preLaunchTask": "win : Release Setup.py",
       "console": "internalConsole"
     },
     {
-      "name": "Win : Instant Debug from py",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "program": "python",
-      "args": [
-        "${file}"
-      ],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}",
-      "environment": [],
-      "console": "internalConsole",
-      "preLaunchTask": "Win : DebugSetup.py"
-    },
-    {
-      "name": "Win : Instant Release from py",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "program": "python",
-      "args": [
-        "${file}"
-      ],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/build",
-      "environment": [],
-      "console": "internalConsole",
-      "preLaunchTask": "Win : ReleaseSetup.py"
-    },
-    {
       "name": "linux : C++ Debug",
-      "type": "cppdbg",
+      "type": "lldb",
       "request": "launch",
-      "program": "${workspaceFolder}/build/${fileBasenameNoExtension}",
+      "program": "${workspaceFolder}/build/${fileBasenameNoExtension}.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",
@@ -113,9 +115,9 @@
     },
     {
       "name": "linux : C++ Release",
-      "type": "cppdbg",
+      "type": "lldb",
       "request": "launch",
-      "program": "${workspaceFolder}/build/${fileBasenameNoExtension}",
+      "program": "${workspaceFolder}/build/${fileBasenameNoExtension}.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",
@@ -125,9 +127,9 @@
     },
     {
       "name": "linux : Debug Setup.py",
-      "type": "cppdbg",
+      "type": "lldb",
       "request": "launch",
-      "program": "/usr/bin/python3",
+      "program": "python3",
       "args": [
         "-m",
         "pytest",
@@ -136,80 +138,62 @@
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/build",
       "environment": [],
-      "preLaunchTask": "linux : DebugSetup.py",
+      "preLaunchTask": "linux : Debug Setup.py",
       "console": "internalConsole"
     },
     {
       "name": "linux : Release Setup.py",
-      "type": "cppdbg",
+      "type": "lldb",
       "request": "launch",
-      "program": "/usr/bin/python3",
+      "program": "python3",
       "args": [
         "-m",
         "pytest",
         ".."
       ],
-      "justMyCode": false,
+      "stopAtEntry": false,
       "cwd": "${workspaceFolder}/build",
-      "preLaunchTask": "linux : ReleaseSetup.py",
+      "environment": [],
+      "preLaunchTask": "linux : Release Setup.py",
       "console": "internalConsole"
     },
     {
       "name": "linux : Instant Debug from py",
-      "type": "cppdbg",
+      "type": "lldb",
       "request": "launch",
-      "program": "/usr/bin/python3",
+      "program": "python3",
       "args": [
         "${file}"
       ],
+      // "MIMode": "gdb",
+      // "setupCommands": [
+      //   {
+      //     "description": "Enable reformat of gdb",
+      //     "text": "-enable-pretty-printing",
+      //     "ignoreFailures": true
+      //   }
+      // ],
+      // "miDebuggerPath": "/usr/bin/gdb",
+      // "miDebuggerArgs": "-q -ex quit; wait() { fg >/dev/null; }; /usr/bin/gdb -q -f --interpreter=mi",
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable reformat of gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ],
-      "miDebuggerPath": "/usr/bin/gdb",
-      "miDebuggerArgs": "-q -ex quit; wait() { fg >/dev/null; }; /usr/bin/gdb -q -f --interpreter=mi",
-      "preLaunchTask": "linux : DebugSetup.py",
-      "console": "internalConsole"
+      "console": "internalConsole",
+      "preLaunchTask": "linux : Debug Setup.py"
     },
     {
       "name": "linux : Instant Release from py",
-      "type": "cppdbg",
+      "type": "lldb",
       "request": "launch",
-      "program": "/usr/bin/python3",
+      "program": "python3",
       "args": [
         "${file}"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable reformat of gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ],
-      "miDebuggerPath": "/usr/bin/gdb",
-      "miDebuggerArgs": "-q -ex quit; wait() { fg >/dev/null; }; /usr/bin/gdb -q -f --interpreter=mi",
-      "preLaunchTask": "linux : ReleaseSetup.py",
-      "console": "internalConsole"
-    },
-    {
-      "name": "Python: Normal Run",
-      "type": "python",
-      "request": "launch",
-      "program": "${file}",
-      "console": "internalConsole"
+      "console": "internalConsole",
+      "preLaunchTask": "linux : Release Setup.py"
     },
     {
       "name": "html-js Debug",
@@ -227,7 +211,7 @@
         // "--disable-gpu",
         // "--remote-debugging-port=9222",
         "--incognito" //private mode
-        ],
+      ],
     },
   ]
 }

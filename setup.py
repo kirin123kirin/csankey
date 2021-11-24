@@ -31,18 +31,17 @@ PROJECT_NAME = "csankey"
 
 skbuild.constants.SKBUILD_DIR = lambda: "build"  # If you wan't change build directory name
 
-skbuild_opts = [
-]
-
 compiled_executefiles = [
     skbuild.constants.CMAKE_BUILD_DIR() + '/sankey' + (".exe" if iswin else ""),
 ]
 
 cmake_args = {
+    # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/Useful-Variables
+    # https://scikit-build.readthedocs.io/en/stable/usage.html#usage-scikit-build-options
     "common": [
     ],
     "nt": [
-        '-G', "Visual Studio 16 2019",
+        '-G', "Ninja",
     ],
     "posix": [
     ]
@@ -50,10 +49,6 @@ cmake_args = {
 # -------------------------------------------------------------------------
 
 from skbuild import setup
-
-sys.argv.extend(skbuild_opts)
-sys.argv.extend(cmake_args["common"] + cmake_args.get(os.name, []))
-
 
 ps = argparse.ArgumentParser()
 ps.add_argument('-f', '--force', action="store_true", dest="is_force")
@@ -100,9 +95,10 @@ is_test = 'pytest' in sys.argv or 'test' in sys.argv
 
 setup(
     packages=[PROJECT_NAME],
+    cmake_args=cmake_args["common"] + cmake_args.get(os.name, []),
     scripts=compiled_executefiles,
     setup_requires=['pytest-runner>=2.0,<3dev'] if is_test else []
 )
 
-for cc in glob(pjoin(SRCDIR, "*.cc")):
-    os.remove(cc)
+# for cc in glob(pjoin(SRCDIR, "*.cc")):
+#     os.remove(cc)
