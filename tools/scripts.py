@@ -7,6 +7,7 @@ def binary_always_allow():
 
     # step2
     import setuptools.command.easy_install
+
     def install_script(self, dist, script_name, script_text, dev_path=None):
         """Generate a legacy script wrapper and install it"""
         spec = str(dist.as_requirement())
@@ -21,11 +22,12 @@ def binary_always_allow():
             body = self._load_template(dev_path) % locals()
             script_text = setuptools.command.easy_install.ScriptWriter.get_header(script_text) + body
         self.write_script(script_name, script_text.encode("utf8"), 'b')
-    
+
     setuptools.command.easy_install.easy_install.install_script = install_script
-    
+
     # step3
     import pkg_resources
+
     def get_metadata(self, name):
         if not self.egg_info:
             return ""
@@ -33,7 +35,7 @@ def binary_always_allow():
         value = self._get(path)
         try:
             return value.decode('utf-8')
-        except UnicodeDecodeError as exc:
+        except UnicodeDecodeError:
             return value
 
     pkg_resources.NullProvider.get_metadata = get_metadata
@@ -41,6 +43,8 @@ def binary_always_allow():
     # step4
     import setuptools.command.develop
     import distutils.util
+    import os
+
     def install_egg_scripts(self, dist):
         if dist is not self.dist:
             return setuptools.command.easy_install.install_egg_scripts(self, dist)
