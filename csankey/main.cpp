@@ -3,14 +3,18 @@
 
 #include "../extern/cxxopts/include/cxxopts.hpp"
 
-#if _WIN32 || _WIN64
+#define IS_WIN (_WIN32 || _WIN64)
+
+#if IS_WIN
 #include <Windows.h>
 #else
 #include <unistd.h>
+#include <X11/Xlib.h>
+#include <limits.h>
 #endif
 
 std::string gettmpdir() {
-#if _WIN32 || _WIN64
+#if IS_WIN
     std::string temp_dir;
     char charPath[MAX_PATH];
     if(GetTempPath(MAX_PATH, charPath)) {
@@ -24,29 +28,30 @@ std::string gettmpdir() {
 #endif
 }
 
-std::string exec(const std::string cmd) {
-    char buffer[128];
-    std::string result = "";
-#if _WIN32 || _WIN64
-    FILE* pipe = _popen(cmd.data(), "r");
+// thanks for http://stackoverflow.com/questions/478898
+std::wstring exec(const std::wstring cmd) {
+    wchar_t buffer[128];
+    std::wstring result = L"";
+#if IS_WIN
+    FILE* pipe = _wpopen(cmd.data(), L"r");
 #else
-    FILE* pipe = popen(cmd.data(), "r");
+    FILE* pipe = wpopen(cmd.data(), L"r");
 #endif
     if(!pipe)
         throw std::runtime_error("popen() failed!");
     try {
-        while(fgets(buffer, sizeof buffer, pipe) != NULL) {
+        while(fgetws(buffer, sizeof buffer, pipe) != NULL) {
             result += buffer;
         }
     } catch(...) {
-#if _WIN32 || _WIN64
+#if IS_WIN
         _pclose(pipe);
 #else
         pclose(pipe);
 #endif
         throw;
     }
-#if _WIN32 || _WIN64
+#if IS_WIN
     _pclose(pipe);
 #else
     pclose(pipe);
@@ -67,7 +72,7 @@ int from_data(Container data, const std::string& outpath, int header = -1) {
 
 int from_clipboard(const std::string& outpath, int header = -1) {
     int ret = 1;
-#if _WIN32 || _WIN64
+#if IS_WIN
     if(!OpenClipboard(nullptr))
         throw std::runtime_error("Failed Read Clipboard Data.");
 
@@ -85,6 +90,18 @@ int from_clipboard(const std::string& outpath, int header = -1) {
     GlobalUnlock(hData);
     CloseClipboard();
 
+#else
+
+#if __APPLE__
+    auto buf = exec("pbpaste");
+#elif __linux__
+    auto buf = exec("xsel --clipboard");
+#endif
+    if(buf.empty())
+        throw std::runtime_error("Failed Read Clipboard Data.");
+    auto data = csv::CsvVec(buf, L'\t', L'"');
+    ret = from_data(data, outpath, header);
+
 #endif
     return ret;
 }
@@ -92,7 +109,7 @@ int from_clipboard(const std::string& outpath, int header = -1) {
 int main(int argc, char** argv) {
     std::string outpath, default_outfile = "tmp_sankey.html";
 
-#if _WIN32 || _WIN64
+#if IS_WIN
     const char sep = '\\';
 #else
     const char sep = '/';
@@ -132,7 +149,7 @@ int main(int argc, char** argv) {
         const wchar_t quote = (wchar_t)opts["quote"].as<std::string>()[0];
 
         if(opts.unmatched().empty()) {
-#if _WIN32 || _WIN64
+#if IS_WIN
             int nopipe = _isatty(_fileno(stdin));
 #else
             int nopipe = isatty(fileno(stdin));
@@ -171,10 +188,10 @@ int main(int argc, char** argv) {
         bool auto_open = !opts["no_open"].as<bool>();
 
         if(auto_open) {
-#if _WIN32 || _WIN64
-            exec("start " + outpath);
+#if IS_WIN
+            exec(L"start " + std::wstring(outpath.begin(), outpath.end()));
 #else
-            exec("open " + outpath);
+            exec(L"open " + std::wstring(outpath.begin(), outpath.end()));
 #endif
             std::cerr << "Opening Build Sankey Output html..." << std::endl;
             std::cerr << outpath << std::endl;

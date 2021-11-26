@@ -201,7 +201,6 @@
       "request": "launch",
       "program": "${file}",
       "args": [
-        "install"
       ],
       "justMyCode": false, //inner library debug
       "cwd": "${workspaceFolder}",
