@@ -9,8 +9,10 @@
 #include <Windows.h>
 #else
 #include <unistd.h>
-#include <X11/Xlib.h>
 #include <limits.h>
+#endif
+#if __linux__
+#include <X11/Xlib.h>
 #endif
 
 std::string gettmpdir() {
