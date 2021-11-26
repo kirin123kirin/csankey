@@ -29,13 +29,44 @@ std::string gettmpdir() {
 }
 
 // thanks for http://stackoverflow.com/questions/478898
+std::string exec(const std::string cmd) {
+    char buffer[128];
+    std::string result = "";
+#if IS_WIN
+    FILE* pipe = _popen(cmd.data(), "r");
+#else
+    FILE* pipe = popen(cmd.data(), "r");
+#endif
+    if(!pipe)
+        throw std::runtime_error("popen() failed!");
+    try {
+        while(fgets(buffer, sizeof buffer, pipe) != NULL) {
+            result += buffer;
+        }
+    } catch(...) {
+#if IS_WIN
+        _pclose(pipe);
+#else
+        pclose(pipe);
+#endif
+        throw;
+    }
+#if IS_WIN
+    _pclose(pipe);
+#else
+    pclose(pipe);
+#endif
+    return result;
+}
+
+// thanks for http://stackoverflow.com/questions/478898
 std::wstring exec(const std::wstring cmd) {
     wchar_t buffer[128];
     std::wstring result = L"";
 #if IS_WIN
     FILE* pipe = _wpopen(cmd.data(), L"r");
 #else
-    FILE* pipe = wpopen(cmd.data(), L"r");
+    FILE* pipe = popen(cmd.data(), L"r");
 #endif
     if(!pipe)
         throw std::runtime_error("popen() failed!");
@@ -59,8 +90,8 @@ std::wstring exec(const std::wstring cmd) {
     return result;
 }
 
-template <typename Container>
-int from_data(Container data, const std::string& outpath, int header = -1) {
+template <typename Container, typename T>
+int from_data(Container data, const std::basic_string<T>& outpath, int header = -1) {
     SankeyData<wchar_t> snk(data);
     if(header == -1)
         snk.parse();
@@ -70,7 +101,8 @@ int from_data(Container data, const std::string& outpath, int header = -1) {
     return snk.to_html(outpath);
 }
 
-int from_clipboard(const std::string& outpath, int header = -1) {
+template <typename T>
+int from_clipboard(const std::basic_string<T>& outpath, int header = -1) {
     int ret = 1;
 #if IS_WIN
     if(!OpenClipboard(nullptr))
