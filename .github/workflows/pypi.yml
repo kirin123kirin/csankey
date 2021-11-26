@@ -36,9 +36,6 @@ jobs:
                   platform:       windows-latest
                   python-version: 2.7
                -
-                  platform:       windows-latest
-                  python-version: 3.6
-               -
                   platform:       macos-latest
                   python-version: 2.7
 
