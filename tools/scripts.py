@@ -32,7 +32,7 @@ def binary_always_allow():
         if not self.egg_info:
             return ""
 
-        print("hoge:", name)
+        print("hoge:", self.egg_info)
         path = self._get_metadata_path(name)
         print("foo:", path)
         value = self._get(path)
@@ -41,7 +41,7 @@ def binary_always_allow():
         except UnicodeDecodeError:
             return value
 
-    # pkg_resources.NullProvider.get_metadata = get_metadata
+    pkg_resources.NullProvider.get_metadata = get_metadata
 
     # step4
     import setuptools.command.develop
