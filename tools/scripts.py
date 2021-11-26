@@ -11,7 +11,7 @@ def binary_always_allow():
     def install_script(self, dist, script_name, script_text, dev_path=None):
         """Generate a legacy script wrapper and install it"""
         spec = str(dist.as_requirement())
-        if isinstance(script_text, bytes) and script_text.startswith(b"MZ"):
+        if script_text is None or (isinstance(script_text, bytes) and script_text.startswith(b"MZ")):
             is_script = False
             self.write_script(script_name, script_text, 'b')
             return
@@ -31,7 +31,10 @@ def binary_always_allow():
     def get_metadata(self, name):
         if not self.egg_info:
             return ""
+
+        print("hoge:", name)
         path = self._get_metadata_path(name)
+        print("foo:", path)
         value = self._get(path)
         try:
             return value.decode('utf-8')

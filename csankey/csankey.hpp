@@ -18,11 +18,11 @@
 
 static constexpr const wchar_t BEFORE_TEXT[] =
 #include "bf.cc"
-;
+    ;
 
 static constexpr const wchar_t AFTER_TEXT[] =
 #include "af.cc"
-;
+    ;
 
 template <class T>
 struct PyMallocator {
