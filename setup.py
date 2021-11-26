@@ -12,7 +12,7 @@ __version__ = open(pjoin(thisdir, "VERSION"), "r").read().strip()
 import shutil
 import argparse
 
-from tools import updatebadge
+from tools import updatebadge, scripts
 import skbuild.constants
 import platform
 
@@ -67,21 +67,15 @@ if arg.is_debug and arg.build_type != "Debug":
 # Readme badge link update.
 updatebadge.readme(pjoin(thisdir, "README.md"), new_version=__version__)
 
-
 if compiled_executefiles:
-    import distutils.command.build_scripts
-    distutils.command.build_scripts.tokenize.detect_encoding = lambda x: ("utf-8", [])
-
+    scripts.binary_always_allow()
 
 # Edit posix platname for pypi upload error
 if islinux and any(x.startswith("bdist") for x in sys.argv) \
         and not ("--plat-name" in sys.argv or "-p" in sys.argv):
-    if "64" in os.uname()[-1]:
-        from tools.platforms import get_platname_64bit
-        sys.argv.extend(["--plat-name", get_platname_64bit()])
-    else:
-        from tools.platforms import get_platname_32bit
-        sys.argv.extend(["--plat-name", get_platname_32bit()])
+    from tools.platforms import get_platname_64bit as x64
+    from tools.platforms import get_platname_32bit as x86
+    sys.argv.extend(["--plat-name", x64() if "64" in os.uname()[-1] else x86()])
 
 # make input data for csankey.cpp
 if (exists(TARGET)):
