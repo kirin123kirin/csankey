@@ -41,7 +41,7 @@ def binary_always_allow():
         except UnicodeDecodeError:
             return value
 
-    pkg_resources.NullProvider.get_metadata = get_metadata
+    # pkg_resources.NullProvider.get_metadata = get_metadata
 
     # step4
     import setuptools.command.develop
