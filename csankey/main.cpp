@@ -29,44 +29,13 @@ std::string gettmpdir() {
 }
 
 // thanks for http://stackoverflow.com/questions/478898
-std::string exec(const std::string cmd) {
-    char buffer[128];
-    std::string result = "";
+std::wstring exec(const std::string cmd) {
+    wchar_t buffer[128];
+    std::wstring result = L"";
 #if IS_WIN
     FILE* pipe = _popen(cmd.data(), "r");
 #else
     FILE* pipe = popen(cmd.data(), "r");
-#endif
-    if(!pipe)
-        throw std::runtime_error("popen() failed!");
-    try {
-        while(fgets(buffer, sizeof buffer, pipe) != NULL) {
-            result += buffer;
-        }
-    } catch(...) {
-#if IS_WIN
-        _pclose(pipe);
-#else
-        pclose(pipe);
-#endif
-        throw;
-    }
-#if IS_WIN
-    _pclose(pipe);
-#else
-    pclose(pipe);
-#endif
-    return result;
-}
-
-// thanks for http://stackoverflow.com/questions/478898
-std::wstring exec(const std::wstring cmd) {
-    wchar_t buffer[128];
-    std::wstring result = L"";
-#if IS_WIN
-    FILE* pipe = _wpopen(cmd.data(), L"r");
-#else
-    FILE* pipe = popen(cmd.data(), L"r");
 #endif
     if(!pipe)
         throw std::runtime_error("popen() failed!");
@@ -221,9 +190,9 @@ int main(int argc, char** argv) {
 
         if(auto_open) {
 #if IS_WIN
-            exec(L"start " + std::wstring(outpath.begin(), outpath.end()));
+            exec("start " + outpath);
 #else
-            exec(L"open " + std::wstring(outpath.begin(), outpath.end()));
+            exec("open " + outpath);
 #endif
             std::cerr << "Opening Build Sankey Output html..." << std::endl;
             std::cerr << outpath << std::endl;
