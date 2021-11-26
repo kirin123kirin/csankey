@@ -1,3 +1,4 @@
+import os
 
 def binary_always_allow():
     # always binary executable true custom
@@ -36,7 +37,7 @@ def binary_always_allow():
             path = self._get_metadata_path(name)
         except AttributeError:
             path = os.path.join(self.egg_info, *name.split("/"))
-        print("hoge:", path)
+
         value = self._get(path)
         try:
             return value.decode('utf-8')
@@ -48,7 +49,6 @@ def binary_always_allow():
     # step4
     import setuptools.command.develop
     import distutils.util
-    import os
 
     def install_egg_scripts(self, dist):
         if dist is not self.dist:
