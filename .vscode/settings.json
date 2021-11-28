@@ -365,7 +365,7 @@
         "span": "cpp",
         "*.inc": "cpp",
         "generator": "cpp",
-        "CMakeLists.txt": "CMake",
+        "CMakeLists.txt": "cmake",
         "*.html": "cpp",
         "cp950": "cpp"
     },
