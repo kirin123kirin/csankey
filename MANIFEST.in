@@ -3,6 +3,14 @@ include LICENSE
 include VERSION
 include setup.cfg
 include CMakeLists.txt
-recursive-include tools *
-recursive-include extern *
-recursive-include csankey *
+include extern/cxxopts/LICENSE
+include extern/cxxopts/include/cxxopts.hpp
+include extern/csv-parser/parser.hpp
+include tools/*.py
+include csankey/*.py
+include csankey/*.cxx
+include csankey/*.cpp
+include csankey/*.hpp
+include csankey/*.js
+include csankey/*.htm*
+include csankey/*.css
