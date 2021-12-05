@@ -6,6 +6,7 @@ include CMakeLists.txt
 include extern/cxxopts/LICENSE
 include extern/cxxopts/include/cxxopts.hpp
 include extern/csv-parser/parser.hpp
+include extern/csv-parser/LICENSE
 include tools/*.py
 include csankey/*.py
 include csankey/*.cxx
@@ -14,3 +15,5 @@ include csankey/*.hpp
 include csankey/*.js
 include csankey/*.htm*
 include csankey/*.css
+include tests/test_*
+exclude build
