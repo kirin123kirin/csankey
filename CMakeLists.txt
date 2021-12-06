@@ -20,9 +20,11 @@ project(csankey)
 
 set(REAL_LIBNAME _csankey)
 
-set(EXENAME sankey)
+if (NOT ANDROID)
+    set(EXENAME sankey)
+    add_executable(${EXENAME} ${CMAKE_PROJECT_NAME}/main.cpp)
+endif()
 
-add_executable(${EXENAME} ${CMAKE_PROJECT_NAME}/main.cpp)
 
 # pre setting
 find_package(Python3 COMPONENTS Interpreter Development)
@@ -35,7 +37,10 @@ find_package(PythonExtensions REQUIRED)
 add_library(${REAL_LIBNAME} MODULE ${CMAKE_PROJECT_NAME}/${REAL_LIBNAME}.cxx)
 
 python_extension_module(${REAL_LIBNAME})
-python_standalone_executable(${EXENAME})
+
+if (NOT ANDROID)
+    python_standalone_executable(${EXENAME})
+endif()
 
 install(TARGETS ${REAL_LIBNAME} LIBRARY DESTINATION ${CMAKE_PROJECT_NAME})
 
