@@ -1,5 +1,5 @@
 # Python C Extention Easy Core functions
-[![Upload pypi.org](https://github.com/kirin123kirin/csankey/actions/workflows/pypi.yml/badge.svg?branch=v0.6.1)](https://github.com/kirin123kirin/csankey/actions/workflows/pypi.yml)
+[![Upload pypi.org](https://github.com/kirin123kirin/csankey/actions/workflows/pypi.yml/badge.svg?branch=v0.6.2)](https://github.com/kirin123kirin/csankey/actions/workflows/pypi.yml)
 
 # Overview
 There is an exciting application that uses d3.js sankey-circular.js.

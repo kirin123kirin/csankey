@@ -31,7 +31,7 @@ PROJECT_NAME = "csankey"
 skbuild.constants.SKBUILD_DIR = lambda: "build"  # If you wan't change build directory name
 
 compiled_executefiles = []
-if('ANDROID_ARGUMENT' not in os.environ):
+if('ANDROID_ROOT' not in os.environ):
     compiled_executefiles.append(skbuild.constants.CMAKE_BUILD_DIR() + '/sankey' + (".exe" if iswin else ""))
 
 

@@ -20,7 +20,7 @@ project(csankey)
 
 set(REAL_LIBNAME _csankey)
 
-if (NOT ANDROID)
+if (NOT DEFINED ENV{ANDROID_ROOT})
     set(EXENAME sankey)
     add_executable(${EXENAME} ${CMAKE_PROJECT_NAME}/main.cpp)
 endif()
@@ -38,7 +38,7 @@ add_library(${REAL_LIBNAME} MODULE ${CMAKE_PROJECT_NAME}/${REAL_LIBNAME}.cxx)
 
 python_extension_module(${REAL_LIBNAME})
 
-if (NOT ANDROID)
+if (NOT DEFINED ENV{ANDROID_ROOT})
     python_standalone_executable(${EXENAME})
 endif()
 
