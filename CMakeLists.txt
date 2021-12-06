@@ -1,68 +1,42 @@
-cmake_minimum_required(VERSION 3.12.0)
+cmake_minimum_required(VERSION 3.15)
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+elseif (CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
+    # Could Not run debugger.(Access violation Error)
+    # Counter bug? : https://github.com/scikit-build/scikit-build/issues/533
+    set(CMAKE_BUILD_TYPE "Release")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+endif()
+
 # Check Run Command
 set(CMAKE_VERBOSE_MAKEFILE 1)
 
 # -- CMAKE Options https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/Useful-Variables
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_GENERATOR Ninja)
-set(CMAKE_AR llvm-lib)
-set(CMAKE_CXX_COMPILER clang++)
-set(CMAKE_C_COMPILER clang)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<$<CONFIG:DEBUG>:${OUTPUT_DEBUG}>$<$<CONFIG:RELEASE>:${OUTPUT_REL}>")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<$<CONFIG:DEBUG>:${OUTPUT_DEBUG}>$<$<CONFIG:RELEASE>:${OUTPUT_REL}>")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<$<CONFIG:DEBUG>:${OUTPUT_DEBUG}>$<$<CONFIG:RELEASE>:${OUTPUT_REL}>")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
 
+project(csankey)
 
-#-- Project Specify Setting Values ----------------------
-
-set(PJNAME csankey)
 set(REAL_LIBNAME _csankey)
+
 set(EXENAME sankey)
 
-set(LIBRARY_SOURCES ${PJNAME}/${REAL_LIBNAME}.cxx)
-set(EXE_SOURCES ${PJNAME}/main.cpp ${CMAKE_CURRENT_BINARY_DIR})
-
-#----------------------------------------------------
-# print variables
-message(STATUS "\n\n*** dump start cmake variables ***\n\n")
-
-get_cmake_property(_variableNames VARIABLES)
-foreach(_variableName ${_variableNames})
-        message(STATUS "${_variableName}=${${_variableName}}")
-endforeach()
+add_executable(${EXENAME} ${CMAKE_PROJECT_NAME}/main.cpp)
 
 # pre setting
-project(${PJNAME})
-
 find_package(Python3 COMPONENTS Interpreter Development)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Python3_SITELIB}/skbuild/resources/cmake)
 
-
-# message(STATUS "\n*** dump end ***")
-
 find_package(PythonExtensions REQUIRED)
 
 # library install
-add_library(${REAL_LIBNAME} MODULE ${LIBRARY_SOURCES})
+add_library(${REAL_LIBNAME} MODULE ${CMAKE_PROJECT_NAME}/${REAL_LIBNAME}.cxx)
 
 python_extension_module(${REAL_LIBNAME})
+python_standalone_executable(${EXENAME})
 
-install(TARGETS ${REAL_LIBNAME} LIBRARY DESTINATION ${PJNAME})
+install(TARGETS ${REAL_LIBNAME} LIBRARY DESTINATION ${CMAKE_PROJECT_NAME})
 
-
-# executable file install
-IF (DEFINED EXENAME AND EXENAME)
-
-  add_executable(${EXENAME} ${EXE_SOURCES})
-
-  python_standalone_executable(${EXENAME})
-
-ENDIF()
 

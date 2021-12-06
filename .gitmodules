@@ -1,6 +1,9 @@
-[submodule "extern/csv-parser"]
-	path = extern/csv-parser
-	url = https://github.com/kirin123kirin/csv-parser.git
+[submodule ".vscpde"]
+	path = .vscode
+	url = https://github.com/kirin123kirin/.vscode.git
 [submodule "extern/cxxopts"]
 	path = extern/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git
+[submodule "extern/csv-parser"]
+	path = extern/csv-parser
+	url = https://github.com/kirin123kirin/csv-parser.git

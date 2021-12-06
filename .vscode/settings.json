@@ -36,10 +36,16 @@
     "editor.renderControlCharacters": true, // 制御コードの表示
     // ターミナル
     // "terminal.integrated.shell.windows": "cmd.exe", // PowerShell嫌い
+    "terminal.integrated.defaultLocation": "view",
     "terminal.integrated.profiles.windows": {
         // "PowerShell": null,
         // "Command Prompt": {
-        //     "path": "C:\\WINDOWS\\System32\\cmd.exe"
+        //     "path": "C:\\WINDOWS\\System32\\cmd.exe",
+        //     "args": [
+        //          "/d",
+        //          "/k",
+        //          "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat"
+        //     ]
         // },
         "Git Bash": null,
         "IPython": {
@@ -367,7 +373,7 @@
         "generator": "cpp",
         "CMakeLists.txt": "cmake",
         "*.html": "cpp",
-        "cp950": "cpp"
+        "cp950": "cpp",
     },
     "C_Cpp.errorSquiggles": "Enabled",
 }
