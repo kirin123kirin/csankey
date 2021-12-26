@@ -39,9 +39,9 @@ cmake_args = {
     # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/Useful-Variables
     # https://scikit-build.readthedocs.io/en/stable/usage.html#usage-scikit-build-options
     "common": [
+        # '-G', "Ninja",
     ],
     "nt": [
-        '-G', "Ninja",
     ],
     "posix": [
     ]
@@ -61,9 +61,11 @@ if arg.is_force:
         if exists(pjoin(thisdir, d)):
             shutil.rmtree(pjoin(thisdir, d))
 
-if arg.is_debug and arg.build_type != "Debug":
-    sys.argv.extend(['--build-type', "Debug"])
-
+# convert to scikit-build option
+if "--build-type" not in sys.argv:
+    sys.argv.extend([
+        "--build-type", "PYDEBUG" if arg.is_debug else "Release"
+    ])
 
 # Readme badge link update.
 updatebadge.readme(pjoin(thisdir, "README.md"), new_version=__version__)
