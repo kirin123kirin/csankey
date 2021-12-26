@@ -1,6 +1,9 @@
 [submodule ".vscpde"]
 	path = .vscode
 	url = https://github.com/kirin123kirin/.vscode.git
+[submodule "cmake"]
+	path = cmake
+	url = https://github.com/kirin123kirin/cmake.git
 [submodule "extern/cxxopts"]
 	path = extern/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git
