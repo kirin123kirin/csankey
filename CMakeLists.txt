@@ -26,21 +26,20 @@ if (NOT DEFINED ENV{ANDROID_ROOT})
 endif()
 
 
-# pre setting
+# Python library install
 find_package(Python3 COMPONENTS Interpreter Development)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Python3_SITELIB}/skbuild/resources/cmake)
+    find_package(PythonExtensions REQUIRED)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Python3_SITELIB}/skbuild/resources/cmake)
+    add_library(${REAL_LIBNAME} MODULE ${CMAKE_PROJECT_NAME}/${REAL_LIBNAME}.cxx)
+        set_target_properties(${REAL_LIBNAME} PROPERTIES LINK_SEARCH_START_STATIC ON)
+        set_target_properties(${REAL_LIBNAME} PROPERTIES LINK_SEARCH_END_STATIC ON)
 
-find_package(PythonExtensions REQUIRED)
+    python_extension_module(${REAL_LIBNAME})
 
-# library install
-add_library(${REAL_LIBNAME} MODULE ${CMAKE_PROJECT_NAME}/${REAL_LIBNAME}.cxx)
-
-python_extension_module(${REAL_LIBNAME})
-
-if (NOT DEFINED ENV{ANDROID_ROOT})
-    python_standalone_executable(${EXENAME})
-endif()
+    if (NOT DEFINED ENV{ANDROID_ROOT})
+        python_standalone_executable(${EXENAME})
+    endif()
 
 install(TARGETS ${REAL_LIBNAME} LIBRARY DESTINATION ${CMAKE_PROJECT_NAME})
 

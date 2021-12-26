@@ -71,6 +71,8 @@
           "*.egg-info",
           "*CMakeFiles",
           ".cmake",
+          ">nul",
+          "2>&1",
           "||",
           "del",
           "/s",
@@ -133,7 +135,6 @@
         "-DCMAKE_BUILD_TYPE=Debug",
         "-DCMAKE_C_COMPILER=clang",
         "-DCMAKE_CXX_COMPILER=clang++",
-        "-DCMAKE_AR=llvm-lib",
         "-DCMAKE_C_FLAGS=\"-g -O0\"",
         "-DCMAKE_CXX_FLAGS=\"-g -O0\"",
         "-DCMAKE_FIND_DEBUG_MODE=1",
@@ -175,7 +176,7 @@
       },
       "dependsOrder": "sequence",
       "dependsOn": [
-        // "CLEANUP"
+        "CLEANUP"
       ],
     },
     {
@@ -195,7 +196,6 @@
         "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_C_COMPILER=clang",
         "-DCMAKE_CXX_COMPILER=clang++",
-        "-DCMAKE_AR=llvm-lib",
         "-DCMAKE_C_FLAGS=\"-g -O2\"",
         "-DCMAKE_CXX_FLAGS=\"-g -O2\"",
         "&&",
@@ -530,6 +530,10 @@
         "build",
         "-gf"
       ],
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "CLEANUP"
+      ],
     },
     {
       "type": "process",
@@ -542,6 +546,10 @@
       "args": [
         "setup.py",
         "build"
+      ],
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "CLEANUP"
       ],
     },
   ]

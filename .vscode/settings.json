@@ -376,4 +376,9 @@
         "cp950": "cpp",
     },
     "C_Cpp.errorSquiggles": "Enabled",
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
 }
