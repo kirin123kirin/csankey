@@ -105,16 +105,3 @@ jobs:
                    pip install twine
                    twine upload --verbose --skip-existing -u "$TEST_PYPI_USERNAME" -p "$TEST_PYPI_PASSWORD" --repository-url https://test.pypi.org/legacy/ ./*
 
-         - name: VirusTotal Monitor Scan
-           uses: crazy-max/ghaction-virustotal@v2
-           with:
-               vt_api_key: ${{ secrets.VT_API_KEY }}
-               github_token: ${{ secrets.GH_TOKEN }}
-               update_release_body: true
-               files: build/*.gz
-
-         - uses: shogo82148/actions-upload-release-asset@v1
-           with:
-               upload_url: ${{ needs.create.outputs.url }}
-               asset_path: "build/*.gz"
-
