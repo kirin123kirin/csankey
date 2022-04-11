@@ -27,3 +27,4 @@ twxs.cmake
 vadimcn.vscode-lldb
 VisualStudioExptTeam.vscodeintellicode
 xyz.local-history
+GrapeCity.gc-excelviewer

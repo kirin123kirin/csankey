@@ -127,5 +127,36 @@
     "key": "ctrl+shift+space",
     "command": "-editor.action.triggerParameterHints",
     "when": "editorHasSignatureHelpProvider && editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+o",
+    "command": "extension.openFolderInExplorer"
+  },
+  {
+    "key": "alt+enter",
+    "command": "google-search.makeSearch",
+    "when": "editorHasSelection"
+  },
+  {
+    "key": "ctrl+alt+g",
+    "command": "-google-search.makeSearch",
+    "when": "editorHasSelection"
+  },
+  {
+    "key": "ctrl+f5",
+    "command": "-cmake.debugTarget",
+    "when": "cmake:enableFullFeatureSet && inCMakeProject && !cmake:hideDebugCommand && !inDebugMode"
+  },
+  {
+    "key": "ctrl+shift+j",
+    "command": "workbench.action.togglePanel"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "-workbench.action.togglePanel"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "workbench.action.toggleAuxiliaryBar"
   }
 ]

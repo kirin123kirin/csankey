@@ -170,6 +170,15 @@
         "--max-line-length=160"
         //"--aggressive", "--aggressive",
     ],
+    // Code Runner 変数メモ
+    // $workspaceRoot           VScodeが開いているフォルダの絶対パス C:\hoge\fuga\root\
+    // $dir	                    実行対象のファイルが存在するディレクトリ "root\src\"
+    // $dirWithoutTrailingSlash	実行対象のファイルが存在するディレクトリ(末尾にスラッシュなし) "root\src"
+    // $fullFileName            実行対象のファイルのフルパス "C:\hoge\fuga\root\src\main.c"
+    // $fileName                実行対象のファイルの名前(拡張子含む+ディレクトリ情報などは含まない) main.c
+    // $fileNameWithoutExt      実行対象のファイルの名前(拡張子含まない+ディレクトリ情報などは含まない) main
+    // $driveLetter             実行対象のファイルがあるドライブ(windows限定) C:
+    // $pythonPath              Pythonのパス。拡張機能のPython: Select Interpreter で決めた値。 C:\Users\hoge\AppData\Local\Programs\Python\Python38\python.exe
     "code-runner.executorMap": {
         "javascript": "node",
         "java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
@@ -177,7 +186,7 @@
         "cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
         "objective-c": "cd $dir && gcc -framework Cocoa $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
         "php": "php",
-        "python": "%PYTHONPATH%/python.exe -u",
+        "python": "python -u",
         "perl": "perl",
         "perl6": "perl6",
         "ruby": "ruby",

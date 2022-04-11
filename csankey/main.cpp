@@ -19,7 +19,7 @@ std::string gettmpdir() {
 #if IS_WIN
     std::string temp_dir;
     char charPath[MAX_PATH];
-    if(GetTempPath(MAX_PATH, charPath)) {
+    if(GetTempPathA(MAX_PATH, charPath)) {
         temp_dir = charPath;
         temp_dir.erase(temp_dir.size() - 1);  // remove last separater.
     }

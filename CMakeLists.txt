@@ -35,4 +35,26 @@ find_package(Python3 COMPONENTS Interpreter Development)
 
 install(TARGETS ${REAL_LIBNAME} LIBRARY DESTINATION ${CMAKE_PROJECT_NAME})
 
+if (WIN32)
+  string(TOLOWER win-${CMAKE_HOST_SYSTEM_PROCESSOR} PLATNAME)
+  set(OUTPUTFILE ${CMAKE_BINARY_DIR}/sankey.exe)
+
+add_custom_command(
+  TARGET sankey POST_BUILD
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  COMMAND tar czf sankey_${PLATNAME}.tar.gz sankey.exe
+  VERBATIM)
+
+else (WIN32)
+  string(TOLOWER ${CMAKE_HOST_SYSTEM_NAME}-${CMAKE_HOST_SYSTEM_PROCESSOR} PLATNAME)
+  set(OUTPUTFILE ${CMAKE_BINARY_DIR}/sankey)
+
+add_custom_command(
+  TARGET sankey POST_BUILD
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  COMMAND chmod a+x sankey && tar czf sankey_${PLATNAME}.tar.gz sankey
+  VERBATIM)
+
+endif (WIN32)
+
 

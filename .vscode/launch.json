@@ -20,7 +20,7 @@
   "configurations": [
     {
       "name": "C++ Debug",
-      "type": "lldb",
+      "type": "cppvsdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/${fileBasenameNoExtension}",
       "windows": {
@@ -50,7 +50,7 @@
     },
     {
       "name": "Instant Debug from py",
-      "type": "lldb",
+      "type": "cppvsdbg",
       "request": "launch",
       "program": "python3",
       "windows": {
@@ -94,7 +94,7 @@
     },
     {
       "name": "Debug Setup.py",
-      "type": "lldb",
+      "type": "cppvsdbg",
       "request": "launch",
       "program": "python3",
       "windows": {
