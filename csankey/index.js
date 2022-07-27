@@ -127,7 +127,7 @@ function makenode(event = null) {
         .attr("x", function (d) { return d.x0; })
         .attr("y", function (d) { return d.y0; })
         .attr("height", function (d) { return d.y1 - d.y0; })
-        .attr("width", function (d) { return d.x1 - d.x0; })
+        .attr("width", function (d) { return nodewidth; })
         .style("shape-rendering", "crispEdges")
         .style("fill", d => nodecolor(d.x0))
         .style("opacity", nodeopacity)
@@ -173,8 +173,10 @@ function makenode(event = null) {
     node.append("foreignObject")
         .attr("x", function (d) { return ((d.x0 + d.x1 - (nodetextfontsize / 2 + d.innertext_maxlength * 9)) / 2); })
         .attr("y", function (d) { return d.y0 - (d.innertext_maxline * nodetextfontsize) - 12; })
-        .attr("width", d => (nodetextfontsize * 1.33) + (d.innertext_maxlength * 9))
-        .attr("height", d => d.innertext_maxline * nodetextfontsize)
+        .attr("width", d => (nodetextfontsize * 1.33) + (d.innertext_maxlength * 27))
+        // .attr("width", d => (nodetextfontsize * 1.33) + (d.innertext_maxlength * 9))
+        .attr("height", d => d.innertext_maxline * nodetextfontsize * 1.33)
+        // .attr("height", d => d.innertext_maxline * nodetextfontsize)
         .append("xhtml:div")
         .attr("class", "node-label")
         .attr("style", function (d) {
@@ -276,6 +278,8 @@ function makebadge(event = null) {
         badge = badge.attr("disabled", false)
     }
     badge.html(l => l.value)
+    if (!document.f_value.R3[0].checked)
+        badge.attr("hidden", true)
 
 };
 
@@ -302,6 +306,11 @@ function makearrow(event = null) {
         animateDash = setInterval(updateDash, duration);
 
     const container = d3.select('svg').classed('container', true);
+
+    if (!document.f_arrow.R2[0].checked)
+        arrowsG.selectAll('.arrow-head')
+        .style("fill", null);
+
 
 }
 
@@ -443,10 +452,12 @@ function redraw(event = null) {
         init(event);
     else
         d3.selectAll(".nodes,.links").remove();
+
     makenode(event);
     makelink(event);
     makearrow(event);
     makebadge(event);
+    
 
     if (document.f_animation.R1[0].checked) {
         animation_on()

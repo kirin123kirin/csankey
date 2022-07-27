@@ -107,16 +107,16 @@
 
           <div class='cp_ipselect cp_sl01'>
             <select id="fontfamily" title="フォントは？">
-              <option value='MS UI Gothic' style='font-family: MS UI Gothic'>MS UI Gothic</option>
-              <option value='ＭＳ Ｐゴシック' style='font-family: ＭＳ Ｐゴシック'>ＭＳ Ｐゴシック</option>
-              <option value='MS PGothic' style='font-family: MS PGothic'>MS PGothic</option>
+              <option value='メイリオ' style='font-family: メイリオ'>メイリオ</option>
               <option value='ＭＳ ゴシック' style='font-family: ＭＳ ゴシック'>ＭＳ ゴシック</option>
+              <option value='ＭＳ Ｐゴシック' style='font-family: ＭＳ Ｐゴシック'>ＭＳ Ｐゴシック</option>
+              <option value='MS UI Gothic' style='font-family: MS UI Gothic'>MS UI Gothic</option>
+              <option value='MS PGothic' style='font-family: MS PGothic'>MS PGothic</option>
               <option value='MS Gothic' style='font-family: MS Gothic'>MS Gothic</option>
               <option value='ＭＳ Ｐ明朝' style='font-family: ＭＳ Ｐ明朝'>ＭＳ Ｐ明朝</option>
               <option value='MS PMincho' style='font-family: MS PMincho'>MS PMincho</option>
               <option value='ＭＳ 明朝' style='font-family: ＭＳ 明朝'>ＭＳ 明朝</option>
               <option value='MS Mincho' style='font-family: MS Mincho'>MS Mincho</option>
-              <option value='メイリオ' style='font-family: メイリオ'>メイリオ</option>
               <option value='Meiryo' style='font-family: Meiryo'>Meiryo</option>
               <option value='Meiryo UI' style='font-family: Meiryo UI'>Meiryo UI</option>
               <option value='游ゴシック' style='font-family: 游ゴシック'>游ゴシック</option>
@@ -198,27 +198,27 @@
           <legend>ノード</legend>
 
           <form class="segmented" name="f_nodepos" action="#">
-            <label title="左寄せ"><input type="radio" name="R4" value="left" onclick="nodetext_left()"><span
+            <label title="左寄せ"><input type="radio" name="R4" value="left" onclick="nodetext_left()" checked><span
                 class="label">左</span></label>
-            <label title="中央揃え"><input type="radio" name="R4" value="center" onclick="nodetext_center()" checked><span
+            <label title="中央揃え"><input type="radio" name="R4" value="center" onclick="nodetext_center()"><span
                 class="label">中</span></label>
             <label title="右寄せ"><input type="radio" name="R4" value="right" onclick="nodetext_right()"><span
                 class="label">右</span></label>
           </form>
 
           <div class="horizon-left" onchange="redraw(event)">
-            <div><input type="range" id="nodewidth" value="10" min="0" max="100" step="1"
+            <div><input type="range" id="nodewidth" value="20" min="0" max="100" step="1"
                 title="ノード幅サイズをピクセル指定します"><label for="nodewidth">幅</label></div>
-            <div><input type='range' id='nodepaddingratio' value='0.5' min='0' max='1' step='0.01' title=''><label
+            <div><input type='range' id='nodepaddingratio' value='1.5' min='1' max='2' step='0.01' title=''><label
                 for='nodepaddingratio'>間隔</label></div>
-            <div><input type='range' id='nodeopacity' value='0.9' min='0' max='1' step='0.01' title=''><label
+            <div><input type='range' id='nodeopacity' value='0.9' min='0' max='2' step='0.01' title=''><label
                 for='nodeopacity'>不透明度</label></div>
           </div>
 
           <div class="horizon-left" onchange="redraw(event)">
-            <div><input type='range' id='nodetextfontsize' value='26' min='0' max='64' step='1' title=''><label
+            <div><input type='range' id='nodetextfontsize' value='18' min='0' max='64' step='1' title=''><label
                 for='nodetextfontsize'>フォントサイズ</label></div>
-            <div><input type='range' id='nodetextfontweight' value='600' min='0' max='1000' step='100' title=''><label
+            <div><input type='range' id='nodetextfontweight' value='300' min='0' max='1000' step='100' title=''><label
                 for='nodetextfontweight'>文字太さ</label></div>
             <div hidden><input type='range' id='nodeiterations' value='5' min='1' max='32' step='1' title=''><label
                 for='nodeiterations'>イテレーション</label></div>
@@ -279,13 +279,13 @@
           <legend>バッヂ</legend>
 
           <form class="segmented" name="f_value" action="#">
-            <label><input type="radio" name="R3" value="on" onclick="value_on()" checked><span
+            <label><input type="radio" name="R3" value="on" onclick="value_on()"><span
                 class="label">入</span></label>
-            <label><input type="radio" name="R3" value="off" onclick="value_off()"><span class="label">切</span></label>
+            <label><input type="radio" name="R3" value="off" onclick="value_off()" checked><span class="label">切</span></label>
           </form>
 
           <div class="horizon-left" onchange="redraw(event)">
-            <div><input type='range' id='badgetextsize' value='26' min='0' max='64' step='1' title=''><label
+            <div><input type='range' id='badgetextsize' value='18' min='1' max='64' step='1' title=''><label
                 for='badgetextsize'>バッヂサイズ</label></div>
           </div>
 
